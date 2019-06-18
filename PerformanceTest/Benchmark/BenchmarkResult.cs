@@ -11,7 +11,8 @@ namespace PerformanceTest.Benchmark
 
         public override string ToString()
         {
-            return $"Mean: {Mean}\nRuns:\n" + string.Join("\n", Runs);
+            //return $"Runs:\n" + string.Join("\n", Runs) + $"\nMean: {Mean}";
+            return $"\nMean: {Mean}";
         }
     }
 }

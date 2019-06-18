@@ -20,12 +20,22 @@ namespace PerformanceTest.Benchmark.Core
             {
                 RunIteration(runs);
             }
-            runs.Sort();
 
+            var graph = new AsciiGraph { Height = 10 };
+            graph.Items = runs.Select(x => (double)x.Ticks).ToList();
+            graph.Draw();
+
+            graph.Items = runs.OrderBy(x => x).Select(x => (double)x.Ticks).ToList();
+            graph.Draw();
+
+            graph.Items = runs.OrderBy(x => x).Take(runs.Count - cutCount).Select(x => (double)x.Ticks).ToList();
+            graph.Draw();
+
+            runs.Sort();
             var mean = runs
-                .Middle(cutCount)
+                .Take(runs.Count - cutCount)
                 .Average(t => t.Ticks)
-                .Select(avTicks => TimeSpan.FromTicks((long)avTicks));
+                .Transform(avTicks => TimeSpan.FromTicks((long)avTicks));
 
             return new BenchmarkResult
             {
@@ -49,6 +59,6 @@ namespace PerformanceTest.Benchmark.Core
         private readonly Stopwatch myStopWatch = new Stopwatch();
 
         private const int runCount = 50;
-        private const int cutCount = (int)(runCount * .1);
+        private const int cutCount = (int)(runCount * .2);
     }
 }
