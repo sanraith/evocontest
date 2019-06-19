@@ -15,7 +15,9 @@ namespace PerformanceTest
             var width = Items.Count;
             var max = Items.Max();
             var min = Items.Min();
-            var step = (max - min) / Height;
+            var diff = max - min;
+            var step = diff / Height;
+
 
             for (int y = 0; y < Height; y++)
             {
@@ -27,8 +29,12 @@ namespace PerformanceTest
                 }
                 Console.WriteLine(line);
             }
-            Console.WriteLine($"{max - min} >< {min}..{max}");
-        }
 
+            var avg = Items.Average();
+            var error = Math.Max(Math.Abs(avg - min), Math.Abs(max - avg));
+            var errorPct = error / avg * 100;
+            
+            Console.WriteLine($"Error: {errorPct,6:0.000}%, ({error:0} of {avg:0}) >< {min}..{max}");
+        }
     }
 }
