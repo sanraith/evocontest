@@ -18,7 +18,7 @@ evowar BE -->> client: Async push test results (fast)
 evowar BE ->> evowar BE: Save results
 
 loop every n minutes
-	Note over evowar BE, raspberry: Communication is secured<br/>by assymmertic key pairs.
+	Note over evowar BE, raspberry: Communication is secured<br/> by assymmertic key pairs.
 	raspberry ->> evowar BE: Request work
 	raspberry ->> raspberry: Local tests
 	raspberry ->> evowar BE: Submit test results
