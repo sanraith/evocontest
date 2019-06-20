@@ -1,29 +1,60 @@
 # evowar 2019 architecture
 
-## Relations
+## Introduction
+This document contains information about the general architecture of the components required to run the contest.
+
+## Overview
 ```mermaid
-graph TD
-A((Client)) --> B[evowar FE]
-B-->D[evowar BE]
-C[RS Rpi3B]-->D
+graph LR
+
+subgraph Any client
+	C(Web Browser)
+end
+
+subgraph Raspberry
+	RPI(Reference System worker)
+end
+
+subgraph Azure
+	FE[evowar FE]
+	BE[evowar BE]
+	DB((Database))
+	FS((Filesystem))
+end
+
+C --> FE
+FE --> BE
+BE --> DB
+BE --> FS
+RPI --> BE
 ```
 
 ## Submitting a solution
+
+After submitting a solution, a static analysis is performed on the server, and tests are run on the reference system. 
+
 ```mermaid
 sequenceDiagram
 
-client ->> evowar FE:Submit solution
-evowar FE ->> evowar BE: Server test
-evowar BE -->> client: Async push test results (fast)
-evowar BE ->> evowar BE: Save results
+participant client
+participant FE as evowar FE
+participant DB as DB & FS
+participant BE as evowar BE
+participant raspberry
 
-loop every n minutes
-	Note over evowar BE, raspberry: Communication is secured<br/> by assymmertic key pairs.
-	raspberry ->> evowar BE: Request work
-	raspberry ->> raspberry: Local tests
-	raspberry ->> evowar BE: Submit test results
-	evowar BE ->> evowar BE: save results
+client ->> FE:Submit solution
+FE -x BE: Save solution
+BE ->> BE: Static analysis
+BE ->> DB: Save solution and metadata
+BE -->> client: Push analysis results (fast)
+
+loop long polling
+	Note over BE, raspberry: Secured connection
+	raspberry ->> BE: Request work
+	BE ->> DB: Get solution and metadata
+	raspberry ->> raspberry: Run tests
+	raspberry -x BE: Submit test results
+	BE ->> DB: Save results
 end
-
-evowar BE -->> client: Async push test results (slow)
+BE -->> client: Push test results (slow)
 ```
