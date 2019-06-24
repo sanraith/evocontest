@@ -11,11 +11,12 @@ title Development and running of the contest
 dateFormat YYYY-MM-DD
 
 section Tags
-    now: now, 201-06-21, 0d
+    now: now, 201-06-24, 0d
 
 section Challenge
-    Find a good challenge: active, challengeFind, 2019-06-21, 2d
+    Find a good challenge: active, challengeFind, 2019-06-25, 2d
     Solve varying time problem: challengeTime, after challengeFind, 2d
+    Alpha test: after challengeTime, 3d
 
 section Web Logic
     Setup repo: done, 2019-06-18, 2d
