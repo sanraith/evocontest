@@ -3,19 +3,20 @@
 ## Introduction
 This document contains information about the forecasted timeline of the contest.
 
-## Timeline
+## Dev Timeline
 ```mermaid
 gantt
-title Development and running of the contest
+title Development of the contest
 dateFormat YYYY-MM-DD
 
 section Misc
     now: now, 0d
-    Summer vacation: vacation, 2019-08-29, 5d
+    Summer vacation: vacation, 2019-08-27, 6d
 
 section Challenge
     Find a good challenge: active, challengeFind, 2019-06-25, 2d
     Solve varying time problem: challengeTime, after challengeFind, 2d
+    Decide between avg/min time: 1d
     Alpha test: after challengeTime, 3d
 
 section Web Logic
@@ -23,14 +24,14 @@ section Web Logic
     Create skeleton: webSkeleton, after now, 1d
 
     Setup azure server: webAzureSetup, after webSkeleton, 1d
-    Setup DB engine: webPickDb, after webAzureSetup, 1d
+    Setup DB engine: webPickDb, after webAzureSetup, 2d
     Setup login: webLogin, after webSkeleton, 2d
     Testability (login, test data): after webLogin, 1d
 
     Create EF + FS model: webModel, after webSkeleton, 1d
     
     Create work distributor: webDistributor, after webModel, 2d
-    Daily runner job: 1d
+    Daily runner job: 2d
 
     Activate site: crit, webActivate, 2019-09-08, 2h
     Make public repo: after webActivate, 2h
@@ -66,9 +67,17 @@ section Raspberry FW
     Create sandbox: rpiSandbox, after now, 1d
     Safely communicate w/ sandbox: rpiSandComm, after rpiSandbox, 1d
     Test data generator: 1d
-    Test runner: rpiRunner, after challengeTime, 2d
-    Long polling worker: after rpiRunner, 1d
+    Test runner: rpiRunner, after challengeTime, 3d
+    Long polling worker: after rpiRunner, 2d
     Contest runner app: 3d
+    
+```
+
+## Run timeline
+```mermaid
+gantt
+title Running of the contest
+dateFormat YYYY-MM-DD
 
 section Contest
     Promo email: 2019-09-05, 1h
@@ -77,4 +86,5 @@ section Contest
     Midtime email: 2019-09-16, 1h
     Finals: after contestRunning, 1d
     Summary email: 2019-09-23, 1h
+
 ```
