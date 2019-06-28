@@ -14,18 +14,18 @@ section Misc
     Summer vacation: vacation, 2019-08-27, 6d
 
 section Challenge
-    Find a good challenge: active, challengeFind, 2019-06-25, 2d
+    Find a good challenge: active, crit, challengeFind, 2019-06-25, 2d
     Solve varying time problem: challengeTime, after challengeFind, 2d
     Decide between avg/min time: 1d
     Alpha test: after challengeTime, 3d
 
 section Web Logic
     Setup repo: done, 2019-06-18, 2d
-    Create skeleton: webSkeleton, after now, 1d
+    Create skeleton: done, webSkeleton, 2019-06-26, 1d
 
-    Setup azure server: webAzureSetup, after webSkeleton, 1d
-    Setup DB engine: webPickDb, after webAzureSetup, 2d
-    Setup login: webLogin, after webSkeleton, 2d
+    Setup DB engine: done, webPickDb, 2019-06-27, 1d
+    Setup azure server: webAzureSetup, after now, 1d
+    Setup login: active, webLogin, 2019-06-27, 2d
     Testability (login, test data): after webLogin, 1d
 
     Create EF + FS model: webModel, after webSkeleton, 1d
@@ -43,7 +43,7 @@ section Web Content
     Personal stats page: 2d
 
     Wiki challenge: after challengeFind, 1d
-    Wiki envirnoment: after subRepo, 1d
+    Wiki environment: after subRepo, 1d
     Wiki solution: 1d
     Wiki submission: webWiki, after subPackager, 1d
     Wiki FAQ: 1d
