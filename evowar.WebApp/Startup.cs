@@ -8,12 +8,12 @@ using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
-using evowar19.WebApp.Data;
+using evowar.WebApp.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace evowar19.WebApp
+namespace evowar.WebApp
 {
     public class Startup
     {
@@ -33,14 +33,11 @@ namespace evowar19.WebApp
                 options.CheckConsentNeeded = context => true;
             });
 
-            services.AddDbContext<ApplicationDbContext>(options =>
+            services.AddDbContext<ContestDb>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<IdentityUser>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
-
-            services.AddControllersWithViews();
-            services.AddRazorPages();
+                .AddEntityFrameworkStores<ContestDb>();
 
             services.Configure<IdentityOptions>(options =>
             {
@@ -51,6 +48,9 @@ namespace evowar19.WebApp
                 options.Password.RequiredLength = 6;
                 options.Password.RequiredUniqueChars = 1;
             });
+
+            services.AddControllersWithViews();
+            services.AddRazorPages();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

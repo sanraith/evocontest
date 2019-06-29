@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace evowar19.WebApp.Data.Migrations
+namespace evowar.WebApp.Data.Migrations
 {
     public partial class CreateIdentitySchema : Migration
     {

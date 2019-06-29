@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace evowar19.WebApp
+namespace evowar.WebApp
 {
     public class Program
     {

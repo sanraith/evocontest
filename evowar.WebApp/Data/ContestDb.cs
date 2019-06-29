@@ -4,11 +4,11 @@ using System.Text;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace evowar19.WebApp.Data
+namespace evowar.WebApp.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ContestDb : IdentityDbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        public ContestDb(DbContextOptions<ContestDb> options)
             : base(options)
         {
         }

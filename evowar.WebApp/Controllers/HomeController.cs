@@ -4,9 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using evowar19.WebApp.Models;
+using evowar.WebApp.Models;
 
-namespace evowar19.WebApp.Controllers
+namespace evowar.WebApp.Controllers
 {
     public class HomeController : Controller
     {

@@ -1,6 +1,6 @@
 using System;
 
-namespace evowar19.WebApp.Models
+namespace evowar.WebApp.Models
 {
     public class ErrorViewModel
     {
