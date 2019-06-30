@@ -48,6 +48,8 @@ namespace evowar.WebApp
                 options.Password.RequireUppercase = true;
                 options.Password.RequiredLength = 6;
                 options.Password.RequiredUniqueChars = 1;
+
+                options.SignIn.RequireConfirmedEmail = false; // TODO
             });
 
             services.AddControllersWithViews();

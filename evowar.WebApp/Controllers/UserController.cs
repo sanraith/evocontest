@@ -5,12 +5,17 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace evowar.WebApp
+namespace evowar.WebApp.Controllers
 {
-    [Authorize(Roles = "Admin")]
-    public class AdminController : Controller
+    [Authorize]
+    public class UserController : Controller
     {
-        public IActionResult Admin()
+        public IActionResult Submit()
+        {
+            return View();
+        }
+
+        public IActionResult Stats()
         {
             return View();
         }
