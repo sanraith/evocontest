@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 namespace evowar.WebApp.Areas.Identity.Pages.Account.Manage
 {
     public class Disable2faModel : PageModel
