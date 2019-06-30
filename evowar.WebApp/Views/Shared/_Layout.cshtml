@@ -35,10 +35,10 @@
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li>
-                                <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Submit">Submit</a>
+                                <a class="nav-link text-dark font-weight-bold" asp-area="" asp-controller="User" asp-action="Submit">Submit</a>
                             </li>
                             <li>
-                                <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Stats">Stats</a>
+                                <a class="nav-link text-dark font-weight-bold" asp-area="" asp-controller="User" asp-action="Stats">Stats</a>
                             </li>
                         }
                         @if (User.IsInRole("Admin"))
