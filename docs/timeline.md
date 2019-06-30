@@ -43,6 +43,7 @@ section Web Content
     Daily standings page: after webSubmitter, 2d
     Personal stats page: 2d
     Translate and scaffold login pages: after webSendGrid, 1d
+    Privacy page: done, 2019-06-30, 1d
 
     Wiki challenge: after challengeFind, 1d
     Wiki environment: after subRepo, 1d
