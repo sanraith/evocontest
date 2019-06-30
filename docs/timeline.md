@@ -25,7 +25,7 @@ section Web Logic
 
     Setup DB engine: done, webPickDb, 2019-06-27, 1d
     Setup azure server: webAzureSetup, after now, 1d
-    Setup login: done, webLogin, 2019-06-27, 2d
+    Setup login: done, webLogin, 2019-06-27, 3d
     Testability (login, test data): after webLogin, 1d
     Setup sendgrid and login confirmation: webSendgrid, after webLogin, 1d
 

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using evowar.WebApp.Resources;
 
 namespace evowar.WebApp.Areas.Identity.Pages.Account
 {
@@ -99,7 +100,7 @@ namespace evowar.WebApp.Areas.Identity.Pages.Account
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    ModelState.AddModelError(string.Empty, StringLibrary.LoginInvalidAttempt);
                     return Page();
                 }
             }

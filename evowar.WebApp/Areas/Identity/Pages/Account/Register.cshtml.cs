@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using evowar.WebApp.Resources;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -95,8 +96,8 @@ namespace evowar.WebApp.Areas.Identity.Pages.Account
                         values: new { userId = user.Id, code = code },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    var emailContent = string.Format(StringLibrary.EmailConfirmationContent, HtmlEncoder.Default.Encode(callbackUrl));
+                    await _emailSender.SendEmailAsync(Input.Email, StringLibrary.EmailConfirmationSubject, emailContent);
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
