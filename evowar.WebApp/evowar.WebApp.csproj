@@ -3,7 +3,10 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <LangVersion>8.0</LangVersion>
-    <Nullable>enable</Nullable>
+    
+    <!-- Scaffolding is not ready for this... -->
+    <!--<Nullable>enable</Nullable>-->
+    
     <UserSecretsId>aspnet-evowar.WebApp-2C38E50A-AB18-487C-8910-EAF3B9A1D150</UserSecretsId>
   </PropertyGroup>
 

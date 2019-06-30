@@ -25,8 +25,9 @@ section Web Logic
 
     Setup DB engine: done, webPickDb, 2019-06-27, 1d
     Setup azure server: webAzureSetup, after now, 1d
-    Setup login: active, webLogin, 2019-06-27, 2d
+    Setup login: done, webLogin, 2019-06-27, 2d
     Testability (login, test data): after webLogin, 1d
+    Setup sendgrid and login confirmation: webSendgrid, after webLogin, 1d
 
     Create EF + FS model: webModel, after webSkeleton, 1d
     
@@ -41,6 +42,7 @@ section Web Content
     Submitter page: webSubmitter, after webDistributor, 3d
     Daily standings page: after webSubmitter, 2d
     Personal stats page: 2d
+    Translate and scaffold login pages: after webSendGrid, 1d
 
     Wiki challenge: after challengeFind, 1d
     Wiki environment: after subRepo, 1d

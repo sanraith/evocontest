@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
-#nullable disable
 namespace evowar.WebApp.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]

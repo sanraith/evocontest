@@ -37,6 +37,7 @@ namespace evowar.WebApp
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<IdentityUser>()
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ContestDb>();
 
             services.Configure<IdentityOptions>(options =>
@@ -85,6 +86,30 @@ namespace evowar.WebApp
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
+
+            //ConfigureRoles(app);
         }
+
+        //private static void ConfigureRoles(IApplicationBuilder app)
+        //{
+        //    using (var db = new ContestDb())
+        //    {
+        //        var adminRole = db.Roles.FirstOrDefault(r => r.Name == "Admin");
+        //        if (db.Roles.Any(r => r.Name == "Admin"))
+        //        {
+        //            adminRole = new IdentityRole("Admin");
+        //            db.Roles.Add(adminRole);
+        //            db.SaveChanges();
+        //        }
+
+        //        var adminUser = db.Users.FirstOrDefault(u => u.Email == "zsjaks@gmail.com");
+        //        var adminUserRole = db.UserRoles.FirstOrDefault(r => r.RoleId == adminRole.Id);
+        //        if (adminUser != null && adminUserRole == null)
+        //        {
+        //            db.UserRoles.Add(new IdentityUserRole<string> { RoleId = adminRole.Id, UserId = adminUser.Id });
+        //            db.SaveChanges();
+        //        }
+        //    }
+        //}
     }
 }
