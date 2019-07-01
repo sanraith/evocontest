@@ -17,7 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{1C1E
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "evowar.WebApp", "evowar.WebApp\evowar.WebApp.csproj", "{FB00C2FB-A67B-41AF-8A9C-C43348D2188C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecurityTest", "SecurityTest\SecurityTest.csproj", "{0F38D32D-2C4F-4AF6-94B4-5E005C375519}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SecurityTest", "SecurityTest\SecurityTest.csproj", "{0F38D32D-2C4F-4AF6-94B4-5E005C375519}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
