@@ -114,6 +114,37 @@ host ->> cloud: Upload results
 
 ## Run performance measurements
 
+### Flowchart
+
+```mermaid
+graph TD
+
+start((Start host)) --> anySubLeft{Any submissions left?}
+	anySubLeft -->|yes| copyWD[Copy files to workdir]
+		copyWD --> createSandbox[Start worker in sandbox]
+		createSandbox --> sendSubData[Send metadata to worker]
+		sendSubData --> isTimeout{Is timeout?}
+			isTimeout -->|yes| errTimeout[Log timeout error]
+				errTimeout --> destroySandbox[Destroy sandbox]
+				destroySandbox --> anySubLeft
+			isTimeout -->|no| isInputRequested{Is input requested?}
+				isInputRequested -->|yes| isInputAvailable{Is input available?}
+					isInputAvailable -->|yes| sendInput[Send input to sandbox]
+					isInputAvailable -->|no| generateInput[Generate input]
+						generateInput --> sendInput
+				sendInput --> updateTimeout[Update timeout]
+				updateTimeout --> isTimeout
+				isInputRequested -->|no| isResultReceived{Is result received?}
+					isResultReceived -->|yes| logResults[Log results]
+						logResults --> isFinalResults{Is final results received?}
+							isFinalResults -->|yes| destroySandbox
+							isFinalResults -->|no| updateTimeout
+					isResultReceived -->|no| isTimeout
+	anySubLeft -->|no| stop((Stop host))
+```
+
+### Sequence
+
 ```mermaid
 sequenceDiagram
 
