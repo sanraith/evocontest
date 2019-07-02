@@ -42,7 +42,7 @@ section Web Content
     Submitter page: webSubmitter, after webDistributor, 3d
     Daily standings page: after webSubmitter, 2d
     Personal stats page: 2d
-    Translate and scaffold login pages: after webSendGrid, 1d
+    Translate pages: after webSendGrid, 1d
     Privacy page: done, 2019-06-30, 1d
 
     Wiki challenge: after challengeFind, 1d
@@ -67,7 +67,7 @@ section Submission
     Make repo public: crit, after webActivate, 2h
 
 section Raspberry FW
-    Create sandbox: rpiSandbox, after now, 1d
+    Create sandbox: done, rpiSandbox, 2019-07-01, 1d
     Safely communicate w/ sandbox: rpiSandComm, after rpiSandbox, 1d
     Test data generator: 1d
     Test runner: rpiRunner, after challengeTime, 3d

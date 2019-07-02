@@ -117,19 +117,21 @@ host ->> cloud: Upload results
 ```mermaid
 sequenceDiagram
 
-participant host as Runner host
 participant fs as Filesystem
+participant host as Runner host
 participant slave as Sandbox worker
 participant sub as Submission library
 
+host ->> slave: Start
+host -->> slave: Send submission metadata
 loop while avg runtime &lt; 100ms
+	slave -->> host: Ask for input
 	opt no input available
-		slave -->> host: Status message
-		slave ->> slave: Generate harder input
-		slave ->> fs: Save input
-		Note over fs: Encrypted files
+		host ->> host: Generate harder input
+		host ->> fs: Save input
 	end
-	slave ->> fs: Load input
+	host ->> fs: Load input
+	host -->> slave: Provide input
 	loop n performance runs
 		slave ->> sub: Load to context
 		activate sub
@@ -138,7 +140,7 @@ loop while avg runtime &lt; 100ms
 		slave ->> sub: Measure
 		Note right of sub: hard input
 		deactivate sub
-		slave ->> slave: validate results
+		slave ->> slave: Validate results
 		slave -->> host: Partial results
 	end
 end
