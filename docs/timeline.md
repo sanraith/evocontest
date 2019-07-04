@@ -68,7 +68,7 @@ section Submission
 
 section Raspberry FW
     Create sandbox: done, rpiSandbox, 2019-07-01, 1d
-    Safely communicate w/ sandbox: rpiSandComm, after rpiSandbox, 1d
+    Safely communicate w/ sandbox: done, rpiSandComm, 2019-07-03, 1d
     Handle detached processes: 1d
     Test data generator: 1d
     Test runner: rpiRunner, after challengeTime, 3d

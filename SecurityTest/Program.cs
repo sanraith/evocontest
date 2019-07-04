@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace SecurityTest
 {
@@ -9,15 +11,19 @@ namespace SecurityTest
     {
         static void Main(string[] args)
         {
-            if (args.Any())
-            {
-                Console.WriteLine("Sandbox");
-                new Sandboxed().Run();
-            }
-            else
+            if (!args.Any())
             {
                 Console.WriteLine("Launcher");
                 new Launcher().Run();
+            }
+            else if (args[0] == "wait")
+            {
+                new Waiter().Run();
+            }
+            else
+            {
+                Console.WriteLine("Sandbox");
+                new Sandboxed().Run();
             }
         }
     }
@@ -26,7 +32,21 @@ namespace SecurityTest
     public sealed class Launcher
     {
         public void Run()
-        { }
+        {
+            var p = new Process();
+            p.StartInfo.FileName = "dotnet";
+            p.StartInfo.Arguments = "SecurityTest.dll wait";
+            p.Start();
+        }
+    }
+
+    public sealed class Waiter
+    {
+        public void Run()
+        {
+            Console.WriteLine("Waiting a lot...");
+            Task.Delay(TimeSpan.FromMinutes(5)).Wait();
+        }
     }
 
     public sealed class Sandboxed

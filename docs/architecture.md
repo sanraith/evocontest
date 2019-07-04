@@ -123,23 +123,22 @@ start((Start host)) --> anySubLeft{Any submissions left?}
 	anySubLeft -->|yes| copyWD[Copy files to workdir]
 		copyWD --> createSandbox[Start worker in sandbox]
 		createSandbox --> sendSubData[Send metadata to worker]
-		sendSubData --> isTimeout{Is timeout?}
-			isTimeout -->|yes| errTimeout[Log timeout error]
-				errTimeout --> destroySandbox[Destroy sandbox]
-				destroySandbox --> anySubLeft
-			isTimeout -->|no| isInputRequested{Is input requested?}
-				isInputRequested -->|yes| isInputAvailable{Is input available?}
-					isInputAvailable -->|yes| sendInput[Send input to sandbox]
-					isInputAvailable -->|no| generateInput[Generate input]
-						generateInput --> sendInput
-				sendInput --> updateTimeout[Update timeout]
-				updateTimeout --> isTimeout
-				isInputRequested -->|no| isResultReceived{Is result received?}
-					isResultReceived -->|yes| logResults[Log results]
-						logResults --> isFinalResults{Is final results received?}
-							isFinalResults -->|yes| destroySandbox
-							isFinalResults -->|no| updateTimeout
-					isResultReceived -->|no| isTimeout
+		sendSubData --> isInputRequested{Is input requested?}
+			isInputRequested -->|yes| isInputAvailable{Is input available?}
+				isInputAvailable -->|yes| sendInput[Send input to sandbox]
+				isInputAvailable -->|no| generateInput[Generate input]
+					generateInput --> sendInput
+					sendInput --> isResultReceived
+			isInputRequested -->|no| isResultReceived{Is result received?}
+				isResultReceived -->|yes| logResults[Log results]
+					logResults --> destroySandbox
+				isResultReceived -->|no| isTimeout{Has operation timed out?}
+					isTimeout -->|yes| errTimeout[Log timeout error]
+						errTimeout --> destroySandbox[Destroy sandbox]
+						destroySandbox --> isFinalResults{Final results or timeout received?}
+							isFinalResults -->|yes| anySubLeft
+							isFinalResults -->|no| createSandbox
+					isTimeout -->|no| isInputRequested{Is input requested?}
 	anySubLeft -->|no| stop((Stop host))
 ```
 
@@ -153,9 +152,10 @@ participant host as Runner host
 participant slave as Sandbox worker
 participant sub as Submission library
 
-host ->> slave: Start
-host -->> slave: Send submission metadata
 loop while avg runtime &lt; 100ms
+	host ->> slave: Start
+	activate slave
+	host -->> slave: Send submission metadata
 	slave -->> host: Ask for input
 	opt no input available
 		host ->> host: Generate harder input
@@ -173,8 +173,8 @@ loop while avg runtime &lt; 100ms
 		deactivate sub
 		slave ->> slave: Validate results
 		slave -->> host: Partial results
+		host ->> slave: Destroy
+		deactivate slave
 	end
 end
-slave -->> host: Total results
-host ->> slave: Destroy
 ```
