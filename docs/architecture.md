@@ -176,4 +176,5 @@ loop while avg runtime &lt; 100ms
 	end
 end
 slave -->> host: Total results
+host ->> slave: Destroy
 ```
