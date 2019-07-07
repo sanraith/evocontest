@@ -1,4 +1,4 @@
-﻿using evowar.Runner.Common.Commands;
+﻿using evowar.Runner.Common.Messages;
 using System;
 using System.IO;
 using System.IO.Pipes;
@@ -16,25 +16,25 @@ namespace evowar.Runner.Common.Connection
             Stream = namedPipeStream;
         }
 
-        public async Task<ICommand> ReceiveCommandAsync()
+        public async Task<IMessage> ReceiveMessageAsync()
         {
             using var reader = new StreamReader(Stream);
             var json = await reader.ReadLineAsync();
-            var command = AbstractCommand.Deserialize(json);
+            var command = AbstractMessage.Deserialize(json);
 
             return command;
         }
 
-        public async Task SendCommandAsync<TCommand>(TCommand command) where TCommand : ICommand
+        public async Task SendMessageAsync<TMessage>(TMessage message) where TMessage : IMessage
         {
             using var writer = new StreamWriter(Stream);
-            await writer.WriteLineAsync(JsonSerializer.ToString(command));
+            var json = JsonSerializer.ToString(message);
+            await writer.WriteLineAsync(json);
         }
 
         public virtual void Dispose()
         {
-            Stream?.Dispose();
-            Stream = null;
+            Stream.Dispose();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using evowar.Runner.Common.Commands;
+﻿using evowar.Runner.Common.Messages;
 using evowar.Runner.Common.Connection;
 using System;
 using System.Diagnostics;
@@ -46,7 +46,7 @@ namespace SecurityTest
                 using var pipeServer = new PipeServer(pipeName);
                 await pipeServer.WaitForConnectionAsync();
                 Console.WriteLine("Start sending...");
-                await pipeServer.SendCommandAsync(new LoadContextCommand { ContesterAssemblyName = "asd.dll" });
+                await pipeServer.SendMessageAsync(new LoadContextMessage("asd.dll"));
                 Console.WriteLine("Done sending");
             });
 
@@ -55,13 +55,13 @@ namespace SecurityTest
                 using var pipeClient = new PipeClient(pipeName);
                 await pipeClient.ConnectAsync();
                 Console.WriteLine("Start receiving...");
-                var command = await pipeClient.ReceiveCommandAsync();
+                var command = await pipeClient.ReceiveMessageAsync();
                 Console.WriteLine("Done receiving");
 
                 switch (command)
                 {
-                    case LoadContextCommand loadCommand:
-                        Console.WriteLine(loadCommand.ContesterAssemblyName);
+                    case LoadContextMessage loadCommand:
+                        Console.WriteLine(loadCommand.TargetAssemblyPath);
                         break;
                 }
             }).Wait();
