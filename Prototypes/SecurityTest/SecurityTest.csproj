@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\evowar.Runner.Common\evowar.Runner.Common.csproj" />
+    <ProjectReference Include="..\..\evowar.Runner.Common\evowar.Runner.Common.csproj" />
   </ItemGroup>
 
 </Project>

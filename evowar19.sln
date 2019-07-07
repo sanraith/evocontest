@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28917.182
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LimiterTest", "LimiterTest\LimiterTest.csproj", "{2FCACC0F-D889-4C10-896F-625CC19533E9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LimiterTest", "Prototypes\LimiterTest\LimiterTest.csproj", "{2FCACC0F-D889-4C10-896F-625CC19533E9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PerformanceTest", "PerformanceTest\PerformanceTest.csproj", "{21552F6D-BD37-4A5D-8D50-4C9F04E026FB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PerformanceTest", "Prototypes\PerformanceTest\PerformanceTest.csproj", "{21552F6D-BD37-4A5D-8D50-4C9F04E026FB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{4C6F9D05-06C4-495D-9377-E624DCBC712B}"
 EndProject
@@ -13,17 +13,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{31FE0C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Runner", "Runner", "{CF0688A3-520B-4D8F-AC9E-24129751BC42}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{1C1EFE3A-0368-43C2-878C-A0AC1FDFD0CA}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Prototypes", "Prototypes", "{1C1EFE3A-0368-43C2-878C-A0AC1FDFD0CA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "evowar.WebApp", "evowar.WebApp\evowar.WebApp.csproj", "{FB00C2FB-A67B-41AF-8A9C-C43348D2188C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SecurityTest", "SecurityTest\SecurityTest.csproj", "{0F38D32D-2C4F-4AF6-94B4-5E005C375519}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SecurityTest", "Prototypes\SecurityTest\SecurityTest.csproj", "{0F38D32D-2C4F-4AF6-94B4-5E005C375519}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "evowar.Runner.Worker", "evowar.Runner.Worker\evowar.Runner.Worker.csproj", "{124FB6D3-7739-45ED-A450-CCDB037D80AC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "evowar.Runner.Worker", "evowar.Runner.Worker\evowar.Runner.Worker.csproj", "{124FB6D3-7739-45ED-A450-CCDB037D80AC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "evowar.Runner.Host", "evowar.Runner.Host\evowar.Runner.Host.csproj", "{A60204D7-A23B-4777-A6B4-DC8471CB5049}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "evowar.Runner.Host", "evowar.Runner.Host\evowar.Runner.Host.csproj", "{A60204D7-A23B-4777-A6B4-DC8471CB5049}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "evowar.Runner.Common", "evowar.Runner.Common\evowar.Runner.Common.csproj", "{DB8D3315-02C3-4051-BCB5-A23CA8E01FDC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "evowar.Runner.Common", "evowar.Runner.Common\evowar.Runner.Common.csproj", "{DB8D3315-02C3-4051-BCB5-A23CA8E01FDC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{5789610E-904A-4A82-ADAC-ED547F2A92A8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "evowar.Runner.Worker.Test", "evowar.Runner.Worker.Test\evowar.Runner.Worker.Test.csproj", "{FB12AD71-A178-4CEE-A20F-E9FF31302210}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +63,10 @@ Global
 		{DB8D3315-02C3-4051-BCB5-A23CA8E01FDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB8D3315-02C3-4051-BCB5-A23CA8E01FDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB8D3315-02C3-4051-BCB5-A23CA8E01FDC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB12AD71-A178-4CEE-A20F-E9FF31302210}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB12AD71-A178-4CEE-A20F-E9FF31302210}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB12AD71-A178-4CEE-A20F-E9FF31302210}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB12AD71-A178-4CEE-A20F-E9FF31302210}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -71,6 +79,7 @@ Global
 		{124FB6D3-7739-45ED-A450-CCDB037D80AC} = {CF0688A3-520B-4D8F-AC9E-24129751BC42}
 		{A60204D7-A23B-4777-A6B4-DC8471CB5049} = {CF0688A3-520B-4D8F-AC9E-24129751BC42}
 		{DB8D3315-02C3-4051-BCB5-A23CA8E01FDC} = {CF0688A3-520B-4D8F-AC9E-24129751BC42}
+		{FB12AD71-A178-4CEE-A20F-E9FF31302210} = {5789610E-904A-4A82-ADAC-ED547F2A92A8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {27104867-D5A0-4652-B00E-91E995E65CF8}
