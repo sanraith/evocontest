@@ -7,7 +7,7 @@ namespace evowar.Runner.Common.Messages
     /// </summary>
     public sealed class OperationSuccessfulMessage : AbstractMessage
     {
-        public Guid TargetMessageId { get; private set; }
+        public Guid TargetMessageId { get; set; }
 
         private OperationSuccessfulMessage() { }
 

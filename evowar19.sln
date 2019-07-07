@@ -27,7 +27,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "evowar.Runner.Common", "evo
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{5789610E-904A-4A82-ADAC-ED547F2A92A8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "evowar.Runner.Worker.Test", "evowar.Runner.Worker.Test\evowar.Runner.Worker.Test.csproj", "{FB12AD71-A178-4CEE-A20F-E9FF31302210}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "evowar.Runner.Worker.Test", "evowar.Runner.Worker.Test\evowar.Runner.Worker.Test.csproj", "{FB12AD71-A178-4CEE-A20F-E9FF31302210}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "evowar.Runner.Common.Test", "evowar.Runner.Common.Test\evowar.Runner.Common.Test.csproj", "{7A5C19DE-1655-408B-9CEA-2942993AB934}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,6 +69,10 @@ Global
 		{FB12AD71-A178-4CEE-A20F-E9FF31302210}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB12AD71-A178-4CEE-A20F-E9FF31302210}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FB12AD71-A178-4CEE-A20F-E9FF31302210}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A5C19DE-1655-408B-9CEA-2942993AB934}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A5C19DE-1655-408B-9CEA-2942993AB934}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A5C19DE-1655-408B-9CEA-2942993AB934}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A5C19DE-1655-408B-9CEA-2942993AB934}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -80,6 +86,7 @@ Global
 		{A60204D7-A23B-4777-A6B4-DC8471CB5049} = {CF0688A3-520B-4D8F-AC9E-24129751BC42}
 		{DB8D3315-02C3-4051-BCB5-A23CA8E01FDC} = {CF0688A3-520B-4D8F-AC9E-24129751BC42}
 		{FB12AD71-A178-4CEE-A20F-E9FF31302210} = {5789610E-904A-4A82-ADAC-ED547F2A92A8}
+		{7A5C19DE-1655-408B-9CEA-2942993AB934} = {5789610E-904A-4A82-ADAC-ED547F2A92A8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {27104867-D5A0-4652-B00E-91E995E65CF8}

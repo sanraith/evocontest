@@ -28,7 +28,7 @@ namespace evowar.Runner.Common.Connection
         public async Task SendMessageAsync<TMessage>(TMessage message) where TMessage : IMessage
         {
             using var writer = new StreamWriter(Stream);
-            var json = JsonSerializer.ToString(message);
+            var json = message.ToString();
             await writer.WriteLineAsync(json);
         }
 
