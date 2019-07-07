@@ -1,4 +1,6 @@
-﻿using System;
+﻿using evowar.Runner.Common.Commands;
+using evowar.Runner.Common.Connection;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -20,6 +22,10 @@ namespace SecurityTest
             {
                 new Waiter().Run();
             }
+            else if (args[0] == "pipe")
+            {
+                new Piper().Run();
+            }
             else
             {
                 Console.WriteLine("Sandbox");
@@ -28,6 +34,39 @@ namespace SecurityTest
         }
     }
 
+
+    public sealed class Piper
+    {
+        public void Run()
+        {
+            var pipeName = "pipe";
+
+            _ = Task.Run(async () =>
+            {
+                using var pipeServer = new PipeServer(pipeName);
+                await pipeServer.WaitForConnectionAsync();
+                Console.WriteLine("Start sending...");
+                await pipeServer.SendCommandAsync(new LoadContextCommand { ContesterAssemblyName = "asd.dll" });
+                Console.WriteLine("Done sending");
+            });
+
+            Task.Run(async () =>
+            {
+                using var pipeClient = new PipeClient(pipeName);
+                await pipeClient.ConnectAsync();
+                Console.WriteLine("Start receiving...");
+                var command = await pipeClient.ReceiveCommandAsync();
+                Console.WriteLine("Done receiving");
+
+                switch (command)
+                {
+                    case LoadContextCommand loadCommand:
+                        Console.WriteLine(loadCommand.ContesterAssemblyName);
+                        break;
+                }
+            }).Wait();
+        }
+    }
 
     public sealed class Launcher
     {
