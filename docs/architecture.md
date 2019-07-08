@@ -1,4 +1,4 @@
-# evowar 2019 architecture
+# evorace 2019 architecture
 
 ## Introduction
 This document contains information about the general architecture of the components required to run the contest.
@@ -16,8 +16,8 @@ subgraph Raspberry
 end
 
 subgraph Azure
-	FE[evowar FE]
-	BE[evowar BE]
+	FE[evorace FE]
+	BE[evorace BE]
 	DB((Database))
 	FS((Filesystem))
 end
@@ -39,9 +39,9 @@ After submitting a solution, a static analysis is performed on the server, and t
 sequenceDiagram
 
 participant client
-participant FE as evowar FE
+participant FE as evorace FE
 participant DB as DB & FS
-participant BE as evowar BE
+participant BE as evorace BE
 participant raspberry
 
 client ->> FE:Submit solution
@@ -66,7 +66,7 @@ BE -->> client: Push test results (slow)
 graph TD
 
 subgraph Azure
-	cloud[evowar BE]
+	cloud[evorace BE]
 end
 
 subgraph Raspberry
@@ -89,7 +89,7 @@ slave --> dll
 ```mermaid
 sequenceDiagram
 
-participant cloud as evowar BE
+participant cloud as evorace BE
 participant host as Runner host
 participant slave as Sandbox worker
 participant sub as Submission library

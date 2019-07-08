@@ -1,5 +1,5 @@
-﻿using evowar.Runner.Common.Messages;
-using evowar.Runner.Common.Connection;
+﻿using evorace.Runner.Common.Messages;
+using evorace.Runner.Common.Connection;
 using System;
 using System.Diagnostics;
 using System.IO;

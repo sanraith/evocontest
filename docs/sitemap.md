@@ -1,7 +1,7 @@
-# evowar 2019 sitemap
+# evorace 2019 sitemap
 
 ## Introduction
-This document contains the outline of the evowar 2019 website.
+This document contains the outline of the evorace 2019 website.
 
 ## Sitemap
 - Index
@@ -11,7 +11,7 @@ This document contains the outline of the evowar 2019 website.
         1. Setup environment
             a. Download VS 2019
             b. Download .net core 3.0 SDK
-            c. Download evowar19 SDK
+            c. Download evorace19 SDK
         2. Create solution
         3. Submit solution
         

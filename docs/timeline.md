@@ -1,4 +1,4 @@
-# evowar 2019 timeline
+# evorace 2019 timeline
 
 ## Introduction
 This document contains information about the forecasted timeline of the contest.
