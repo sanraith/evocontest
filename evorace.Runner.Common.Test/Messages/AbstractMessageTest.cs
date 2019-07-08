@@ -1,16 +1,14 @@
-using evorace.Runner.Common.Messages;
 using NUnit.Framework;
 
 namespace evorace.Runner.Common.Test.Messages
 {
-    public class AbstractMessageTest
+    public partial class AbstractMessageTest
     {
         [Test]
-        public void Test_Deserialize()
+        public void Test_Serializable()
         {
             var testMessage = new TestMessage { TestProperty = "test value" };
-            var serialized = testMessage.ToString();
-            var deserialized = AbstractMessage.Deserialize(serialized);
+            var deserialized = SerializationHelper.SerializeAndDeserialize(testMessage);
 
             // Abstract properties are deserialized.
             Assert.That(deserialized.MessageType, Is.EqualTo(testMessage.MessageType));
@@ -18,11 +16,6 @@ namespace evorace.Runner.Common.Test.Messages
 
             // Derived properties are deserialzied.
             Assert.That(((TestMessage)deserialized).TestProperty, Is.EqualTo(testMessage.TestProperty));
-        }
-
-        private sealed class TestMessage : AbstractMessage
-        {
-            public string TestProperty { get; set; }
         }
     }
 }

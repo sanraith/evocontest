@@ -5,6 +5,7 @@ namespace evorace.Runner.Common.Messages
     /// <summary>
     /// Informs the receiver that the handling of the target message failed.
     /// </summary>
+    [Serializable]
     public sealed class OperationFailedMessage : AbstractMessage
     {
         public Guid TargetMessageId { get; set; }

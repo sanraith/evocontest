@@ -1,9 +1,7 @@
 ﻿using evorace.Runner.Common.Messages;
 using System;
-using System.IO;
 using System.IO.Pipes;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace evorace.Runner.Common.Connection
 {
@@ -16,25 +14,23 @@ namespace evorace.Runner.Common.Connection
             Stream = namedPipeStream;
         }
 
-        public async Task<IMessage> ReceiveMessageAsync()
+        public IMessage ReceiveMessage()
         {
-            using var reader = new StreamReader(Stream);
-            var json = await reader.ReadLineAsync();
-            var command = AbstractMessage.Deserialize(json);
+            var command = (IMessage)myFormatter.Deserialize(Stream);
 
             return command;
         }
 
-        public async Task SendMessageAsync<TMessage>(TMessage message) where TMessage : IMessage
+        public void SendMessage<TMessage>(TMessage message) where TMessage : IMessage
         {
-            using var writer = new StreamWriter(Stream);
-            var json = message.ToString();
-            await writer.WriteLineAsync(json);
+            myFormatter.Serialize(Stream, message);
         }
 
         public virtual void Dispose()
         {
             Stream.Dispose();
         }
+
+        private readonly BinaryFormatter myFormatter = new BinaryFormatter();
     }
 }

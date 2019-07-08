@@ -22,12 +22,12 @@ namespace evorace.Runner.Worker
             var isDone = false;
             while (!isDone)
             {
-                var message = await pipeClient.ReceiveMessageAsync();
+                var message = pipeClient.ReceiveMessage();
                 var result = messageHandler.Handle(message);
 
                 if (result.Response != null)
                 {
-                    await pipeClient.SendMessageAsync(result.Response);
+                    pipeClient.SendMessage(result.Response);
                 }
 
                 isDone = result.IsDone;

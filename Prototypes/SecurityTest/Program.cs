@@ -46,7 +46,7 @@ namespace SecurityTest
                 using var pipeServer = new PipeServer(pipeName);
                 await pipeServer.WaitForConnectionAsync();
                 Console.WriteLine("Start sending...");
-                await pipeServer.SendMessageAsync(new LoadContextMessage("asd.dll"));
+                pipeServer.SendMessage(new LoadContextMessage("asd.dll"));
                 Console.WriteLine("Done sending");
             });
 
@@ -55,7 +55,7 @@ namespace SecurityTest
                 using var pipeClient = new PipeClient(pipeName);
                 await pipeClient.ConnectAsync();
                 Console.WriteLine("Start receiving...");
-                var command = await pipeClient.ReceiveMessageAsync();
+                var command = pipeClient.ReceiveMessage();
                 Console.WriteLine("Done receiving");
 
                 switch (command)

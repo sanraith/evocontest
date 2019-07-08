@@ -12,7 +12,7 @@ namespace evorace.Runner.Worker.Test
         }
 
         [Test]
-        public void TerminateMessageTest()
+        public void Test_Handle_TerminateMessage()
         {
             var result = myMessageHandler.Handle(new TerminateMessage());
 
