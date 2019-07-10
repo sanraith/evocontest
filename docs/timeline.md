@@ -39,7 +39,7 @@ section Web Logic
 
 section Web Content
     Admin page: after webModel, 2d
-    Submitter page: webSubmitter, after webDistributor, 3d
+    Submitter page: active, webSubmitter, after webDistributor, 3d
     Daily standings page: after webSubmitter, 2d
     Personal stats page: 2d
     Translate pages: after webSendGrid, 1d

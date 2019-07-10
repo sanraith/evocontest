@@ -19,5 +19,11 @@ namespace evorace.WebApp.Controllers
         {
             return View();
         }
+
+        [HttpPost]
+        public IActionResult DoUpload()
+        {
+            return new ContentResult() { Content = "ok"};
+        }
     }
 }
