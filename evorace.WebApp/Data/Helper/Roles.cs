@@ -1,4 +1,4 @@
-﻿namespace evorace.WebApp.Data
+﻿namespace evorace.WebApp.Data.Helper
 {
     /// <summary>
     /// Defines the available roles throughout the application used for authorization.

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,8 +6,26 @@ namespace evorace.WebApp.Data
 {
     public class ContestDb : IdentityDbContext
     {
+        public virtual DbSet<Submission> Submissions { get; set; }
+
         public ContestDb(DbContextOptions<ContestDb> options)
             : base(options)
         { }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+            Seed(builder);
+        }
+
+        private static void Seed(ModelBuilder builder)
+        {
+            builder.Entity<IdentityRole>().HasData(new
+            {
+                Id = "68df6f0d-7056-4399-9e11-0a5a4ec2c5cb",
+                ConcurrencyStamp = "21e4b3f3-b26b-4b20-9f95-3b4cb87e53f0",
+                Name = "Admin"
+            });
+        }
     }
 }
