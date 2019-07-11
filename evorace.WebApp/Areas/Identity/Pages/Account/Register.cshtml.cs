@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using evorace.WebApp.Data;
 using evorace.WebApp.Resources;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -74,7 +75,7 @@ namespace evorace.WebApp.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-            returnUrl = returnUrl ?? Url.Content("~/");
+            returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
@@ -86,7 +87,7 @@ namespace evorace.WebApp.Areas.Identity.Pages.Account
 
                     if (_adminEmail.Equals(user.Email, StringComparison.OrdinalIgnoreCase))
                     {
-                        await _userManager.AddToRoleAsync(user, "Admin");
+                        await _userManager.AddToRoleAsync(user, Roles.Administrator);
                     }
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
