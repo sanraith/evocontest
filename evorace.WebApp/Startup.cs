@@ -57,8 +57,14 @@ namespace evorace.WebApp
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IConfiguration configuration)
         {
+            var adminEmail = configuration.GetValue<string>("AdminEmail");
+            if (adminEmail == null)
+            {
+                throw new ArgumentNullException(nameof(adminEmail), @"User secrets are not configured!");
+            }
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
