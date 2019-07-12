@@ -1,4 +1,4 @@
-﻿
+﻿@using evorace.WebApp.Controllers;
 @{
     ViewData["Title"] = "Admin";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -6,3 +6,9 @@
 
 <h1>Admin</h1>
 
+@ViewBag.Message
+
+@using (Html.BeginForm(nameof(AdminController.DoClearAllSubmissions), "Admin", FormMethod.Post))
+{
+    <input type="submit" value="Delete all submissions" />
+}
