@@ -1,4 +1,6 @@
-﻿@{
+﻿@using evorace.WebApp.Controllers;
+@model evorace.WebApp.ViewModels.SubmitViewModel
+@{
     ViewData["Title"] = "Feltöltés";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -53,12 +55,26 @@
     }
 </script>
 
-<div>
-    @using (Html.BeginForm("DoUpload", "User", FormMethod.Post, new { id = "upload_form", enctype = "multipart/form-data" }))
-    {@:
-        <input type="file" name="file1" id="file1" onchange="uploadFile()"><br>
-        <progress id="progressBar" value="0" max="100" style="width:300px;"></progress>
-        <h3 id="status"></h3>
-        <p id="loaded_n_total"></p>
-    }
-</div>
+@if (Model.LatestSubmission != null)
+{
+    <p class="card-header">
+        Feltöltött dll: @Model.LatestSubmission.OriginalFileName
+        <a href="@Url.Action(nameof(UserController.DoDelete), "User", new { submissionId = Model.LatestSubmission.Id })"
+           onclick="return confirm('Biztos törölni szeretnéd a benevezett DLL-ed?')"
+           class="btn btn-warning">
+            Törlés
+        </a>
+    </p>
+}
+else
+{
+    <div>
+        @using (Html.BeginForm(nameof(UserController.DoUpload), "User", FormMethod.Post, new { id = "upload_form", enctype = "multipart/form-data" }))
+        {@:
+            <input type="file" name="file1" id="file1" onchange="uploadFile()"><br>
+            <progress id="progressBar" value="0" max="100" style="width:300px;"></progress>
+            <h3 id="status"></h3>
+            <p id="loaded_n_total"></p>
+        }
+    </div>
+}

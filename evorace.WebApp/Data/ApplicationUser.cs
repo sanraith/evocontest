@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
@@ -16,6 +17,8 @@ namespace evorace.WebApp.Data
         [Required]
         [StringLength(255)]
         public string UploadFolderName { get; set; }
+
+        public virtual List<Submission> Submissions { get; set; }
 
         public sealed class Configuration : IEntityTypeConfiguration<ApplicationUser>
         {
