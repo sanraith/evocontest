@@ -37,9 +37,6 @@
 
   <ItemGroup>
     <None Remove="_Store\**\*.dll" />
-    <None Update="_Store\Submissions\readme.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

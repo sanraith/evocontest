@@ -6,5 +6,6 @@
     public static class Roles
     {
         public const string Administrator = "Admin";
+        public const string Runner = "Runner";
     }
 }

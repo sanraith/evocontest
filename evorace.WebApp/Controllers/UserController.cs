@@ -29,11 +29,7 @@ namespace evorace.WebApp.Controllers
             var user = await myUserManager.GetUserAsync(HttpContext.User);
             var latestSubmission = Query(user, u => u.Submissions).LastOrDefault(x => !x.IsDeleted);
 
-            var viewModel = new SubmitViewModel
-            {
-                LatestSubmission = latestSubmission
-            };
-
+            var viewModel = new SubmitViewModel { LatestSubmission = latestSubmission };
             return View(viewModel);
         }
 

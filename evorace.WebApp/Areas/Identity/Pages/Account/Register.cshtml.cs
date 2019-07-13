@@ -25,7 +25,7 @@ namespace evorace.WebApp.Areas.Identity.Pages.Account
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
-        private readonly string _adminEmail;
+        private readonly Dictionary<string, string> _emailToRoleMap;
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
@@ -39,7 +39,11 @@ namespace evorace.WebApp.Areas.Identity.Pages.Account
             _logger = logger;
             _emailSender = emailSender;
 
-            _adminEmail = configuration.GetValue<string>("AdminEmail");
+            _emailToRoleMap = new Dictionary<string, string>
+            {
+                { configuration.GetValue<string>("AdminEmail").ToLowerInvariant(), Roles.Administrator},
+                { configuration.GetValue<string>("RunnerEmail").ToLowerInvariant(), Roles.Runner}
+            };
         }
 
         [BindProperty]
@@ -86,9 +90,10 @@ namespace evorace.WebApp.Areas.Identity.Pages.Account
                 {
                     _logger.LogInformation("User created a new account with password.");
 
-                    if (_adminEmail.Equals(user.Email, StringComparison.OrdinalIgnoreCase))
+                    if (_emailToRoleMap.TryGetValue(user.Email.ToLowerInvariant(), out var mappedRole))
                     {
-                        await _userManager.AddToRoleAsync(user, Roles.Administrator);
+                        _logger.LogInformation($"User was mapped to role: {mappedRole}");
+                        await _userManager.AddToRoleAsync(user, mappedRole);
                     }
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
