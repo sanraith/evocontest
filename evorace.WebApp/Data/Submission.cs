@@ -14,6 +14,7 @@ namespace evorace.WebApp.Data
         [Required]
         public virtual ApplicationUser User { get; set; }
 
+        #region File attributes
 
         [Required]
         [StringLength(255)]
@@ -29,11 +30,15 @@ namespace evorace.WebApp.Data
         [DisplayName("Feltöltés ideje")]
         public DateTime UploadDate { get; set; }
 
-        public bool IsValid { get; set; }
-
         public bool IsDeleted { get; set; }
 
         public DateTime? DeletionDate { get; set; }
+
+        #endregion
+
+        public ValidationStateEnum ValidationState { get; set; }
+
+        public bool IsValid { get; set; }
 
         [StringLength(2048)]
         public string Error { get; set; }
@@ -41,6 +46,15 @@ namespace evorace.WebApp.Data
         public Submission()
         {
             Id = Guid.NewGuid().ToString();
+        }
+
+        public enum ValidationStateEnum
+        {
+            None = 0,
+            File = 1,
+            Static = 2,
+            UnitTest = 3,
+            Completed = 100
         }
     }
 }

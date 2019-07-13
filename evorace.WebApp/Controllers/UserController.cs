@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using evorace.WebApp.Core;
@@ -36,35 +37,38 @@ namespace evorace.WebApp.Controllers
         {
             var user = await myUserManager.GetUserAsync(HttpContext.User);
             var file = Request.Form.Files.SingleOrDefault();
+            var timeStamp = DateTime.Now;
 
             var checkResult = myFileManager.CheckUserSubmission(file);
-            if (checkResult != FileManager.SubmissionFileCheckResult.Ok)
+            if (checkResult == FileManager.SubmissionFileCheckResult.Ok)
             {
-                return new ContentResult { Content = "Error: " + checkResult.ToString() };
-            }
-
-            try
-            {
-                var timeStamp = DateTime.Now;
-                var savedFile = await myFileManager.SaveUserSubmissionAsync(user, file, timeStamp);
-                var submission = new Submission
+                FileInfo savedFile = null;
+                try
                 {
-                    User = user,
-                    OriginalFileName = file.Name,
-                    StoredFileName = savedFile.Name,
-                    FileSize = (int)savedFile.Length,
-                    UploadDate = timeStamp,
-                    IsValid = true,
-                    IsDeleted = false
-                };
-                myDb.Submissions.Add(submission);
-                myDb.SaveChanges();
+                    savedFile = await myFileManager.SaveUserSubmissionAsync(user, file, timeStamp);
+                    var submission = new Submission
+                    {
+                        User = user,
+                        OriginalFileName = file.FileName,
+                        StoredFileName = savedFile.Name,
+                        FileSize = (int)savedFile.Length,
+                        UploadDate = timeStamp,
+                        ValidationState = Submission.ValidationStateEnum.File,
+                        IsValid = true
+                    };
 
-                return new ContentResult { Content = "ok" };
-            }
-            catch (Exception)
-            {
-                // TODO
+                    myDb.Submissions.Add(submission);
+                    myDb.SaveChanges();
+
+                    return new ContentResult { Content = "ok" };
+                }
+                catch (Exception)
+                {
+                    if (savedFile != null)
+                    {
+                        myFileManager.DeleteUserSubmission(user, savedFile.Name);
+                    }
+                }
             }
 
             return new ContentResult { Content = "error" };
