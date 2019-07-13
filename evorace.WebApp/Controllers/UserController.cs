@@ -8,6 +8,7 @@ using evorace.WebApp.Core;
 using evorace.WebApp.Data;
 using evorace.WebApp.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -47,38 +48,36 @@ namespace evorace.WebApp.Controllers
         {
             var user = await myUserManager.GetUserAsync(HttpContext.User);
             var hasActiveSubmission = Query(user, u => u.Submissions).Any(x => !x.IsDeleted);
-
             if (hasActiveSubmission)
             {
                 // User still has an active submission which has to be deleted first.
-                return new ContentResult { Content = "Delete previous submission first." };
+                return BadRequest(new { success = false, error = "Már van aktív nevezésed. Frissítsd az oldalt." });
             }
 
+            var success = false;
             var file = Request.Form.Files.SingleOrDefault();
-            var timeStamp = DateTime.Now;
-
             var checkResult = myFileManager.CheckUserSubmission(file);
             if (checkResult == FileManager.SubmissionFileCheckResult.Ok)
             {
-                FileInfo savedFile = null;
-                try
-                {
-                    savedFile = await SaveUserSubmission(user, file, timeStamp);
-
-                    return new ContentResult { Content = "ok" };
-                }
-                catch (Exception)
-                {
-                    if (savedFile != null)
-                    {
-                        myFileManager.DeleteUserSubmission(user, savedFile.Name);
-                    }
-                }
+                success = await SaveUserSubmission(user, file);
             }
 
-            return new ContentResult { Content = "error" };
+            return success ?
+                Ok(new { success }) as IActionResult :
+                BadRequest(new
+                {
+                    success = false,
+                    error = checkResult switch
+                    {
+                        FileManager.SubmissionFileCheckResult.NoFile => "Hiányzó fájl.",
+                        FileManager.SubmissionFileCheckResult.InvalidSize => $"Túl nagy méretű fájl. Maximális méret: {FileManager.MaxSubmittedFileSize / 1024 / 1024} MB.",
+                        FileManager.SubmissionFileCheckResult.InvalidFileExtension => "Hibás kiterjesztésű fájl. Csak .dll fájlok tölthetők fel.",
+                        _ => "Ismeretlen hiba."
+                    }
+                });
         }
 
+        [HttpPost]
         public async Task<ActionResult> DoDelete(string submissionId)
         {
             var user = await myUserManager.GetUserAsync(HttpContext.User);
@@ -93,24 +92,37 @@ namespace evorace.WebApp.Controllers
             return RedirectToAction(nameof(Submit));
         }
 
-        private async Task<FileInfo> SaveUserSubmission(ApplicationUser user, Microsoft.AspNetCore.Http.IFormFile file, DateTime timeStamp)
+        private async Task<bool> SaveUserSubmission(ApplicationUser user, IFormFile file)
         {
-            var savedFile = await myFileManager.SaveUserSubmissionAsync(user, file, timeStamp);
-            var submission = new Submission
+            FileInfo savedFile = null;
+            try
             {
-                User = user,
-                OriginalFileName = file.FileName,
-                StoredFileName = savedFile.Name,
-                FileSize = (int)savedFile.Length,
-                UploadDate = timeStamp,
-                ValidationState = Submission.ValidationStateEnum.File,
-                IsValid = true
-            };
+                var timeStamp = DateTime.Now;
+                savedFile = await myFileManager.SaveUserSubmissionAsync(user, file, timeStamp);
+                var submission = new Submission
+                {
+                    User = user,
+                    OriginalFileName = file.FileName,
+                    StoredFileName = savedFile.Name,
+                    FileSize = (int)savedFile.Length,
+                    UploadDate = timeStamp,
+                    ValidationState = Submission.ValidationStateEnum.File,
+                    IsValid = true
+                };
 
-            myDb.Submissions.Add(submission);
-            myDb.SaveChanges();
+                myDb.Submissions.Add(submission);
+                myDb.SaveChanges();
 
-            return savedFile;
+                return true;
+            }
+            catch (Exception)
+            {
+                if (savedFile != null)
+                {
+                    myFileManager.DeleteUserSubmission(user, savedFile.Name);
+                }
+            }
+            return false;
         }
 
         private IQueryable<TProperty> Query<TEntity, TProperty>(TEntity entity,

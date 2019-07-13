@@ -10,5 +10,5 @@
 
 @using (Html.BeginForm(nameof(AdminController.DoClearAllSubmissions), "Admin", FormMethod.Post))
 {
-    <input type="submit" value="Delete all submissions" />
+    <input type="submit" value="Delete all submissions" onclick="return confirm('Biztos?')" />
 }

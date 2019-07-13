@@ -11,7 +11,7 @@ namespace evorace.WebApp.Core
 {
     public class FileManager : IFileManager
     {
-        public const int MaxSubmittedFileSize = 10 * 1024 * 1024;
+        public const int MaxSubmittedFileSize = 5 * 1024 * 1024;
 
         public FileManager(IWebHostEnvironment environment)
         {
