@@ -12,6 +12,7 @@ using evorace.WebApp.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using evorace.WebApp.Core;
 
 namespace evorace.WebApp
 {
@@ -54,6 +55,7 @@ namespace evorace.WebApp
 
             services.AddControllersWithViews();
             services.AddRazorPages();
+            AddDependencies(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -94,6 +96,11 @@ namespace evorace.WebApp
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
+        }
+
+        private void AddDependencies(IServiceCollection services)
+        {
+            services.AddTransient(typeof(IFileManager), typeof(FileManager));
         }
     }
 }
