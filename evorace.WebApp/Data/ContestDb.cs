@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace evorace.WebApp.Data
 {
-    public class ContestDb : IdentityDbContext
+    public class ContestDb : IdentityDbContext<ApplicationUser>
     {
         public virtual DbSet<Submission> Submissions { get; set; }
 
@@ -15,7 +15,14 @@ namespace evorace.WebApp.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            Configure(builder);
             Seed(builder);
+        }
+
+        private static void Configure(ModelBuilder builder)
+        {
+            builder
+                .ApplyConfiguration(new ApplicationUser.Configuration());
         }
 
         private static void Seed(ModelBuilder builder)

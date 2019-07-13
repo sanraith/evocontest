@@ -12,7 +12,7 @@ namespace evorace.WebApp.Controllers
     [Authorize]
     public class UserController : Controller
     {
-        public UserController(UserManager<IdentityUser> userManager, ContestDb database)
+        public UserController(UserManager<ApplicationUser> userManager, ContestDb database)
         {
             myUserManager = userManager;
             myDb = database;
@@ -49,7 +49,7 @@ namespace evorace.WebApp.Controllers
         }
 
 
-        private UserManager<IdentityUser> myUserManager;
+        private UserManager<ApplicationUser> myUserManager;
         private ContestDb myDb;
     }
 }

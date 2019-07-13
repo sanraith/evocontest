@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Identity;
 
 namespace evorace.WebApp.Data
 {
@@ -13,7 +12,7 @@ namespace evorace.WebApp.Data
         public string Id { get; set; }
 
         [Required]
-        public virtual IdentityUser User { get; set; }
+        public virtual ApplicationUser User { get; set; }
 
 
         [Required]
