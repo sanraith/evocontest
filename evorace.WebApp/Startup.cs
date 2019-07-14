@@ -13,6 +13,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using evorace.WebApp.Core;
+using evorace.WebApp.Hubs;
+using evorace.WebApp.Common;
 
 namespace evorace.WebApp
 {
@@ -55,16 +57,16 @@ namespace evorace.WebApp
 
             services.AddControllersWithViews();
             services.AddRazorPages();
+
+            services.AddSignalR();
+
             AddDependencies(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IConfiguration configuration)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IConfigurationValidator configValidator)
         {
-            if (new[] { "AdminEmail", "RunnerEmail" }.Any(x => configuration.GetValue<string>(x) == null))
-            {
-                throw new ArgumentNullException(nameof(configuration), @"User secrets are not configured!");
-            }
+            configValidator.ValidateSecrets();
 
             if (env.IsDevelopment())
             {
@@ -94,12 +96,14 @@ namespace evorace.WebApp
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
+                endpoints.MapHub<WorkerHub>(Constants.WorkerHubRoute);
             });
         }
 
         private void AddDependencies(IServiceCollection services)
         {
             services.AddTransient(typeof(IFileManager), typeof(FileManager));
+            services.AddSingleton(typeof(IConfigurationValidator), typeof(ConfigurationValidator));
         }
     }
 }

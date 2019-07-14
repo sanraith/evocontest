@@ -6,10 +6,19 @@
     <UserSecretsId>b0d1fb99-8118-421c-a4bc-bdd4dc124416</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="3.0.0-preview6.19307.2" />
     <PackageReference Include="Microsoft.Configuration.ConfigurationBuilders.UserSecrets" Version="2.0.0-beta" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.0.0-preview6.19304.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="3.0.0-preview6.19304.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.0.0-preview6.19304.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.0.0-preview6.19304.6" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\evorace.WebApp.Common\evorace.WebApp.Common.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

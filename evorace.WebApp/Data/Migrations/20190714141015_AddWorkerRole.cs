@@ -2,7 +2,7 @@
 
 namespace evorace.WebApp.Data.Migrations
 {
-    public partial class AddRunnerRole : Migration
+    public partial class AddWorkerRole : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -16,7 +16,7 @@ namespace evorace.WebApp.Data.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "fc7b455a-6a16-4f4e-8e59-626d0727cd7a", "00431db5-df2c-4502-8e33-649df720b220", "Runner", "RUNNER" });
+                values: new object[] { "fc7b455a-6a16-4f4e-8e59-626d0727cd7a", "00431db5-df2c-4502-8e33-649df720b220", "Worker", "WORKER" });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

@@ -10,8 +10,8 @@ using evorace.WebApp.Data;
 namespace evorace.WebApp.Data.Migrations
 {
     [DbContext(typeof(ContestDb))]
-    [Migration("20190713212545_AddRunnerRole")]
-    partial class AddRunnerRole
+    [Migration("20190714141015_AddWorkerRole")]
+    partial class AddWorkerRole
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -55,8 +55,8 @@ namespace evorace.WebApp.Data.Migrations
                         {
                             Id = "fc7b455a-6a16-4f4e-8e59-626d0727cd7a",
                             ConcurrencyStamp = "00431db5-df2c-4502-8e33-649df720b220",
-                            Name = "Runner",
-                            NormalizedName = "RUNNER"
+                            Name = "Worker",
+                            NormalizedName = "WORKER"
                         });
                 });
 

@@ -4,24 +4,29 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using evorace.WebApp.Common;
 using evorace.WebApp.Core;
 using evorace.WebApp.Data;
+using evorace.WebApp.Hubs;
 using evorace.WebApp.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace evorace.WebApp.Controllers
 {
     [Authorize]
     public class UserController : Controller
     {
-        public UserController(UserManager<ApplicationUser> userManager, IFileManager fileManager, ContestDb database)
+        public UserController(UserManager<ApplicationUser> userManager, IFileManager fileManager, ContestDb database,
+            IHubContext<WorkerHub, IWorkerHubClient> apiHub)
         {
             myUserManager = userManager;
             myFileManager = fileManager;
             myDb = database;
+            myApiHub = apiHub;
         }
 
         public async Task<IActionResult> Submit()
@@ -58,9 +63,14 @@ namespace evorace.WebApp.Controllers
                 success = await SaveUserSubmission(user, file);
             }
 
-            return success ?
-                Ok(new { success }) as IActionResult :
-                BadRequest(new
+            if (success)
+            {
+                await myApiHub.Clients.All.ReceiveMessage($"{user.Id} uploaded a file.");
+                return Ok(new { success });
+            }
+            else
+            {
+                return BadRequest(new
                 {
                     success = false,
                     error = checkResult switch
@@ -71,6 +81,7 @@ namespace evorace.WebApp.Controllers
                         _ => "Ismeretlen hiba."
                     }
                 });
+            }
         }
 
         [HttpPost]
@@ -129,8 +140,9 @@ namespace evorace.WebApp.Controllers
             return myDb.Entry(entity).Collection(expression).Query();
         }
 
-        private ContestDb myDb;
-        private IFileManager myFileManager;
-        private UserManager<ApplicationUser> myUserManager;
+        private readonly ContestDb myDb;
+        private readonly IHubContext<WorkerHub, IWorkerHubClient> myApiHub;
+        private readonly IFileManager myFileManager;
+        private readonly UserManager<ApplicationUser> myUserManager;
     }
 }

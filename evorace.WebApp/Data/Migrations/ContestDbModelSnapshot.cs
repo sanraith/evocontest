@@ -53,8 +53,8 @@ namespace evorace.WebApp.Data.Migrations
                         {
                             Id = "fc7b455a-6a16-4f4e-8e59-626d0727cd7a",
                             ConcurrencyStamp = "00431db5-df2c-4502-8e33-649df720b220",
-                            Name = "Runner",
-                            NormalizedName = "RUNNER"
+                            Name = "Worker",
+                            NormalizedName = "WORKER"
                         });
                 });
 

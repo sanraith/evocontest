@@ -31,7 +31,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "evorace.Runner.Worker.Test"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "evorace.Runner.Common.Test", "evorace.Runner.Common.Test\evorace.Runner.Common.Test.csproj", "{7A5C19DE-1655-408B-9CEA-2942993AB934}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoginTest", "Prototypes\LoginTest\LoginTest.csproj", "{252C13BD-8522-457C-8ECB-BD97FC7D1B9D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LoginTest", "Prototypes\LoginTest\LoginTest.csproj", "{252C13BD-8522-457C-8ECB-BD97FC7D1B9D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "evorace.WebApp.Common", "evorace.WebApp.Common\evorace.WebApp.Common.csproj", "{D79465BB-675E-4260-800B-D9B7B710D012}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -79,6 +81,10 @@ Global
 		{252C13BD-8522-457C-8ECB-BD97FC7D1B9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{252C13BD-8522-457C-8ECB-BD97FC7D1B9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{252C13BD-8522-457C-8ECB-BD97FC7D1B9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D79465BB-675E-4260-800B-D9B7B710D012}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D79465BB-675E-4260-800B-D9B7B710D012}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D79465BB-675E-4260-800B-D9B7B710D012}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D79465BB-675E-4260-800B-D9B7B710D012}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -94,6 +100,7 @@ Global
 		{FB12AD71-A178-4CEE-A20F-E9FF31302210} = {5789610E-904A-4A82-ADAC-ED547F2A92A8}
 		{7A5C19DE-1655-408B-9CEA-2942993AB934} = {5789610E-904A-4A82-ADAC-ED547F2A92A8}
 		{252C13BD-8522-457C-8ECB-BD97FC7D1B9D} = {1C1EFE3A-0368-43C2-878C-A0AC1FDFD0CA}
+		{D79465BB-675E-4260-800B-D9B7B710D012} = {4C6F9D05-06C4-495D-9377-E624DCBC712B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {27104867-D5A0-4652-B00E-91E995E65CF8}

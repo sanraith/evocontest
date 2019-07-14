@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace evorace.WebApp.Controllers
 {
-    [Authorize(Roles = Roles.Administrator)]
+    [Authorize(Roles = Roles.Admin)]
     public class AdminController : Controller
     {
         public AdminController(ContestDb db, IFileManager fileManager)

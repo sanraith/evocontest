@@ -41,8 +41,8 @@ namespace evorace.WebApp.Areas.Identity.Pages.Account
 
             _emailToRoleMap = new Dictionary<string, string>
             {
-                { configuration.GetValue<string>("AdminEmail").ToLowerInvariant(), Roles.Administrator},
-                { configuration.GetValue<string>("RunnerEmail").ToLowerInvariant(), Roles.Runner}
+                { configuration.GetValue<string>("AdminEmail").ToLowerInvariant(), Roles.Admin},
+                { configuration.GetValue<string>("WorkerEmail").ToLowerInvariant(), Roles.Worker}
             };
         }
 

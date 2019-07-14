@@ -5,7 +5,7 @@
     /// </summary>
     public static class Roles
     {
-        public const string Administrator = "Admin";
-        public const string Runner = "Runner";
+        public const string Admin = "Admin";
+        public const string Worker = "Worker";
     }
 }

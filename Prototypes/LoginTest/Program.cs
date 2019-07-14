@@ -1,6 +1,8 @@
 ﻿using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using System;
+using evorace.WebApp.Common;
 
 namespace LoginTest
 {
@@ -9,11 +11,28 @@ namespace LoginTest
         static async Task Main(string[] args)
         {
             IConfiguration config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", false, true)
                 .AddUserSecrets(Assembly.GetExecutingAssembly())
                 .Build();
 
-            using var connector = new WebAppConnector();
+            var hostUri = new Uri(config["HostUrl"]);
+            var loginUri = new Uri(hostUri, Constants.LoginRoute);
+            var signalrUri= new Uri(hostUri, Constants.WorkerHubRoute);
+
+            using var connector = new WebAppConnector(loginUri, signalrUri);
             await connector.Login(config["Login.Email"], config["Login.Password"]);
+            await connector.ConnectToSignalR(new MyClient());
+
+            Console.ReadLine();
+        }
+
+        private class MyClient : IWorkerHubClient
+        {
+            public Task ReceiveMessage(string message)
+            {
+                Console.WriteLine(message);
+                return Task.CompletedTask;
+            }
         }
     }
 }
