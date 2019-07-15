@@ -23,19 +23,22 @@ namespace LoginTest
 
         public async Task Login(string email, string password)
         {
-            string requestVerificationToken = await LogProgress("Getting request verification token", GetRequestVerificationToken(myLoginUrl));
-            await LogProgress("Logging in", PostLogin(email, password, requestVerificationToken));
+            string requestVerificationToken = await GetRequestVerificationToken(myLoginUrl).LogProgress("Getting request verification token");
+            await PostLogin(email, password, requestVerificationToken).LogProgress("Logging in");
         }
 
         public async Task ConnectToSignalR(IWorkerHubClient client)
         {
-            myHubConn = new HubConnectionBuilder()
-                .WithUrl(mySignalrUrl,
-                    options => options.Cookies.Add(myCookieContainer.GetCookies(myLoginUrl)))
-                .Build();
-            MapClient(myHubConn, client);
+            LoggerExtensions.LogProgress("Configuring signalR", () =>
+            {
+                myHubConn = new HubConnectionBuilder()
+                    .WithUrl(mySignalrUrl,
+                        options => options.Cookies.Add(myCookieContainer.GetCookies(myLoginUrl)))
+                    .Build();
+                MapClient(myHubConn, client);
+            });
 
-            await LogProgress("Connecting to signalR", myHubConn.StartAsync());
+            await myHubConn.StartAsync().LogProgress("Connecting to signalR");
         }
 
         private async Task<string> GetRequestVerificationToken(Uri loginUri)
@@ -90,19 +93,6 @@ namespace LoginTest
 
                 conn.On(method.Name, method.GetParameters().Select(x => x.ParameterType).ToArray(), methodInvoker);
             }
-        }
-
-        private static async Task<T> LogProgress<T>(string message, Task<T> task)
-        {
-            Console.Write($"{message}... ");
-            var result = await task;
-            Console.WriteLine("done.");
-            return result;
-        }
-
-        private static Task LogProgress(string message, Task task)
-        {
-            return LogProgress(message, task.ContinueWith(_ => Task.FromResult(true)));
         }
 
         private HubConnection myHubConn;
