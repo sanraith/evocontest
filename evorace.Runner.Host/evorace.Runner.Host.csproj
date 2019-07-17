@@ -7,7 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="3.0.0-preview6.19307.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\evorace.Runner.Common\evorace.Runner.Common.csproj" />
+    <ProjectReference Include="..\evorace.WebApp.Common\evorace.WebApp.Common.csproj" />
   </ItemGroup>
 
 </Project>
