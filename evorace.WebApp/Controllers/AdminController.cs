@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using evorace.WebApp.Core;
@@ -30,7 +31,14 @@ namespace evorace.WebApp.Controllers
         {
             foreach (var sub in myDb.Submissions.Include(x => x.User))
             {
-                myFileManager.DeleteUserSubmission(sub.User, sub.StoredFileName);
+                try
+                {
+                    myFileManager.DeleteUserSubmission(sub.User, sub.StoredFileName);
+                }
+                catch (FileNotFoundException)
+                {
+                    // do not care
+                }
             }
 
             myDb.Submissions.RemoveRange(myDb.Submissions);

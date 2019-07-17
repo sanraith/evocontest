@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using evorace.WebApp.Common;
+using Microsoft.Extensions.Logging;
 
 namespace LoginTest
 {
@@ -33,7 +34,11 @@ namespace LoginTest
             {
                 myHubConn = new HubConnectionBuilder()
                     .WithUrl(mySignalrUrl,
-                        options => options.Cookies.Add(myCookieContainer.GetCookies(myLoginUrl)))
+                        options => options.Cookies.Add(myCookieContainer.GetCookies(myLoginUrl)))                    .ConfigureLogging(logging =>
+                    {
+                        logging.AddConsole();
+                        logging.SetMinimumLevel(LogLevel.Trace);
+                    })
                     .Build();
                 MapClient(myHubConn, client);
             });

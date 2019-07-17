@@ -20,7 +20,11 @@ namespace LoginTest
             var signalrUri= new Uri(hostUri, Constants.WorkerHubRoute);
 
             using var connector = new WebAppConnector(loginUri, signalrUri);
+            
+            Console.WriteLine(loginUri);
             await connector.Login(config["Login.Email"], config["Login.Password"]);
+
+            Console.WriteLine(signalrUri);
             await connector.ConnectToSignalR(new MyClient());
 
             Console.ReadLine();
