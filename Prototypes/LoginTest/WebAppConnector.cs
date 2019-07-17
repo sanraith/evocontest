@@ -33,12 +33,12 @@ namespace LoginTest
             LoggerExtensions.LogProgress("Configuring signalR", () =>
             {
                 myHubConn = new HubConnectionBuilder()
-                    .WithUrl(mySignalrUrl,
-                        options => options.Cookies.Add(myCookieContainer.GetCookies(myLoginUrl)))                    .ConfigureLogging(logging =>
-                    {
-                        logging.AddConsole();
-                        logging.SetMinimumLevel(LogLevel.Trace);
-                    })
+                    .WithUrl(mySignalrUrl, options => options.Cookies.Add(myCookieContainer.GetCookies(myLoginUrl)))
+                    //.ConfigureLogging(logging =>
+                    //    {
+                    //        logging.AddConsole();
+                    //        logging.SetMinimumLevel(LogLevel.Trace);
+                    //    })
                     .Build();
                 MapClient(myHubConn, client);
             });
@@ -50,6 +50,11 @@ namespace LoginTest
         {
             using var request = new HttpRequestMessage { Method = HttpMethod.Get, RequestUri = loginUri };
             using var response = await myHttpClient.SendAsync(request);
+
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                throw new InvalidProgramException();
+            }
 
             var regex = new Regex(@"__RequestVerificationToken[^\>]*value=""(?'token'[^""]*)""");
             var contentString = await response.Content.ReadAsStringAsync();
@@ -72,7 +77,11 @@ namespace LoginTest
                     { "__RequestVerificationToken", requestVerificationToken }
                 })
             };
-            using var _ = await myHttpClient.SendAsync(request);
+            using var response = await myHttpClient.SendAsync(request);
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                throw new InvalidProgramException();
+            }
         }
 
         public void Dispose()

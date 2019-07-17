@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace evorace.WebApp.Hubs
 {
-    //[Authorize(Roles = Roles.Worker)]
+    [Authorize(Roles = Roles.Worker)]
     public class WorkerHub : Hub<IWorkerHubClient>
     {
         public static ConcurrentDictionary<string, string> Users = new ConcurrentDictionary<string, string>();

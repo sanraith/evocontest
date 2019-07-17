@@ -35,7 +35,6 @@ namespace evorace.Runner.Common.Test.Connection
 
             Assert.That(tasksCompleted, Is.True);
             Assert.That(receivedMessage.Id, Is.EqualTo(sendMessage.Id));
-            Assert.That(receivedMessage.MessageType, Is.EqualTo(sendMessage.MessageType));
             Assert.That(receivedMessage, Is.InstanceOf<TestMessage>());
             Assert.That(((TestMessage)receivedMessage).TestProperty, Is.EqualTo(sendMessage.TestProperty));
         }

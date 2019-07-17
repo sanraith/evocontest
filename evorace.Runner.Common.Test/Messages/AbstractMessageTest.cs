@@ -11,7 +11,6 @@ namespace evorace.Runner.Common.Test.Messages
             var deserialized = SerializationHelper.SerializeAndDeserialize(testMessage);
 
             // Abstract properties are deserialized.
-            Assert.That(deserialized.MessageType, Is.EqualTo(testMessage.MessageType));
             Assert.That(deserialized.Id, Is.EqualTo(testMessage.Id));
 
             // Derived properties are deserialzied.
