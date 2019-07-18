@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -105,6 +106,54 @@ namespace evorace.Runner.Host.Connection
             {
                 await myHubConn.DisposeAsync();
             }
+        }
+
+        private class HubProxy<TClient> : DynamicObject where TClient : class
+        {
+            public HubProxy(HubConnection hubConnection)
+            {
+                myHubConnection = hubConnection;
+                myClientType = typeof(TClient);
+            }
+
+            public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object? result)
+            {
+                result = null;
+                var targetMethodName = binder.Name;
+                var methods = myClientType.GetMethods();
+
+
+                var targetMethod = methods
+                    .Where(x => x.Name == targetMethodName)
+                    .FirstOrDefault(m =>
+                    {
+                        var targetParameterInfos = m.GetParameters();
+                        if (targetParameterInfos.Length != args.Length)
+                        {
+                            return false;
+                        }
+
+                        var parameterPairs = targetParameterInfos
+                            .Select(x => x.ParameterType)
+                            .Zip(args.Select(x => x?.GetType()))
+                            .Select(p => p.Second == null ?
+                            (!p.First.IsValueType || Nullable.GetUnderlyingType(p.First) != null ? null : p.First, null) : p);
+                        var areParameterTypesMatch = parameterPairs.All(p => p.First == p.Second);
+
+                        return areParameterTypesMatch;
+                    });
+
+                if (targetMethod == null)
+                {
+                    return false;
+                }
+
+                result = myHubConnection.SendCoreAsync(targetMethodName, args);
+                return true;
+            }
+
+            private readonly Type myClientType;
+            private readonly HubConnection myHubConnection;
         }
 
         private HubConnection? myHubConn;
