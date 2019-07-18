@@ -4,16 +4,26 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <UserSecretsId>9b88f7ee-863b-4c95-bfae-e81160a6b369</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="ImpromptuInterface" Version="7.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="3.0.0-preview6.19307.2" />
+    <PackageReference Include="Microsoft.Configuration.ConfigurationBuilders.UserSecrets" Version="2.0.0-beta" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.0.0-preview6.19304.6" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.0.0-preview6.19304.6" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\evorace.Runner.Common\evorace.Runner.Common.csproj" />
     <ProjectReference Include="..\evorace.WebApp.Common\evorace.WebApp.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

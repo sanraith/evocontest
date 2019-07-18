@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace evorace.WebApp.Hubs
 {
     [Authorize(Roles = Roles.Worker)]
-    public class WorkerHub : Hub<IWorkerHubClient>
+    public class WorkerHub : Hub<IWorkerHubClient>, IWorkerHubServer
     {
         public static ConcurrentDictionary<string, string> Users = new ConcurrentDictionary<string, string>();
 
@@ -25,9 +25,9 @@ namespace evorace.WebApp.Hubs
             return base.OnDisconnectedAsync(exception);
         }
 
-        public Task SendMessage(string message)
+        public Task SendMessage(string status)
         {
-            return Clients.All.ReceiveMessage(message);
+            return Clients.Others.ReceiveMessage(status);
         }
     }
 }

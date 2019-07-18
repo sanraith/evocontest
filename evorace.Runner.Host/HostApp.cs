@@ -1,4 +1,8 @@
 ﻿using evorace.Runner.Common.Connection;
+using evorace.Runner.Host.Configuration;
+using evorace.Runner.Host.Connection;
+using evorace.WebApp.Common;
+using System;
 using System.Threading.Tasks;
 
 namespace evorace.Runner.Host
@@ -14,10 +18,30 @@ namespace evorace.Runner.Host
 
         private async Task Run()
         {
+            var config = RunnerHostConfiguration.Load();
+
+            await using var webApp = await ConnectToWebApp(config);
+            var hubProxy = await webApp.ConnectToSignalR(new HubClient());
+
+            string msg;
+            while (!string.IsNullOrWhiteSpace(msg = Console.ReadLine()))
+            {
+                await hubProxy.SendMessage(msg);
+            }
+
             using var pipeServer = new PipeServer(PipeName);
-            // TODO start worker
-            await pipeServer.WaitForConnectionAsync();
-            // TODO send commands for worker
+        }
+
+        private static async Task<WebAppConnector> ConnectToWebApp(RunnerHostConfiguration config)
+        {
+            var hostUri = new Uri(config.HostUrl);
+            var loginUri = new Uri(hostUri, Constants.LoginRoute);
+            var workerHubUri = new Uri(hostUri, Constants.WorkerHubRoute);
+
+            var connector = new WebAppConnector(loginUri, workerHubUri);
+            await connector.Login(config.Login.Email, config.Login.Password);
+
+            return connector;
         }
     }
 }
