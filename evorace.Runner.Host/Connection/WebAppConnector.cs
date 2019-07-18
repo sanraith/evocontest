@@ -9,6 +9,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using evorace.WebApp.Common;
 using evorace.Runner.Host.Extensions;
+using ImpromptuInterface;
+using System.Reflection;
 
 namespace evorace.Runner.Host.Connection
 {
@@ -17,7 +19,7 @@ namespace evorace.Runner.Host.Connection
         public WebAppConnector(Uri loginUrl, Uri signalrUrl)
         {
             myCookieContainer = new CookieContainer();
-            HttpClientHandler handler = new HttpClientHandler { CookieContainer = myCookieContainer };
+            var handler = new HttpClientHandler { CookieContainer = myCookieContainer };
             myLoginUrl = loginUrl;
             mySignalrUrl = signalrUrl;
             myHttpClient = new HttpClient(handler);
@@ -29,17 +31,19 @@ namespace evorace.Runner.Host.Connection
             await PostLogin(email, password, requestVerificationToken).LogProgress("Logging in");
         }
 
-        public async Task ConnectToSignalR(IWorkerHubClient client)
+        public async Task<IWorkerHubClient> ConnectToSignalR(IWorkerHubClient client)
         {
-            LoggerExtensions.LogProgress("Configuring signalR", () =>
+            var hubProxy = LoggerExtensions.LogProgress("Configuring signalR", () =>
             {
                 myHubConn = new HubConnectionBuilder()
                     .WithUrl(mySignalrUrl, options => options.Cookies.Add(myCookieContainer.GetCookies(myLoginUrl)))
                     .Build();
-                MapClient(myHubConn, client);
+                return MapClient(myHubConn, client);
             });
 
             await myHubConn!.StartAsync().LogProgress("Connecting to signalR");
+
+            return hubProxy;
         }
 
         private async Task<string> GetRequestVerificationToken(Uri loginUri)
@@ -80,7 +84,7 @@ namespace evorace.Runner.Host.Connection
             }
         }
 
-        private static void MapClient<TClient>(HubConnection conn, TClient client) where TClient : class
+        private static TClient MapClient<TClient>(HubConnection conn, TClient client) where TClient : class
         {
             var methods = typeof(TClient).GetMethods();
             foreach (var method in methods)
@@ -97,6 +101,8 @@ namespace evorace.Runner.Host.Connection
 
                 conn.On(method.Name, method.GetParameters().Select(x => x.ParameterType).ToArray(), methodInvoker);
             }
+
+            return HubProxy<TClient>.Create(conn);
         }
 
         public async ValueTask DisposeAsync()
@@ -110,20 +116,34 @@ namespace evorace.Runner.Host.Connection
 
         private class HubProxy<TClient> : DynamicObject where TClient : class
         {
-            public HubProxy(HubConnection hubConnection)
+            private HubProxy(HubConnection hubConnection)
             {
                 myHubConnection = hubConnection;
-                myClientType = typeof(TClient);
+                myTargetMethods = typeof(TClient).GetMethods();
+            }
+
+            public static TClient Create(HubConnection hubConnection)
+            {
+                return new HubProxy<TClient>(hubConnection).ActLike<TClient>();
             }
 
             public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object? result)
             {
                 result = null;
                 var targetMethodName = binder.Name;
-                var methods = myClientType.GetMethods();
 
+                if (!TryGetTargetMethod(targetMethodName, args, out _))
+                {
+                    return false;
+                }
 
-                var targetMethod = methods
+                result = myHubConnection.SendCoreAsync(targetMethodName, args);
+                return true;
+            }
+
+            private bool TryGetTargetMethod(string targetMethodName, object[] args, out MethodInfo targetMethodInfo)
+            {
+                targetMethodInfo = myTargetMethods
                     .Where(x => x.Name == targetMethodName)
                     .FirstOrDefault(m =>
                     {
@@ -133,26 +153,27 @@ namespace evorace.Runner.Host.Connection
                             return false;
                         }
 
-                        var parameterPairs = targetParameterInfos
-                            .Select(x => x.ParameterType)
-                            .Zip(args.Select(x => x?.GetType()))
-                            .Select(p => p.Second == null ?
-                            (!p.First.IsValueType || Nullable.GetUnderlyingType(p.First) != null ? null : p.First, null) : p);
-                        var areParameterTypesMatch = parameterPairs.All(p => p.First == p.Second);
+                        var areParameterTypesMatch = targetParameterInfos
+                            .Zip(args, (a, b) => (Source: b?.GetType(), Target: a.ParameterType))
+                            .Select(pair =>
+                            {
+                                (var source, Type? target) = pair;
+                                if (source == null)
+                                {
+                                    var isTargetNullable = !target.IsValueType || Nullable.GetUnderlyingType(target) != null;
+                                    target = isTargetNullable ? null : target;
+                                }
+                                return (Source: source, Target: target);
+                            })
+                            .All(p => p.Source == p.Target);
 
                         return areParameterTypesMatch;
                     });
 
-                if (targetMethod == null)
-                {
-                    return false;
-                }
-
-                result = myHubConnection.SendCoreAsync(targetMethodName, args);
-                return true;
+                return targetMethodInfo != null;
             }
 
-            private readonly Type myClientType;
+            private readonly MethodInfo[] myTargetMethods;
             private readonly HubConnection myHubConnection;
         }
 
