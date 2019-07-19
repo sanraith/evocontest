@@ -1,8 +1,10 @@
 ﻿using evorace.Runner.Common.Connection;
+using evorace.Runner.Common.Messages;
 using evorace.Runner.Host.Configuration;
 using evorace.Runner.Host.Connection;
 using evorace.WebApp.Common;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace evorace.Runner.Host
@@ -23,13 +25,20 @@ namespace evorace.Runner.Host
             await using var webApp = await ConnectToWebApp(config);
             var hubProxy = await webApp.ConnectToSignalR(new HubClient());
 
-            string msg;
-            while (!string.IsNullOrWhiteSpace(msg = Console.ReadLine()))
-            {
-                await hubProxy.SendMessage(msg);
-            }
+            var process = Process.Start(config.WorkerProcessInfo);
 
             using var pipeServer = new PipeServer(PipeName);
+            await pipeServer.WaitForConnectionAsync();
+
+            pipeServer.SendMessage(new LoadContextMessage("TODO add assembly name"));
+            var response = pipeServer.ReceiveMessage();
+            Console.WriteLine(response.ToString());
+            pipeServer.SendMessage(new TerminateMessage());
+
+            process.WaitForExit();
+            Console.WriteLine("Worker process finished.");
+
+            Console.ReadLine();
         }
 
         private static async Task<WebAppConnector> ConnectToWebApp(RunnerHostConfiguration config)

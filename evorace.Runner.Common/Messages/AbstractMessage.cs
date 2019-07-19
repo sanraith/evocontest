@@ -14,5 +14,10 @@ namespace evorace.Runner.Common.Messages
             MessageType = GetType().FullName;
             Id = Guid.NewGuid();
         }
+
+        public override string ToString()
+        {
+            return $"{Id.ToString()[..6]} {GetType().Name}";
+        }
     }
 }
