@@ -21,6 +21,8 @@ namespace evorace.WebApp.Controllers
             myFileManager = fileManager;
         }
 
+        public IActionResult Index() => RedirectToAction(nameof(Admin));
+        
         public IActionResult Admin()
         {
             return View();

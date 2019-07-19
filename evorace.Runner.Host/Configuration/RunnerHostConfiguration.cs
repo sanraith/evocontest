@@ -7,6 +7,8 @@ namespace evorace.Runner.Host.Configuration
     {
         public string HostUrl { get; set; } = string.Empty;
 
+        public string StartWorkerCommand { get; set; } = string.Empty;
+
         public LoginInformation Login { get; set; } = new LoginInformation();
 
         public static RunnerHostConfiguration Load()

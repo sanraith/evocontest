@@ -2,7 +2,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace evorace.Runner.Host
+namespace evorace.Runner.Host.Connection
 {
     public class HubClient : IWorkerHubClient
     {

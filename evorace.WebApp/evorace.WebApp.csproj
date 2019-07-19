@@ -38,9 +38,16 @@
   <ItemGroup>
     <None Remove="_Store\**\*.dll" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\evorace.WebApp.Common\evorace.WebApp.Common.csproj" />
   </ItemGroup>
+
+  <Target Name="CopySignalR" BeforeTargets="AfterBuild">
+    <ItemGroup>
+      <SignalRJSClientFiles Include="$(MSBuildThisFileDirectory)node_modules\@aspnet\signalr\dist\browser\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(SignalRJSClientFiles)" DestinationFolder="$(MSBuildThisFileDirectory)wwwroot\lib\signalr" />
+  </Target>
 
 </Project>

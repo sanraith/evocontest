@@ -29,6 +29,8 @@ namespace evorace.WebApp.Controllers
             myApiHub = apiHub;
         }
 
+        public IActionResult Index() => RedirectToAction(nameof(Submit));
+
         public async Task<IActionResult> Submit()
         {
             var user = await myUserManager.GetUserAsync(HttpContext.User);

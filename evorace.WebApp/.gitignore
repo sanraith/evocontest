@@ -1,2 +1,8 @@
 # User submitted assemblies
 _Store/**/*.dll
+
+# npm packages
+node_modules/
+
+# client side signalr
+wwwroot/lib/signalr
