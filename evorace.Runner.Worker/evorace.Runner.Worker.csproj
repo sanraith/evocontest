@@ -10,10 +10,4 @@
     <ProjectReference Include="..\evorace.Runner.Common\evorace.Runner.Common.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="evorace.Runner.Worker.runtimeconfig.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>

@@ -27,4 +27,12 @@
     </None>
   </ItemGroup>
 
+  <Target Name="CopyWorker" BeforeTargets="AfterBuild">
+    <ItemGroup>
+      <WorkerFiles Include="$(MSBuildThisFileDirectory)..\evorace.Runner.Worker\$(OutputPath)\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(WorkerFiles)" DestinationFolder="$(MSBuildThisFileDirectory)$(OutputPath)\worker" />
+    <Message Importance="high" Text="Copying worker files..." />
+  </Target>
+
 </Project>

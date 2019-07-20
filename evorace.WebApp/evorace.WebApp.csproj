@@ -40,6 +40,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\.vs\evorace19\config\applicationhost.config" Link="applicationhost.config" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\evorace.WebApp.Common\evorace.WebApp.Common.csproj" />
   </ItemGroup>
 
