@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,6 +9,7 @@ using evorace.WebApp.Data;
 using evorace.WebApp.Data.Helper;
 using evorace.WebApp.Hubs;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,17 +18,25 @@ namespace evorace.WebApp.Controllers
     [Authorize(Roles = Roles.Admin)]
     public class AdminController : Controller
     {
-        public AdminController(ContestDb db, IFileManager fileManager)
+        public AdminController(ContestDb db, IFileManager fileManager, UserManager<ApplicationUser> userManager)
         {
             myDb = db;
             myFileManager = fileManager;
+            myUserManager = userManager;
         }
 
         public IActionResult Index() => RedirectToAction(nameof(Admin));
-        
-        public IActionResult Admin()
+
+        public async Task<IActionResult> Admin()
         {
-            ViewBag.Message = "SignalR clients: " + string.Join(", ", WorkerHub.Users.Values);
+            var signalRUsers = new ConcurrentDictionary<ApplicationUser, int>();
+            foreach (var userId in WorkerHub.Users.Values)
+            {
+                var user = await myUserManager.FindByIdAsync(userId);
+                signalRUsers.AddOrUpdate(user, 1, (_, connCount) => connCount + 1);
+            }
+
+            ViewBag.Message = "SignalR clients: " + string.Join(", ", signalRUsers.Select(x => $"{x.Key.Email} ({x.Value})"));
             return View();
         }
 
@@ -55,5 +65,6 @@ namespace evorace.WebApp.Controllers
 
         private readonly ContestDb myDb;
         private readonly IFileManager myFileManager;
+        private readonly UserManager<ApplicationUser> myUserManager;
     }
 }

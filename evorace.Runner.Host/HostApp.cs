@@ -23,8 +23,10 @@ namespace evorace.Runner.Host
             var config = RunnerHostConfiguration.Load();
 
             await using var webApp = await ConnectToWebApp(config);
-            var hubProxy = await webApp.ConnectToSignalR(new HubClient());
+            HubClient client = new HubClient();
+            client.SubmissionValidationRequested += async (_, id) => _ = await webApp.DownloadSubmission(id);
 
+            var hubProxy = await webApp.ConnectToSignalR(client);
             var process = Process.Start(config.WorkerProcessInfo);
 
             using var pipeServer = new PipeServer(PipeName);
@@ -44,10 +46,7 @@ namespace evorace.Runner.Host
         private static async Task<WebAppConnector> ConnectToWebApp(RunnerHostConfiguration config)
         {
             var hostUri = new Uri(config.HostUrl);
-            var loginUri = new Uri(hostUri, Constants.LoginRoute);
-            var workerHubUri = new Uri(hostUri, Constants.WorkerHubRoute);
-
-            var connector = new WebAppConnector(loginUri, workerHubUri);
+            var connector = new WebAppConnector(hostUri);
             await connector.Login(config.Login.Email, config.Login.Password);
 
             return connector;

@@ -34,7 +34,7 @@ namespace evorace.WebApp.Controllers
         public async Task<IActionResult> Submit()
         {
             var user = await myUserManager.GetUserAsync(HttpContext.User);
-            var latestSubmission = Query(user, u => u.Submissions).LastOrDefault(x => !x.IsDeleted);
+            var latestSubmission = myDb.Query(user, u => u.Submissions).LastOrDefault(x => !x.IsDeleted);
 
             var viewModel = new SubmitViewModel { LatestSubmission = latestSubmission };
             return View(viewModel);
@@ -50,7 +50,7 @@ namespace evorace.WebApp.Controllers
         public async Task<IActionResult> DoUpload()
         {
             var user = await myUserManager.GetUserAsync(HttpContext.User);
-            var hasActiveSubmission = Query(user, u => u.Submissions).Any(x => !x.IsDeleted);
+            var hasActiveSubmission = myDb.Query(user, u => u.Submissions).Any(x => !x.IsDeleted);
             if (hasActiveSubmission)
             {
                 // User still has an active submission which has to be deleted first.
@@ -92,7 +92,7 @@ namespace evorace.WebApp.Controllers
         public async Task<ActionResult> DoDelete(string submissionId)
         {
             var user = await myUserManager.GetUserAsync(HttpContext.User);
-            var submissionForDelete = Query(user, u => u.Submissions).LastOrDefault(x => x.Id == submissionId);
+            var submissionForDelete = myDb.Query(user, u => u.Submissions).LastOrDefault(x => x.Id == submissionId);
 
             if (submissionForDelete != null)
             {
@@ -134,14 +134,6 @@ namespace evorace.WebApp.Controllers
                 }
             }
             return null;
-        }
-
-        private IQueryable<TProperty> Query<TEntity, TProperty>(TEntity entity,
-            Expression<Func<TEntity, IEnumerable<TProperty>>> expression)
-            where TEntity : class
-            where TProperty : class
-        {
-            return myDb.Entry(entity).Collection(expression).Query();
         }
 
         private readonly ContestDb myDb;

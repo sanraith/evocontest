@@ -1,5 +1,6 @@
 ﻿using evorace.WebApp.Data;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.FileProviders;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -14,5 +15,7 @@ namespace evorace.WebApp.Core
         Task<FileInfo> SaveUserSubmissionAsync(ApplicationUser user, IFormFile file, DateTime timeStamp);
 
         void DeleteUserSubmission(ApplicationUser user, string fileName);
+
+        IFileInfo GetFileInfo(ApplicationUser user, string fileName);
     }
 }

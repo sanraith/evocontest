@@ -4,5 +4,6 @@
     {
         public static readonly string LoginRoute = "/Identity/Account/Login";
         public static readonly string WorkerHubRoute = "/workerhub";
+        public static readonly string DownloadSubmissionRoute = "/Worker/DoDownloadSubmission";
     }
 }

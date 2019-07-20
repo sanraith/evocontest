@@ -1,6 +1,7 @@
 ﻿using evorace.WebApp.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.FileProviders;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,6 +18,7 @@ namespace evorace.WebApp.Core
         {
             myRootPath = environment.ContentRootPath;
             myStoreRootPath = Path.Combine(myRootPath, StorageFolderName);
+            myEnvironment = environment;
         }
 
         public SubmissionFileCheckResult CheckUserSubmission(IFormFile file)
@@ -74,6 +76,11 @@ namespace evorace.WebApp.Core
             }
         }
 
+        public IFileInfo GetFileInfo(ApplicationUser user, string fileName)
+        {
+            return myEnvironment.ContentRootFileProvider.GetFileInfo(Path.Combine(StorageFolderName, SubmissionFolderName, user.UploadFolderName, fileName));
+        }
+
         private DirectoryInfo GetUserDir(ApplicationUser user)
         {
             return new DirectoryInfo(Path.Combine(myStoreRootPath, SubmissionFolderName, user.UploadFolderName));
@@ -94,7 +101,7 @@ namespace evorace.WebApp.Core
 
         private readonly string myRootPath;
         private readonly string myStoreRootPath;
-
+        private readonly IWebHostEnvironment myEnvironment;
         private const string StorageFolderName = "_Store";
         private const string SubmissionFolderName = "Submissions";
     }

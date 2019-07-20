@@ -8,23 +8,25 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using evorace.WebApp.Common;
 using evorace.Runner.Host.Extensions;
+using System.IO;
 
 namespace evorace.Runner.Host.Connection
 {
     public sealed class WebAppConnector : IAsyncDisposable
     {
-        public WebAppConnector(Uri loginUrl, Uri signalrUrl)
+        public WebAppConnector(Uri hostUri)
         {
             myCookieContainer = new CookieContainer();
             var handler = new HttpClientHandler { CookieContainer = myCookieContainer };
-            myLoginUrl = loginUrl;
-            mySignalrUrl = signalrUrl;
+            myLoginUri = new Uri(hostUri, Constants.LoginRoute);
+            mySignalrUri = new Uri(hostUri, Constants.WorkerHubRoute);
+            myDownloadSubmissionUri = new Uri(hostUri, Constants.DownloadSubmissionRoute);
             myHttpClient = new HttpClient(handler);
         }
 
         public async Task Login(string email, string password)
         {
-            string requestVerificationToken = await GetRequestVerificationToken(myLoginUrl).LogProgress("Getting request verification token");
+            string requestVerificationToken = await GetRequestVerificationToken(myLoginUri).LogProgress("Getting request verification token");
             await PostLogin(email, password, requestVerificationToken).LogProgress("Logging in");
         }
 
@@ -33,7 +35,7 @@ namespace evorace.Runner.Host.Connection
             var hubProxy = Extensions.LoggerExtensions.LogProgress("Configuring signalR", () =>
             {
                 myHubConn = new HubConnectionBuilder()
-                    .WithUrl(mySignalrUrl, options => options.Cookies.Add(myCookieContainer.GetCookies(myLoginUrl)))
+                    .WithUrl(mySignalrUri, options => options.Cookies.Add(myCookieContainer.GetCookies(myLoginUri)))
                     .WithAutomaticReconnect()
                     .ConfigureLogging(options => options.AddConsole().SetMinimumLevel(LogLevel.Error))
                     .Build();
@@ -45,6 +47,35 @@ namespace evorace.Runner.Host.Connection
             return hubProxy;
         }
 
+        public async Task<FileInfo> DownloadSubmission(string submissionId)
+        {
+            using var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = myDownloadSubmissionUri,
+                Content = new FormUrlEncodedContent(new Dictionary<string, string>
+                {
+                    { "submissionId", submissionId}
+                })
+            };
+            using var response = await myHttpClient.SendAsync(request);
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                throw new InvalidOperationException();
+            }
+
+            var fileName = response.Content.Headers.ContentDisposition.FileName;
+            var targetDirectory = new DirectoryInfo($"temp\\{submissionId}");
+            var fileInfo = new FileInfo(Path.Combine(targetDirectory.FullName, fileName));
+            if (!targetDirectory.Exists) { targetDirectory.Create(); }
+
+            using var readStream = await response.Content.ReadAsStreamAsync();
+            using var writeStream = File.Create(fileInfo.FullName);
+            await readStream.CopyToAsync(writeStream);
+
+            return fileInfo;
+        }
+
         private async Task<string> GetRequestVerificationToken(Uri loginUri)
         {
             using var request = new HttpRequestMessage { Method = HttpMethod.Get, RequestUri = loginUri };
@@ -52,7 +83,7 @@ namespace evorace.Runner.Host.Connection
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                throw new InvalidProgramException();
+                throw new InvalidOperationException();
             }
 
             var regex = new Regex(@"__RequestVerificationToken[^\>]*value=""(?'token'[^""]*)""");
@@ -67,7 +98,7 @@ namespace evorace.Runner.Host.Connection
             using var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = myLoginUrl,
+                RequestUri = myLoginUri,
                 Content = new FormUrlEncodedContent(new Dictionary<string, string>
                 {
                     { "Input.Email", email },
@@ -79,7 +110,7 @@ namespace evorace.Runner.Host.Connection
             using var response = await myHttpClient.SendAsync(request);
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                throw new InvalidProgramException();
+                throw new InvalidOperationException();
             }
         }
 
@@ -93,8 +124,9 @@ namespace evorace.Runner.Host.Connection
         }
 
         private HubConnection? myHubConn;
-        private readonly Uri myLoginUrl;
-        private readonly Uri mySignalrUrl;
+        private readonly Uri myLoginUri;
+        private readonly Uri mySignalrUri;
+        private readonly Uri myDownloadSubmissionUri;
         private readonly HttpClient myHttpClient;
         private readonly CookieContainer myCookieContainer;
     }

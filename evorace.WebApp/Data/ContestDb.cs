@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace evorace.WebApp.Data
 {
@@ -11,6 +15,24 @@ namespace evorace.WebApp.Data
         public ContestDb(DbContextOptions<ContestDb> options)
             : base(options)
         { }
+
+
+        public IQueryable<TProperty> Query<TEntity, TProperty>(TEntity entity,
+            Expression<Func<TEntity, IEnumerable<TProperty>>> expression)
+            where TEntity : class
+            where TProperty : class
+        {
+            return Entry(entity).Collection(expression).Query();
+        }
+
+        public TProperty Load<TEntity, TProperty>(TEntity entity,
+            Expression<Func<TEntity, TProperty>> expression)
+            where TEntity : class
+            where TProperty : class
+        {
+            Entry(entity).Reference(expression).Load();
+            return expression.Compile().Invoke(entity);
+        }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

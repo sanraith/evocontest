@@ -6,6 +6,8 @@ namespace evorace.Runner.Host.Connection
 {
     public class HubClient : IWorkerHubClient
     {
+        public event EventHandler<string> SubmissionValidationRequested;
+
         public Task ReceiveMessage(string message)
         {
             Console.WriteLine(message);
@@ -18,6 +20,8 @@ namespace evorace.Runner.Host.Connection
             foreach (var id in submissionIds)
             {
                 Console.WriteLine(" - " + id);
+                SubmissionValidationRequested?.Invoke(this, id);
+                break;
             }
 
             return Task.CompletedTask;
