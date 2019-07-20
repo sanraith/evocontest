@@ -81,6 +81,8 @@ namespace evorace.WebApp.Controllers
                     {
                         FileManager.SubmissionFileCheckResult.NoFile => "Hiányzó fájl.",
                         FileManager.SubmissionFileCheckResult.InvalidSize => $"Túl nagy méretű fájl. Maximális méret: {FileManager.MaxSubmittedFileSize / 1024 / 1024} MB.",
+                        FileManager.SubmissionFileCheckResult.InvalidFileName => "Helytelen fájlnév. Csak a következő karaktereket használd: A-Z, a-z, 0-9, _.-",
+                        FileManager.SubmissionFileCheckResult.InvalidFileNameLength => $"Túl hosszú fájlnév. Maximum {FileManager.MaxFileNameLength} karakter hosszú fájlnevet használj.",
                         FileManager.SubmissionFileCheckResult.InvalidFileExtension => "Hibás kiterjesztésű fájl. Csak .dll fájlok tölthetők fel.",
                         _ => "Ismeretlen hiba."
                     }

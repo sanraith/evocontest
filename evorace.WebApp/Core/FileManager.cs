@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace evorace.WebApp.Core
@@ -13,6 +14,7 @@ namespace evorace.WebApp.Core
     public class FileManager : IFileManager
     {
         public const int MaxSubmittedFileSize = 5 * 1024 * 1024;
+        public const int MaxFileNameLength = 100;
 
         public FileManager(IWebHostEnvironment environment)
         {
@@ -33,9 +35,20 @@ namespace evorace.WebApp.Core
                 return SubmissionFileCheckResult.InvalidSize;
             }
 
+            if (file.FileName.Length <= 0 || file.FileName.Length > MaxFileNameLength)
+            {
+                return SubmissionFileCheckResult.InvalidFileNameLength;
+            }
+
             if (!string.Equals(".dll", new FileInfo(file.FileName).Extension, StringComparison.OrdinalIgnoreCase))
             {
                 return SubmissionFileCheckResult.InvalidFileExtension;
+            }
+
+            var fileNameRegex = new Regex(@"^[\w\-. ]+\.(?i)(dll)$");
+            if (!fileNameRegex.IsMatch(file.FileName))
+            {
+                return SubmissionFileCheckResult.InvalidFileName;
             }
 
             return SubmissionFileCheckResult.Ok;
@@ -96,7 +109,9 @@ namespace evorace.WebApp.Core
             Ok,
             NoFile,
             InvalidSize,
-            InvalidFileExtension
+            InvalidFileName,
+            InvalidFileExtension,
+            InvalidFileNameLength
         }
 
         private readonly string myRootPath;
