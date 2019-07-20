@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -29,11 +30,12 @@ namespace evorace.Runner.Host.Connection
 
         public async Task<IWorkerHubServer> ConnectToSignalR(IWorkerHubClient client)
         {
-            var hubProxy = LoggerExtensions.LogProgress("Configuring signalR", () =>
+            var hubProxy = Extensions.LoggerExtensions.LogProgress("Configuring signalR", () =>
             {
                 myHubConn = new HubConnectionBuilder()
                     .WithUrl(mySignalrUrl, options => options.Cookies.Add(myCookieContainer.GetCookies(myLoginUrl)))
                     .WithAutomaticReconnect()
+                    .ConfigureLogging(options => options.AddConsole().SetMinimumLevel(LogLevel.Error))
                     .Build();
                 return HubProxy.Create<IWorkerHubServer, IWorkerHubClient>(myHubConn, client);
             });

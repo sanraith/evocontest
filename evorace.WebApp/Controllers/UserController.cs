@@ -57,17 +57,19 @@ namespace evorace.WebApp.Controllers
                 return BadRequest(new { success = false, error = "Már van aktív nevezésed. Frissítsd az oldalt." });
             }
 
+            string submissionId = null;
             var success = false;
             var file = Request.Form.Files.SingleOrDefault();
             var checkResult = myFileManager.CheckUserSubmission(file);
             if (checkResult == FileManager.SubmissionFileCheckResult.Ok)
             {
-                success = await SaveUserSubmission(user, file);
+                submissionId = await SaveUserSubmission(user, file);
+                success = submissionId != null;
             }
 
             if (success)
             {
-                await myApiHub.Clients.All.ReceiveMessage($"{user.Id} uploaded a file.");
+                await myApiHub.Clients.All.ValidateSubmissions(submissionId);
                 return Ok(new { success });
             }
             else
@@ -101,7 +103,7 @@ namespace evorace.WebApp.Controllers
             return RedirectToAction(nameof(Submit));
         }
 
-        private async Task<bool> SaveUserSubmission(ApplicationUser user, IFormFile file)
+        private async Task<string> SaveUserSubmission(ApplicationUser user, IFormFile file)
         {
             FileInfo savedFile = null;
             try
@@ -122,7 +124,7 @@ namespace evorace.WebApp.Controllers
                 myDb.Submissions.Add(submission);
                 myDb.SaveChanges();
 
-                return true;
+                return submission.Id;
             }
             catch (Exception)
             {
@@ -131,7 +133,7 @@ namespace evorace.WebApp.Controllers
                     myFileManager.DeleteUserSubmission(user, savedFile.Name);
                 }
             }
-            return false;
+            return null;
         }
 
         private IQueryable<TProperty> Query<TEntity, TProperty>(TEntity entity,

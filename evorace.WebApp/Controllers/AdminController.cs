@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using evorace.WebApp.Core;
 using evorace.WebApp.Data;
 using evorace.WebApp.Data.Helper;
+using evorace.WebApp.Hubs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,7 @@ namespace evorace.WebApp.Controllers
         
         public IActionResult Admin()
         {
+            ViewBag.Message = "SignalR clients: " + string.Join(", ", WorkerHub.Users.Values);
             return View();
         }
 
