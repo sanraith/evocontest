@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Reflection;
+﻿using System.Reflection;
 using Microsoft.Extensions.Configuration;
 
 namespace evorace.Runner.Host.Configuration
@@ -8,7 +7,7 @@ namespace evorace.Runner.Host.Configuration
     {
         public string HostUrl { get; set; } = string.Empty;
 
-        public ProcessStartInfo WorkerProcessInfo { get; set; } = new ProcessStartInfo();
+        public CustomProcessStartInfo WorkerProcessInfo { get; set; } = new CustomProcessStartInfo();
 
         public LoginInformation Login { get; set; } = new LoginInformation();
 
