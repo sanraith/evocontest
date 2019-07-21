@@ -31,7 +31,7 @@ namespace evorace.Runner.Host.Connection
                 var fileInfo = await LoadSubmission(id);
 
                 var wf = new ValidationWorkflow(myConfig);
-                await wf.Start(fileInfo);
+                await wf.Execute(fileInfo);
             }
         }
 

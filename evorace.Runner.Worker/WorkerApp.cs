@@ -1,12 +1,11 @@
-﻿using evorace.Runner.Common.Connection;
+﻿using evorace.Runner.Common;
+using evorace.Runner.Common.Connection;
 using System.Threading.Tasks;
 
 namespace evorace.Runner.Worker
 {
     public sealed class WorkerApp
     {
-        public const string PipeName = "evorace.Runner";
-
         static async Task Main(string[] args)
         {
             await new WorkerApp().Run();
@@ -14,7 +13,7 @@ namespace evorace.Runner.Worker
 
         public async Task Run()
         {
-            using var pipeClient = new PipeClient(PipeName);
+            using var pipeClient = new PipeClient(Constants.PipeName);
             await pipeClient.ConnectAsync();
 
             var messageHandler = new MessageHandler();

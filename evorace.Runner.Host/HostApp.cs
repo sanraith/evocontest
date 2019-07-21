@@ -2,6 +2,7 @@
 using evorace.Runner.Host.Connection;
 using evorace.Runner.Host.Core;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace evorace.Runner.Host
@@ -10,6 +11,12 @@ namespace evorace.Runner.Host
     {
         static async Task Main(string[] args)
         {
+            if (args.FirstOrDefault() == "--debug")
+            {
+                Console.WriteLine("Press enter when ready...");
+                Console.ReadLine();
+            }
+
             await new HostApp().Run();
         }
 

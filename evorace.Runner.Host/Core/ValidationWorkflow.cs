@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using evorace.Runner.Common;
 using evorace.Runner.Common.Connection;
 using evorace.Runner.Common.Messages;
 using evorace.Runner.Host.Configuration;
@@ -10,36 +11,76 @@ namespace evorace.Runner.Host.Core
 {
     public sealed class ValidationWorkflow
     {
-        public const string PipeName = "evorace.Runner";
-
         public ValidationWorkflow(HostConfiguration config)
         {
             myConfig = config;
+            myPipeServer = null!;
+            myWorkerProcess = null!;
         }
 
-        public async Task Start(FileInfo targetFile)
+        public async Task Execute(FileInfo targetFile)
         {
-            // Setup sandbox
-            var process = Process.Start(myConfig.WorkerProcessInfo);
-            using var pipeServer = new PipeServer(PipeName);
-            await pipeServer.WaitForConnectionAsync();
+            Console.WriteLine($"Validating {targetFile.Name}...");
 
-            // Load context to sandbox
-            var workerDirectory = new DirectoryInfo(myConfig.Directories.Worker);
-            var relativePath = GetRelativePath(workerDirectory, targetFile);
-            pipeServer.SendMessage(new LoadContextMessage(relativePath));
-
-            var response = pipeServer.ReceiveMessage();
-            switch (response)
+            using (myWorkerProcess = StartWorkerProcess())
+            using (myPipeServer = await StartPipeServer())
             {
-                case OperationSuccessfulMessage _: Console.WriteLine("success"); break;
-                case OperationFailedMessage _: Console.WriteLine("fail"); break; // TODO handle fail
-                default: throw new InvalidOperationException();
+                LoadSubmissionToWorker(targetFile);
+                StopWorkerProcess();
             }
 
-            pipeServer.SendMessage(new TerminateMessage());
+            Console.WriteLine("Validation done.");
+        }
 
-            process.WaitForExit();
+        private bool LoadSubmissionToWorker(FileInfo targetFile)
+        {
+            var workerDirectory = new DirectoryInfo(myConfig.Directories.Worker);
+            var relativePath = GetRelativePath(workerDirectory, targetFile);
+            myPipeServer.SendMessage(new LoadContextMessage(relativePath));
+
+            var response = myPipeServer.ReceiveMessage();
+            switch (response)
+            {
+                case OperationSuccessfulMessage _: return true;
+                case OperationFailedMessage _: return false;
+                default: throw new InvalidOperationException();
+            }
+        }
+
+        private void StopWorkerProcess()
+        {
+            myPipeServer.SendMessage(new TerminateMessage());
+            
+            Console.Write("Waiting for worker process to exit... ");
+            myWorkerProcess.WaitForExit(5000);
+
+            if (!myWorkerProcess.HasExited)
+            {
+                Console.Write("Killing it instead... ");
+                myWorkerProcess.Kill(entireProcessTree: true);
+            }
+
+            Console.WriteLine($"Exit code: {myWorkerProcess.ExitCode}.");
+        }
+
+        private Process StartWorkerProcess()
+        {
+            ProcessStartInfo startInfo = myConfig.WorkerProcessInfo;
+            startInfo.CreateNoWindow = true;
+            startInfo.UseShellExecute = false;
+            startInfo.RedirectStandardOutput = true;
+            startInfo.RedirectStandardError = true;
+            var process = Process.Start(startInfo);
+
+            return process;
+        }
+
+        private static async Task<PipeServer> StartPipeServer()
+        {
+            var pipeServer = new PipeServer(Constants.PipeName);
+            await pipeServer.WaitForConnectionAsync();
+
+            return pipeServer;
         }
 
         private static string GetRelativePath(DirectoryInfo directoryInfo, FileInfo fileInfo)
@@ -56,6 +97,8 @@ namespace evorace.Runner.Host.Core
             return relativePath;
         }
 
+        private Process myWorkerProcess;
+        private PipeServer myPipeServer;
         private readonly HostConfiguration myConfig;
     }
 }
