@@ -22,6 +22,7 @@ namespace evorace.Runner.Worker
 
         private static MessageHandlerResult HandleLoadContextMessage(LoadContextMessage loadMsg)
         {
+            Console.WriteLine(loadMsg.TargetAssemblyPath);
             IMessage response;
             try
             {

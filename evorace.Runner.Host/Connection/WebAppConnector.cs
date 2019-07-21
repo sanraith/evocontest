@@ -9,19 +9,23 @@ using System.Threading.Tasks;
 using evorace.WebApp.Common;
 using evorace.Runner.Host.Extensions;
 using System.IO;
+using evorace.Runner.Host.Configuration;
+using evorace.Runner.Host.Core;
 
 namespace evorace.Runner.Host.Connection
 {
     public sealed class WebAppConnector : IAsyncDisposable
     {
-        public WebAppConnector(Uri hostUri)
+        public WebAppConnector(HostConfiguration config)
         {
             myCookieContainer = new CookieContainer();
             var handler = new HttpClientHandler { CookieContainer = myCookieContainer };
+            myHttpClient = new HttpClient(handler);
+
+            Uri hostUri = new Uri(config.HostUrl);
             myLoginUri = new Uri(hostUri, Constants.LoginRoute);
             mySignalrUri = new Uri(hostUri, Constants.WorkerHubRoute);
             myDownloadSubmissionUri = new Uri(hostUri, Constants.DownloadSubmissionRoute);
-            myHttpClient = new HttpClient(handler);
         }
 
         public async Task Login(string email, string password)
@@ -47,7 +51,7 @@ namespace evorace.Runner.Host.Connection
             return hubProxy;
         }
 
-        public async Task<FileInfo> DownloadSubmission(string submissionId)
+        public async Task<DisposableValue<(string FileName, Stream DownloadStream)>> DownloadSubmission(string submissionId)
         {
             using var request = new HttpRequestMessage
             {
@@ -58,22 +62,22 @@ namespace evorace.Runner.Host.Connection
                     { "submissionId", submissionId}
                 })
             };
-            using var response = await myHttpClient.SendAsync(request);
+
+            var response = await myHttpClient.SendAsync(request);
             if (response.StatusCode != HttpStatusCode.OK)
             {
+                response.Dispose();
                 throw new InvalidOperationException();
             }
 
             var fileName = response.Content.Headers.ContentDisposition.FileName;
-            var targetDirectory = new DirectoryInfo($"temp\\{submissionId}");
-            var fileInfo = new FileInfo(Path.Combine(targetDirectory.FullName, fileName));
-            if (!targetDirectory.Exists) { targetDirectory.Create(); }
+            var downloadStream = await response.Content.ReadAsStreamAsync();
 
-            using var readStream = await response.Content.ReadAsStreamAsync();
-            using var writeStream = File.Create(fileInfo.FullName);
-            await readStream.CopyToAsync(writeStream);
-
-            return fileInfo;
+            return DisposableValue.Create((fileName, DownloadStream: downloadStream), x =>
+            {
+                response.Dispose();
+                x.DownloadStream.Dispose();
+            });
         }
 
         private async Task<string> GetRequestVerificationToken(Uri loginUri)

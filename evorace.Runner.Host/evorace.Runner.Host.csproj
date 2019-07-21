@@ -19,7 +19,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\evorace.Runner.Common\evorace.Runner.Common.csproj" />
-    <ProjectReference Include="..\evorace.Runner.Worker\evorace.Runner.Worker.csproj" />
     <ProjectReference Include="..\evorace.WebApp.Common\evorace.WebApp.Common.csproj" />
   </ItemGroup>
 
@@ -34,7 +33,15 @@
       <WorkerFiles Include="$(MSBuildThisFileDirectory)..\evorace.Runner.Worker\$(OutputPath)\*" />
     </ItemGroup>
     <Copy SourceFiles="@(WorkerFiles)" DestinationFolder="$(MSBuildThisFileDirectory)$(OutputPath)\worker" />
-    <Message Importance="high" Text="Copying worker files..." />
+    <Message Importance="high" Text="Copying worker..." />
+  </Target>
+
+  <Target Name="CopySubmissionEnvironment" BeforeTargets="AfterBuild">
+    <ItemGroup>
+      <SubmissionEnvironmentFiles Include="$(MSBuildThisFileDirectory)..\evorace.Runner.SubmissionEnvironment\$(OutputPath)\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(SubmissionEnvironmentFiles)" DestinationFolder="$(MSBuildThisFileDirectory)$(OutputPath)\_submission" />
+    <Message Importance="high" Text="Copying submission environment..." />
   </Target>
 
 </Project>
