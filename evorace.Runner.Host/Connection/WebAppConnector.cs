@@ -73,11 +73,7 @@ namespace evorace.Runner.Host.Connection
             var fileName = response.Content.Headers.ContentDisposition.FileName;
             var downloadStream = await response.Content.ReadAsStreamAsync();
 
-            return DisposableValue.Create((fileName, DownloadStream: downloadStream), x =>
-            {
-                response.Dispose();
-                x.DownloadStream.Dispose();
-            });
+            return DisposableValue.Create((fileName, downloadStream), downloadStream, response);
         }
 
         private async Task<string> GetRequestVerificationToken(Uri loginUri)
