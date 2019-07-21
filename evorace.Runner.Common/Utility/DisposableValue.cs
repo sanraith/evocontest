@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace evorace.Runner.Host.Core
+namespace evorace.Runner.Common.Utility
 {
     public static class DisposableValue
     {

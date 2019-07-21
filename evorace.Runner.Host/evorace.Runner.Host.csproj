@@ -19,6 +19,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\evorace.Runner.Common\evorace.Runner.Common.csproj" />
+    <ProjectReference Include="..\evorace.Runner.SubmissionEnvironment\evorace.Runner.SubmissionEnvironment.csproj" />
+    <ProjectReference Include="..\evorace.Runner.Worker\evorace.Runner.Worker.csproj" />
     <ProjectReference Include="..\evorace.WebApp.Common\evorace.WebApp.Common.csproj" />
   </ItemGroup>
 

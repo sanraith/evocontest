@@ -1,7 +1,9 @@
-﻿using evorace.Runner.Common.Messages;
+﻿using evorace.Common;
+using evorace.Runner.Common.Messages;
 using System;
+using System.Linq;
 
-namespace evorace.Runner.Worker
+namespace evorace.Runner.Worker.Core
 {
     public sealed class MessageHandler
     {
@@ -26,7 +28,8 @@ namespace evorace.Runner.Worker
             IMessage response;
             try
             {
-                // TODO actually load assembly
+                using var disposableAssembly = AssemblyLoader.Load(loadMsg.TargetAssemblyPath);
+                var solutionType = disposableAssembly.Value.GetTypes().Single(x => typeof(ISolution).IsAssignableFrom(x));
                 response = new OperationSuccessfulMessage(loadMsg.Id);
             }
             catch (Exception e)

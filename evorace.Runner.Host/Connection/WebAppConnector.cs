@@ -10,7 +10,7 @@ using evorace.WebApp.Common;
 using evorace.Runner.Host.Extensions;
 using System.IO;
 using evorace.Runner.Host.Configuration;
-using evorace.Runner.Host.Core;
+using evorace.Runner.Common.Utility;
 
 namespace evorace.Runner.Host.Connection
 {

@@ -1,5 +1,6 @@
 ﻿using evorace.Runner.Common;
 using evorace.Runner.Common.Connection;
+using evorace.Runner.Worker.Core;
 using System.Threading.Tasks;
 
 namespace evorace.Runner.Worker

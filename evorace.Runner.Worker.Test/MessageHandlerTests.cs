@@ -1,4 +1,5 @@
 using evorace.Runner.Common.Messages;
+using evorace.Runner.Worker.Core;
 using NUnit.Framework;
 
 namespace evorace.Runner.Worker.Test
