@@ -39,9 +39,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "evorace.WebApp.Common", "ev
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "evorace.Common", "evorace.Common\evorace.Common.csproj", "{12AC5501-3D4E-4E11-8949-0C971F60D9D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "evorace.Runner.SubmissionEnvironment", "evorace.Runner.SubmissionEnvironment\evorace.Runner.SubmissionEnvironment.csproj", "{51A85350-0B8E-4ABF-BFBC-9CD11E75C5C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "evorace.Runner.SubmissionEnvironment", "evorace.Runner.SubmissionEnvironment\evorace.Runner.SubmissionEnvironment.csproj", "{51A85350-0B8E-4ABF-BFBC-9CD11E75C5C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MySubmission", "Prototypes\MySubmission\MySubmission.csproj", "{FA5C6022-57DA-4DC1-AFFE-E455F4DD0A06}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MySubmission", "Prototypes\MySubmission\MySubmission.csproj", "{FA5C6022-57DA-4DC1-AFFE-E455F4DD0A06}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{810F52BF-5E11-4484-B977-9628B8369215}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		global.json = global.json
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
