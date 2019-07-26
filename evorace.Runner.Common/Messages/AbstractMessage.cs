@@ -11,7 +11,7 @@ namespace evorace.Runner.Common.Messages
 
         public AbstractMessage()
         {
-            MessageType = GetType().FullName;
+            MessageType = GetType().FullName!;
             Id = Guid.NewGuid();
         }
 

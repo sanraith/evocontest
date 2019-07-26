@@ -7,6 +7,10 @@
     <UserSecretsId>9b88f7ee-863b-4c95-bfae-e81160a6b369</UserSecretsId>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>NU1701</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="ImpromptuInterface" Version="7.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="3.0.0-preview7.19365.7" />

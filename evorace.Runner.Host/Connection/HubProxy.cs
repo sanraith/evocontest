@@ -57,7 +57,7 @@ namespace evorace.Runner.Host.Connection
                 Func<object[], Task> methodInvoker;
                 if (typeof(Task).IsAssignableFrom(method.ReturnType))
                 {
-                    methodInvoker = @params => (Task)method.Invoke(client, @params);
+                    methodInvoker = @params => (Task?)method.Invoke(client, @params) ?? Task.CompletedTask;
                 }
                 else
                 {
