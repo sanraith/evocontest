@@ -6,30 +6,44 @@ using evorace.Runner.Common;
 using evorace.Runner.Common.Connection;
 using evorace.Runner.Common.Messages;
 using evorace.Runner.Host.Configuration;
+using evorace.Runner.Host.Connection;
+using evorace.Runner.Host.Extensions;
+using evorace.WebApp.Common;
+
+using RunnerConstants = evorace.Runner.Common.Constants;
 
 namespace evorace.Runner.Host.Core
 {
     public sealed class ValidationWorkflow
     {
-        public ValidationWorkflow(HostConfiguration config)
+        public ValidationWorkflow(HostConfiguration config, IWorkerHubServer server, WebAppConnector webApp, FileManager fileManager)
         {
             myConfig = config;
+            myServer = server;
+            myWebApp = webApp;
+            myFileManager = fileManager;
             myPipeServer = null!;
             myWorkerProcess = null!;
         }
 
-        public async Task Execute(FileInfo targetFile)
+        public async Task Execute(string submissionId)
         {
+            var loadStep = new LoadStep(myConfig, myWebApp, myFileManager);
+            var targetFile = await loadStep.Execute(submissionId);
+
             Console.WriteLine($"Validating {targetFile.Name}...");
 
+            bool result;
             using (myWorkerProcess = StartWorkerProcess())
             using (myPipeServer = await StartPipeServer())
             {
-                LoadSubmissionToWorker(targetFile);
+                result = LoadSubmissionToWorker(targetFile);
                 StopWorkerProcess();
             }
 
             Console.WriteLine("Validation done.");
+            await myServer.UpdateStatus(submissionId, ValidationStateEnum.Static, result ? null : "error")
+                .WithProgressLog("Sending validation result to server");
         }
 
         private bool LoadSubmissionToWorker(FileInfo targetFile)
@@ -39,12 +53,12 @@ namespace evorace.Runner.Host.Core
             myPipeServer.SendMessage(new LoadContextMessage(relativePath));
 
             var response = myPipeServer.ReceiveMessage();
-            switch (response)
+            return response switch
             {
-                case OperationSuccessfulMessage _: return true;
-                case OperationFailedMessage _: return false;
-                default: throw new InvalidOperationException();
-            }
+                OperationSuccessfulMessage _ => true,
+                OperationFailedMessage _ => false,
+                _ => throw new InvalidOperationException(),
+            };
         }
 
         private void StopWorkerProcess()
@@ -77,7 +91,7 @@ namespace evorace.Runner.Host.Core
 
         private static async Task<PipeServer> StartPipeServer()
         {
-            var pipeServer = new PipeServer(Constants.PipeName);
+            var pipeServer = new PipeServer(RunnerConstants.PipeName);
             await pipeServer.WaitForConnectionAsync();
 
             return pipeServer;
@@ -100,5 +114,8 @@ namespace evorace.Runner.Host.Core
         private Process myWorkerProcess;
         private PipeServer myPipeServer;
         private readonly HostConfiguration myConfig;
+        private readonly IWorkerHubServer myServer;
+        private readonly WebAppConnector myWebApp;
+        private readonly FileManager myFileManager;
     }
 }

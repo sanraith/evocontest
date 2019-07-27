@@ -1,4 +1,5 @@
-﻿using System;
+﻿using evorace.WebApp.Common;
+using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
@@ -38,7 +39,7 @@ namespace evorace.WebApp.Data
 
         public ValidationStateEnum ValidationState { get; set; }
 
-        public bool IsValid { get; set; }
+        public bool? IsValid { get; set; }
 
         [StringLength(2048)]
         public string Error { get; set; }
@@ -46,15 +47,6 @@ namespace evorace.WebApp.Data
         public Submission()
         {
             Id = Guid.NewGuid().ToString();
-        }
-
-        public enum ValidationStateEnum
-        {
-            None = 0,
-            File = 1,
-            Static = 2,
-            UnitTest = 3,
-            Completed = 100
         }
     }
 }

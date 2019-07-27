@@ -26,7 +26,7 @@ namespace evorace.WebApp.Hubs
             await base.OnConnectedAsync();
 
             var waitingSubmissionIds = myDb.Submissions.AsQueryable()
-                .Where(x => !x.IsDeleted && x.IsValid && x.ValidationState < Submission.ValidationStateEnum.Completed)
+                .Where(x => !x.IsDeleted && !x.IsValid.HasValue && x.ValidationState < ValidationStateEnum.Completed)
                 .Select(x => x.Id)
                 .ToArray();
 
@@ -42,6 +42,21 @@ namespace evorace.WebApp.Hubs
         public Task SendMessage(string status)
         {
             return Clients.Others.ReceiveMessage(status);
+        }
+
+        public async Task UpdateStatus(string submissionId, ValidationStateEnum state, string error)
+        {
+            var submission = await myDb.Submissions.FindAsync(submissionId);
+            if (submission == null) { return; }
+
+            submission.ValidationState = state;
+            if (error != null)
+            {
+                submission.IsValid = false;
+                submission.Error = error;
+            }
+
+            await myDb.SaveChangesAsync();
         }
 
         private readonly ContestDb myDb;

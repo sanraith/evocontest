@@ -10,7 +10,8 @@ namespace evorace.Runner.Worker.Core
         public static DisposableValue<Assembly> Load(string assemblyPath)
         {
             var context = new CollectibleAssemblyLoadContext();
-            var assembly = context.LoadFromAssemblyPath(assemblyPath);
+            var assemblyFile = new FileInfo(assemblyPath);
+            var assembly = context.LoadFromAssemblyPath(assemblyFile.FullName);
 
             return DisposableValue.Create(assembly, _ => context.Unload());
         }

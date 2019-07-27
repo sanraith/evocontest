@@ -13,7 +13,8 @@
     @using (Html.BeginForm(nameof(UserController.DoDelete), "User", new { submissionId = Model.LatestSubmission.Id }, FormMethod.Post))
     {
         <p class="card-header">
-            Feltöltött dll: @Model.LatestSubmission.OriginalFileName
+            Feltöltött dll: @Model.LatestSubmission.OriginalFileName <br />
+            Validációs állapot: @Model.LatestSubmission.ValidationState @(Model.LatestSubmission.IsValid ?? true ? "ok" : ":(") <br />
             <input type="submit" value="Törlés"
                    class="btn btn-warning"
                    onclick="return confirm('Biztos törölni szeretnéd a benevezett DLL-ed?')" />

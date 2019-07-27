@@ -25,9 +25,12 @@ namespace evorace.Runner.Host
             var config = HostConfiguration.Load();
 
             await using var webApp = await ConnectToWebApp(config);
-            HubClient client = new HubClient(config, webApp, new FileManager(config));
 
-            var hubProxy = await webApp.ConnectToSignalR(client);
+            HubClient client = new HubClient(config, webApp, new FileManager(config));
+            var hubProxy = webApp.InitSignalR(client);
+            client.WorkerHubServer = hubProxy;
+
+            await webApp.StartSignalR();
 
             Console.ReadLine();
         }

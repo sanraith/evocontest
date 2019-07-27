@@ -30,13 +30,13 @@ namespace evorace.Runner.Host.Connection
 
         public async Task Login(string email, string password)
         {
-            string requestVerificationToken = await GetRequestVerificationToken(myLoginUri).LogProgress("Getting request verification token");
-            await PostLogin(email, password, requestVerificationToken).LogProgress("Logging in");
+            string requestVerificationToken = await GetRequestVerificationToken(myLoginUri).WithProgressLog("Getting request verification token");
+            await PostLogin(email, password, requestVerificationToken).WithProgressLog("Logging in");
         }
 
-        public async Task<IWorkerHubServer> ConnectToSignalR(IWorkerHubClient client)
+        public IWorkerHubServer InitSignalR(IWorkerHubClient client)
         {
-            var hubProxy = Extensions.LoggerExtensions.LogProgress("Configuring signalR", () =>
+            var hubProxy = Extensions.LoggerExtensions.WithProgressLog("Configuring signalR", () =>
             {
                 myHubConn = new HubConnectionBuilder()
                     .WithUrl(mySignalrUri, options => options.Cookies.Add(myCookieContainer.GetCookies(myLoginUri)))
@@ -46,9 +46,12 @@ namespace evorace.Runner.Host.Connection
                 return HubProxy.Create<IWorkerHubServer, IWorkerHubClient>(myHubConn, client);
             });
 
-            await myHubConn!.StartAsync().LogProgress("Connecting to signalR");
-
             return hubProxy;
+        }
+
+        public Task StartSignalR()
+        {
+            return myHubConn!.StartAsync().WithProgressLog("Connecting to signalR");
         }
 
         public async Task<DisposableValue<(string FileName, Stream DownloadStream)>> DownloadSubmission(string submissionId)
