@@ -14,7 +14,7 @@ using evorace.Runner.Common.Utility;
 
 namespace evorace.Runner.Host.Connection
 {
-    public sealed class WebAppConnector : IAsyncDisposable
+    public sealed class WebAppConnector : IAsyncDisposable, IResolvable
     {
         public WebAppConnector(HostConfiguration config)
         {

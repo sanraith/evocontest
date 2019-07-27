@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace evorace.Runner.Host.Core
 {
-    public sealed class LoadStep
+    public sealed class LoadStep : IResolvable
     {
         public LoadStep(HostConfiguration config, WebAppConnector webApp, FileManager fileManager)
         {

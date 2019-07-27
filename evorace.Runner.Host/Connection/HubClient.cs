@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace evorace.Runner.Host.Connection
 {
-    public class HubClient : IWorkerHubClient
+    public class HubClient : IWorkerHubClient, IResolvable
     {
         public IWorkerHubServer? WorkerHubServer { get; set; }
 

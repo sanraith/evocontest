@@ -14,7 +14,7 @@ using RunnerConstants = evorace.Runner.Common.Constants;
 
 namespace evorace.Runner.Host.Core
 {
-    public sealed class ValidationWorkflow
+    public sealed class ValidationWorkflow : IResolvable
     {
         public ValidationWorkflow(HostConfiguration config, IWorkerHubServer server, WebAppConnector webApp, FileManager fileManager)
         {
