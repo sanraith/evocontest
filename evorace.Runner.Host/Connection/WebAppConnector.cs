@@ -57,6 +57,11 @@ namespace evorace.Runner.Host.Connection
             return myHubConn!.StartAsync().WithProgressLog("Connecting to signalR");
         }
 
+        public Task StopSignalR()
+        {
+            return myHubConn!.StopAsync().WithProgressLog("Stopping signalR");
+        }
+
         public async Task<DisposableValue<(string FileName, Stream DownloadStream)>> DownloadSubmission(string submissionId)
         {
             using var request = new HttpRequestMessage

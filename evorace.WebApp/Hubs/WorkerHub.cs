@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace evorace.WebApp.Hubs
 {
-    [Authorize(Roles = Roles.Worker)]
+    [Authorize(Roles = Roles.Worker + "," + Roles.Admin)]
     public class WorkerHub : Hub<IWorkerHubClient>, IWorkerHubServer
     {
         public static ConcurrentDictionary<string, string> Users { get; } = new ConcurrentDictionary<string, string>();

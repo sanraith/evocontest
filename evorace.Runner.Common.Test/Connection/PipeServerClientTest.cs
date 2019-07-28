@@ -40,7 +40,7 @@ namespace evorace.Runner.Common.Test.Connection
         }
 
         [Test]
-        public void Test_SendReceive_MultipleMessagesDoNotBlock()
+        public void Test_SendReceive_MessagesBlock()
         {
             const int messageCount = 10;
             var sentValues = Enumerable.Range(0, messageCount).Select(x => $"value #{x}").ToList();
@@ -68,8 +68,8 @@ namespace evorace.Runner.Common.Test.Connection
             });
             var tasksCompleted = Task.WaitAll(new[] { serverTask, clientTask }, TimeSpan.FromSeconds(1));
 
-            Assert.That(tasksCompleted, Is.True);
-            Assert.That(receivedValues, Is.EqualTo(sentValues));
+            Assert.That(tasksCompleted, Is.False);
+            Assert.That(receivedValues, Is.EqualTo(new string[0]));
         }
 
         private const string PipeName = "testPipe";

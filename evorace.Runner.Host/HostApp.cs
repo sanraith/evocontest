@@ -3,6 +3,7 @@ using evorace.Runner.Host.Configuration;
 using evorace.Runner.Host.Connection;
 using evorace.Runner.Host.Core;
 using evorace.Runner.Host.Extensions;
+using evorace.Runner.Host.Workflow;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,25 +23,9 @@ namespace evorace.Runner.Host
             using var container = LoggerExtensions.ProgressLog("Initializing", CreateContainer);
             using (var scope = container.BeginLifetimeScope())
             {
-                var app = scope.Resolve<HostApp>();
-                await app.Run();
+                var workflow = scope.Resolve<MainWorkflow>();
+                await workflow.Execute();
             }
-        }
-
-        public HostApp(HostConfiguration config, WebAppConnector webApp, HubClient hubClient)
-        {
-            myConfig = config;
-            myWebApp = webApp;
-            myHubClient = hubClient;
-        }
-
-        private async Task Run()
-        {
-            await myWebApp.Login(myConfig.Login.Email, myConfig.Login.Password);
-            myWebApp.InitSignalR(myHubClient);
-            await myWebApp.StartSignalR();
-
-            Console.ReadLine();
         }
 
         private static IContainer CreateContainer()
@@ -66,9 +51,5 @@ namespace evorace.Runner.Host
             var container = builder.Build();
             return container;
         }
-
-        private readonly HostConfiguration myConfig;
-        private readonly WebAppConnector myWebApp;
-        private readonly HubClient myHubClient;
     }
 }
