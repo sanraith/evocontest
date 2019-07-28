@@ -27,5 +27,10 @@ namespace evorace.Runner.Host.Extensions
         {
             Task.Run(action).WithProgressLog(message).GetAwaiter().GetResult();
         }
+
+        public static TResult ProgressLog<TResult>(string message, Func<TResult> action)
+        {
+            return Task.Run(action).WithProgressLog(message).GetAwaiter().GetResult();
+        }
     }
 }

@@ -31,6 +31,9 @@ $(function () {
     function progressHandler(event) {
         _progressStatus.innerHTML = "Uploaded " + event.loaded + " bytes of " + event.total;
         var percent = (event.loaded / event.total) * 100;
+        if (percent > 99) {
+            percent = 99; // Do not show 100% until completed event.
+        }
         _progressBar.value = Math.round(percent);
         _status.innerHTML = Math.round(percent) + "% uploaded... please wait";
     }

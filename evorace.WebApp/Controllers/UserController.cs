@@ -119,8 +119,7 @@ namespace evorace.WebApp.Controllers
                     StoredFileName = savedFile.Name,
                     FileSize = (int)savedFile.Length,
                     UploadDate = timeStamp,
-                    ValidationState = ValidationStateEnum.File,
-                    IsValid = true
+                    ValidationState = ValidationStateEnum.File
                 };
 
                 myDb.Submissions.Add(submission);

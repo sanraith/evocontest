@@ -3,18 +3,19 @@
 @{
     ViewData["Title"] = "Feltöltés";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var sub = Model.LatestSubmission;
 }
 <script src="~/js/file-upload-progress.js"></script>
 
 <h1>Feltöltés</h1>
 
-@if (Model.LatestSubmission != null)
+@if (sub != null)
 {
-    @using (Html.BeginForm(nameof(UserController.DoDelete), "User", new { submissionId = Model.LatestSubmission.Id }, FormMethod.Post))
+    @using (Html.BeginForm(nameof(UserController.DoDelete), "User", new { submissionId = sub.Id }, FormMethod.Post))
     {
         <p class="card-header">
-            Feltöltött dll: @Model.LatestSubmission.OriginalFileName <br />
-            Validációs állapot: @Model.LatestSubmission.ValidationState @(Model.LatestSubmission.IsValid ?? true ? "ok" : ":(") <br />
+            Feltöltött dll: @sub.OriginalFileName <br />
+            Validációs állapot: @sub.ValidationState @(sub.IsValid.HasValue ? (sub.IsValid.Value ? "ok" : "failed") : "pending") <br />
             <input type="submit" value="Törlés"
                    class="btn btn-warning"
                    onclick="return confirm('Biztos törölni szeretnéd a benevezett DLL-ed?')" />

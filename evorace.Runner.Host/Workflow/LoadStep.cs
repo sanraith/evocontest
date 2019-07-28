@@ -1,14 +1,12 @@
 ﻿using evorace.Runner.Host.Configuration;
 using evorace.Runner.Host.Connection;
+using evorace.Runner.Host.Core;
 using evorace.Runner.Host.Extensions;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace evorace.Runner.Host.Core
+namespace evorace.Runner.Host.Workflow
 {
     public sealed class LoadStep : IResolvable
     {

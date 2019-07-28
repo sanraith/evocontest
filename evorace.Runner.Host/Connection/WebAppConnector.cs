@@ -14,8 +14,10 @@ using evorace.Runner.Common.Utility;
 
 namespace evorace.Runner.Host.Connection
 {
-    public sealed class WebAppConnector : IAsyncDisposable, IResolvable
+    public sealed class WebAppConnector : IAsyncDisposable
     {
+        public IWorkerHubServer? WorkerHubServer { get; private set; }
+
         public WebAppConnector(HostConfiguration config)
         {
             myCookieContainer = new CookieContainer();
@@ -45,6 +47,7 @@ namespace evorace.Runner.Host.Connection
                     .Build();
                 return HubProxy.Create<IWorkerHubServer, IWorkerHubClient>(myHubConn, client);
             });
+            WorkerHubServer = hubProxy;
 
             return hubProxy;
         }

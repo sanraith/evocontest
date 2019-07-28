@@ -2,34 +2,32 @@
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
-using evorace.Runner.Common;
 using evorace.Runner.Common.Connection;
 using evorace.Runner.Common.Messages;
 using evorace.Runner.Host.Configuration;
 using evorace.Runner.Host.Connection;
+using evorace.Runner.Host.Core;
 using evorace.Runner.Host.Extensions;
 using evorace.WebApp.Common;
 
 using RunnerConstants = evorace.Runner.Common.Constants;
 
-namespace evorace.Runner.Host.Core
+namespace evorace.Runner.Host.Workflow
 {
     public sealed class ValidationWorkflow : IResolvable
     {
-        public ValidationWorkflow(HostConfiguration config, IWorkerHubServer server, WebAppConnector webApp, FileManager fileManager)
+        public ValidationWorkflow(HostConfiguration config, WebAppConnector webApp, Lazy<LoadStep> loadStep)
         {
             myConfig = config;
-            myServer = server;
-            myWebApp = webApp;
-            myFileManager = fileManager;
+            myLoadStep = loadStep;
+            myServer = webApp.WorkerHubServer ?? throw new ArgumentException(nameof(webApp));
             myPipeServer = null!;
             myWorkerProcess = null!;
         }
 
         public async Task Execute(string submissionId)
         {
-            var loadStep = new LoadStep(myConfig, myWebApp, myFileManager);
-            var targetFile = await loadStep.Execute(submissionId);
+            var targetFile = await myLoadStep.Value.Execute(submissionId);
 
             Console.WriteLine($"Validating {targetFile.Name}...");
 
@@ -64,7 +62,7 @@ namespace evorace.Runner.Host.Core
         private void StopWorkerProcess()
         {
             myPipeServer.SendMessage(new TerminateMessage());
-            
+
             Console.Write("Waiting for worker process to exit... ");
             myWorkerProcess.WaitForExit(5000);
 
@@ -115,7 +113,6 @@ namespace evorace.Runner.Host.Core
         private PipeServer myPipeServer;
         private readonly HostConfiguration myConfig;
         private readonly IWorkerHubServer myServer;
-        private readonly WebAppConnector myWebApp;
-        private readonly FileManager myFileManager;
+        private readonly Lazy<LoadStep> myLoadStep;
     }
 }

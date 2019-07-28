@@ -1,23 +1,16 @@
 ﻿using evorace.WebApp.Common;
 using System;
 using System.Threading.Tasks;
-using evorace.Runner.Host.Extensions;
-using evorace.Runner.Host.Configuration;
+using evorace.Runner.Host.Workflow;
 using evorace.Runner.Host.Core;
-using System.IO;
-using System.Linq;
 
 namespace evorace.Runner.Host.Connection
 {
     public class HubClient : IWorkerHubClient, IResolvable
     {
-        public IWorkerHubServer? WorkerHubServer { get; set; }
-
-        public HubClient(HostConfiguration config, WebAppConnector webApp, FileManager fileManager)
+        public HubClient(Lazy<ValidationWorkflow> validationWorkflow)
         {
-            myConfig = config;
-            myWebApp = webApp;
-            myFileManager = fileManager;
+            myValidationWorkflow = validationWorkflow;
         }
 
         public Task ReceiveMessage(string message)
@@ -30,15 +23,11 @@ namespace evorace.Runner.Host.Connection
         {
             foreach (var submissionId in submissionIds)
             {
-                var workflow = new ValidationWorkflow(myConfig, 
-                    WorkerHubServer ?? throw new ArgumentNullException(nameof(WorkerHubServer)),
-                    myWebApp, myFileManager);
+                var workflow = myValidationWorkflow.Value;
                 await workflow.Execute(submissionId);
             }
         }
 
-        private readonly HostConfiguration myConfig;
-        private readonly WebAppConnector myWebApp;
-        private readonly FileManager myFileManager;
+        private readonly Lazy<ValidationWorkflow> myValidationWorkflow;
     }
 }

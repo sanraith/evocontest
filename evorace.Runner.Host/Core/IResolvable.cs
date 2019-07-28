@@ -1,4 +1,4 @@
-﻿namespace evorace.Runner.Host.Extensions
+﻿namespace evorace.Runner.Host.Core
 {
     public interface IResolvable
     { }

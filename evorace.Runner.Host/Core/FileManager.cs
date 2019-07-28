@@ -4,7 +4,6 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using evorace.Runner.Host.Configuration;
-using evorace.Runner.Host.Extensions;
 
 namespace evorace.Runner.Host.Core
 {
