@@ -57,6 +57,8 @@ namespace evorace.WebApp.Hubs
             }
 
             await myDb.SaveChangesAsync();
+
+            await Clients.Others.ReceiveMessage($"UpdateStatus ID:{submissionId}, State:{state}, Error:{error}");
         }
 
         private readonly ContestDb myDb;

@@ -60,8 +60,7 @@ namespace evorace.WebApp.Controllers
             myDb.Submissions.RemoveRange(myDb.Submissions);
             await myDb.SaveChangesAsync();
 
-            ViewBag.Message = "Success";
-            return View(nameof(Admin));
+            return RedirectToAction(nameof(Admin));
         }
 
         [HttpPost]
@@ -69,8 +68,7 @@ namespace evorace.WebApp.Controllers
         {
             await myWorkerHub.Clients.All.RunRace();
 
-            ViewBag.Message = "Sent RunRace command.";
-            return View(nameof(Admin));
+            return RedirectToAction(nameof(Admin));
         }
 
         private readonly ContestDb myDb;
