@@ -31,14 +31,14 @@ section Web Logic
 
     Create EF + FS model: webModel, after webSkeleton, 1d
     
-    Create work distributor: webDistributor, after webModel, 2d
+    Create work distributor: done, webDistributor, 2019-07-25, 2d
     Daily runner job: 2d
 
     Activate site: crit, webActivate, 2019-09-08, 2h
     Make public repo: after webActivate, 2h
 
 section Web Content
-    Admin page: after webModel, 2d
+    Admin page: active, after webModel, 2d
     Submitter page: active, webSubmitter, after webDistributor, 3d
     Daily standings page: after webSubmitter, 2d
     Personal stats page: 2d
@@ -69,10 +69,10 @@ section Submission
 section Raspberry FW
     Create sandbox: done, rpiSandbox, 2019-07-01, 1d
     Safely communicate w/ sandbox: done, rpiSandComm, 2019-07-03, 1d
-    Handle detached processes: 1d
+    Handle detached processes: done, 2019-07-25, 1d
     Test data generator: 1d
     Test runner: rpiRunner, after challengeTime, 3d
-    Long polling worker: after rpiRunner, 2d
+    Long polling worker: done, 2019-07-26, 2d
     Contest runner app: 3d
     
 ```
