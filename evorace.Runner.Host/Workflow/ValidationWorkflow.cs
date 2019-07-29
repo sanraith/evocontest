@@ -25,15 +25,15 @@ namespace evorace.Runner.Host.Workflow
             myWorkerProcess = null!;
         }
 
-        public async Task Execute(string submissionId)
+        public async Task ExecuteAsync(string submissionId)
         {
-            var targetFile = await myLoadStep.Execute(submissionId);
+            var targetFile = await myLoadStep.ExecuteAsync(submissionId);
 
             Console.WriteLine($"Validating {targetFile.Name}...");
 
             bool result;
             using (myWorkerProcess = StartWorkerProcess())
-            using (myPipeServer = await StartPipeServer())
+            using (myPipeServer = await StartPipeServerAsync())
             {
                 result = LoadSubmissionToWorker(targetFile);
                 StopWorkerProcess();
@@ -87,7 +87,7 @@ namespace evorace.Runner.Host.Workflow
             return process;
         }
 
-        private static async Task<PipeServer> StartPipeServer()
+        private static async Task<PipeServer> StartPipeServerAsync()
         {
             var pipeServer = new PipeServer(RunnerConstants.PipeName);
             await pipeServer.WaitForConnectionAsync();

@@ -24,7 +24,7 @@ namespace evorace.Runner.Host
             using (var scope = container.BeginLifetimeScope())
             {
                 var workflow = scope.Resolve<MainWorkflow>();
-                await workflow.Execute();
+                await workflow.ExecuteAsync();
             }
         }
 

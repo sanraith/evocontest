@@ -14,22 +14,22 @@ namespace evorace.Runner.Host.Workflow
             myConfig = config;
         }
 
-        public async Task Execute()
+        public async Task ExecuteAsync()
         {
             while (true)
             {
                 using var scope = myContainer.BeginLifetimeScope();
 
                 var webApp = scope.Resolve<WebAppConnector>();
-                await webApp.Login(myConfig.Login.Email, myConfig.Login.Password);
+                await webApp.LoginAsync(myConfig.Login.Email, myConfig.Login.Password);
 
                 var listener = scope.Resolve<ListeningWorkflow>();
-                await listener.Start();
+                await listener.StartAsync();
                 await listener.WaitUntilRunRaceReceivedAsync();
-                await listener.Stop();
+                await listener.StopAsync();
 
                 var racer = scope.Resolve<RaceWorkflow>();
-                await racer.Execute();
+                await racer.ExecuteAsync();
             }
         }
 

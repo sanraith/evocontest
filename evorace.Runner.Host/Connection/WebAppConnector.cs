@@ -30,10 +30,10 @@ namespace evorace.Runner.Host.Connection
             myDownloadSubmissionUri = new Uri(hostUri, Constants.DownloadSubmissionRoute);
         }
 
-        public async Task Login(string email, string password)
+        public async Task LoginAsync(string email, string password)
         {
-            string requestVerificationToken = await GetRequestVerificationToken(myLoginUri).WithProgressLog("Getting request verification token");
-            await PostLogin(email, password, requestVerificationToken).WithProgressLog("Logging in");
+            string requestVerificationToken = await GetRequestVerificationTokenAsync(myLoginUri).WithProgressLog("Getting request verification token");
+            await PostLoginAsync(email, password, requestVerificationToken).WithProgressLog("Logging in");
         }
 
         public IWorkerHubServer InitSignalR(IWorkerHubClient client)
@@ -52,21 +52,21 @@ namespace evorace.Runner.Host.Connection
             return hubProxy;
         }
 
-        public Task StartSignalR()
+        public Task StartSignalRAsync()
         {
             if (myHubConn == null) { throw new InvalidOperationException("SignalR is not initialized!"); }
 
             return myHubConn.StartAsync().WithProgressLog("Connecting to signalR");
         }
 
-        public Task StopSignalR()
+        public Task StopSignalRAsync()
         {
             if (myHubConn == null) { throw new InvalidOperationException("SignalR is not initialized!"); }
 
             return myHubConn.StopAsync().WithProgressLog("Stopping signalR");
         }
 
-        public async Task<DisposableValue<(string FileName, Stream DownloadStream)>> DownloadSubmission(string submissionId)
+        public async Task<DisposableValue<(string FileName, Stream DownloadStream)>> DownloadSubmissionAsync(string submissionId)
         {
             using var request = new HttpRequestMessage
             {
@@ -91,7 +91,7 @@ namespace evorace.Runner.Host.Connection
             return DisposableValue.Create((fileName, downloadStream), downloadStream, response);
         }
 
-        private async Task<string> GetRequestVerificationToken(Uri loginUri)
+        private async Task<string> GetRequestVerificationTokenAsync(Uri loginUri)
         {
             using var request = new HttpRequestMessage { Method = HttpMethod.Get, RequestUri = loginUri };
             using var response = await myHttpClient.SendAsync(request);
@@ -108,7 +108,7 @@ namespace evorace.Runner.Host.Connection
             return requestVerificationToken;
         }
 
-        private async Task PostLogin(string email, string password, string requestVerificationToken)
+        private async Task PostLoginAsync(string email, string password, string requestVerificationToken)
         {
             using var request = new HttpRequestMessage
             {

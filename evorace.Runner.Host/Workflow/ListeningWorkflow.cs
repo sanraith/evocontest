@@ -7,22 +7,24 @@ namespace evorace.Runner.Host.Workflow
 {
     public sealed class ListeningWorkflow : IDisposable, IResolvable
     {
-        public ListeningWorkflow(WebAppConnector webApp, HubClient hubClient)
+        public ListeningWorkflow(WebAppConnector webApp, HubClient hubClient, ValidationJobHandler validationJobHandler)
         {
             myWebApp = webApp;
             myHubClient = hubClient;
+            myValidationJobHandler = validationJobHandler;
         }
 
-        public async Task Start()
+        public async Task StartAsync()
         {
             myHubClient.RunRaceReceived += OnRunRaceReceived;
             myWebApp.InitSignalR(myHubClient);
-            await myWebApp.StartSignalR();
+            await myWebApp.StartSignalRAsync();
         }
 
-        public async Task Stop()
+        public async Task StopAsync()
         {
-            await myWebApp.StopSignalR();
+            await myValidationJobHandler.StopAsync();
+            await myWebApp.StopSignalRAsync();
         }
 
         public Task WaitUntilRunRaceReceivedAsync()
@@ -42,6 +44,7 @@ namespace evorace.Runner.Host.Workflow
 
         private readonly HubClient myHubClient;
         private readonly WebAppConnector myWebApp;
+        private readonly ValidationJobHandler myValidationJobHandler;
         private readonly TaskCompletionSource<bool> myRunRaceReceived = new TaskCompletionSource<bool>();
     }
 }

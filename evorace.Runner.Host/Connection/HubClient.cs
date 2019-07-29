@@ -12,8 +12,7 @@ namespace evorace.Runner.Host.Connection
 
         public HubClient(ValidationJobHandler validationJobQueue)
         {
-            myValidationJobQueue = validationJobQueue;
-            myValidationJobQueue.Start();
+            myValidationJobHandler = validationJobQueue;
         }
 
         public Task ReceiveMessage(string message)
@@ -24,16 +23,16 @@ namespace evorace.Runner.Host.Connection
 
         public Task ValidateSubmissions(params string[] submissionIds)
         {
-            myValidationJobQueue.Enqueue(submissionIds);
+            myValidationJobHandler.Enqueue(submissionIds);
             return Task.CompletedTask;
         }
 
-        public async Task RunRace()
+        public Task RunRace()
         {
-            await myValidationJobQueue.Stop();
             RunRaceReceived?.Invoke(this, new EventArgs());
+            return Task.CompletedTask;
         }
 
-        private readonly ValidationJobHandler myValidationJobQueue;
+        private readonly ValidationJobHandler myValidationJobHandler;
     }
 }

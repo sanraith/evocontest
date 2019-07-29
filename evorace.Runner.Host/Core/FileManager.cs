@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using System.IO;
 using System.Threading.Tasks;
 using evorace.Runner.Host.Configuration;
 
@@ -15,7 +12,7 @@ namespace evorace.Runner.Host.Core
             myTempDirectory = new DirectoryInfo(myConfg.Directories.Temp);
         }
 
-        public async Task<FileInfo> SaveSubmission(string submissionId, Stream downloadStream, string fileName)
+        public async Task<FileInfo> SaveSubmissionAsync(string submissionId, Stream downloadStream, string fileName)
         {
             var targetDirectory = new DirectoryInfo(Path.Combine(myTempDirectory.FullName, submissionId));
             var fileInfo = new FileInfo(Path.Combine(targetDirectory.FullName, fileName));
