@@ -16,7 +16,7 @@ namespace evorace.Runner.Host.Workflow
 {
     public sealed class ValidationWorkflow : IResolvable
     {
-        public ValidationWorkflow(HostConfiguration config, WebAppConnector webApp, Lazy<LoadStep> loadStep)
+        public ValidationWorkflow(HostConfiguration config, WebAppConnector webApp, LoadStep loadStep)
         {
             myConfig = config;
             myLoadStep = loadStep;
@@ -27,7 +27,7 @@ namespace evorace.Runner.Host.Workflow
 
         public async Task Execute(string submissionId)
         {
-            var targetFile = await myLoadStep.Value.Execute(submissionId);
+            var targetFile = await myLoadStep.Execute(submissionId);
 
             Console.WriteLine($"Validating {targetFile.Name}...");
 
@@ -113,6 +113,6 @@ namespace evorace.Runner.Host.Workflow
         private PipeServer myPipeServer;
         private readonly HostConfiguration myConfig;
         private readonly IWorkerHubServer myServer;
-        private readonly Lazy<LoadStep> myLoadStep;
+        private readonly LoadStep myLoadStep;
     }
 }

@@ -1,8 +1,8 @@
 ﻿using evorace.WebApp.Common;
 using System;
 using System.Threading.Tasks;
-using evorace.Runner.Host.Workflow;
 using evorace.Runner.Host.Core;
+using evorace.Runner.Host.Workflow;
 
 namespace evorace.Runner.Host.Connection
 {
@@ -10,9 +10,10 @@ namespace evorace.Runner.Host.Connection
     {
         public event EventHandler RunRaceReceived;
 
-        public HubClient(Lazy<ValidationWorkflow> validationWorkflow)
+        public HubClient(ValidationJobHandler validationJobQueue)
         {
-            myValidationWorkflow = validationWorkflow;
+            myValidationJobQueue = validationJobQueue;
+            myValidationJobQueue.Start();
         }
 
         public Task ReceiveMessage(string message)
@@ -21,21 +22,18 @@ namespace evorace.Runner.Host.Connection
             return Task.CompletedTask;
         }
 
-        public async Task ValidateSubmissions(params string[] submissionIds)
+        public Task ValidateSubmissions(params string[] submissionIds)
         {
-            var workflow = myValidationWorkflow.Value;
-            foreach (var submissionId in submissionIds)
-            {
-                await workflow.Execute(submissionId);
-            }
-        }
-
-        public Task RunRace()
-        {
-            RunRaceReceived?.Invoke(this, new EventArgs());
+            myValidationJobQueue.Enqueue(submissionIds);
             return Task.CompletedTask;
         }
 
-        private readonly Lazy<ValidationWorkflow> myValidationWorkflow;
+        public async Task RunRace()
+        {
+            await myValidationJobQueue.Stop();
+            RunRaceReceived?.Invoke(this, new EventArgs());
+        }
+
+        private readonly ValidationJobHandler myValidationJobQueue;
     }
 }

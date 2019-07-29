@@ -54,12 +54,16 @@ namespace evorace.Runner.Host.Connection
 
         public Task StartSignalR()
         {
-            return myHubConn!.StartAsync().WithProgressLog("Connecting to signalR");
+            if (myHubConn == null) { throw new InvalidOperationException("SignalR is not initialized!"); }
+
+            return myHubConn.StartAsync().WithProgressLog("Connecting to signalR");
         }
 
         public Task StopSignalR()
         {
-            return myHubConn!.StopAsync().WithProgressLog("Stopping signalR");
+            if (myHubConn == null) { throw new InvalidOperationException("SignalR is not initialized!"); }
+
+            return myHubConn.StopAsync().WithProgressLog("Stopping signalR");
         }
 
         public async Task<DisposableValue<(string FileName, Stream DownloadStream)>> DownloadSubmission(string submissionId)
@@ -70,7 +74,7 @@ namespace evorace.Runner.Host.Connection
                 RequestUri = myDownloadSubmissionUri,
                 Content = new FormUrlEncodedContent(new Dictionary<string, string>
                 {
-                    { "submissionId", submissionId}
+                    { "submissionId", submissionId }
                 })
             };
 
