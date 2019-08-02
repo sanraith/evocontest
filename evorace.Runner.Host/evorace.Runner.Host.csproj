@@ -20,10 +20,13 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.0.0-preview7.19362.4" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.0-preview7.19362.4" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.0.0-preview7.19362.4" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0006" />
+    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta0006" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\evorace.Runner.Common\evorace.Runner.Common.csproj" />
+    <ProjectReference Include="..\evorace.Runner.RaspberryPiUtilities\evorace.Runner.RaspberryPiUtilities.csproj" />
     <ProjectReference Include="..\evorace.Runner.SubmissionEnvironment\evorace.Runner.SubmissionEnvironment.csproj" />
     <ProjectReference Include="..\evorace.Runner.Worker\evorace.Runner.Worker.csproj" />
     <ProjectReference Include="..\evorace.WebApp.Common\evorace.WebApp.Common.csproj" />

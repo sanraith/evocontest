@@ -4,6 +4,12 @@ using evorace.Runner.Host.Connection;
 using evorace.Runner.Host.Core;
 using evorace.Runner.Host.Extensions;
 using evorace.Runner.Host.Workflow;
+using evorace.Runner.RaspberryPiUtilities;
+using SixLabors.Fonts;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.Primitives;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,6 +29,17 @@ namespace evorace.Runner.Host
             using var container = LoggerExtensions.ProgressLog("Initializing", CreateContainer);
             using (var scope = container.BeginLifetimeScope())
             {
+                var screen = container.Resolve<IEpaperDisplay>();
+                using (var image = new Image<Rgba32>(SixLabors.ImageSharp.Configuration.Default, screen.Width, screen.Height, Rgba32.White))
+                {
+                    image.Mutate(x => x.DrawText(new TextGraphicsOptions { Antialias = false }, 
+                        "evorace Runner", 
+                        RpiFonts.Roboto.CreateFont(24), Rgba32.Black, new PointF(10, 10)));
+
+                    await screen.InitializeAsync(RefreshMode.Full);
+                    await screen.SleepAsync();
+                }
+
                 var workflow = scope.Resolve<MainWorkflow>();
                 await workflow.ExecuteAsync();
             }
@@ -46,6 +63,8 @@ namespace evorace.Runner.Host
             builder.RegisterInstance(HostConfiguration.Load());
             builder.RegisterType<HostApp>().InstancePerLifetimeScope();
             builder.RegisterType<WebAppConnector>().InstancePerLifetimeScope()
+                .OnRelease(x => x.DisposeAsync().GetAwaiter().GetResult());
+            builder.RegisterType<Waveshare213EpaperDisplay>().As<IEpaperDisplay>().SingleInstance()
                 .OnRelease(x => x.DisposeAsync().GetAwaiter().GetResult());
 
             var container = builder.Build();
