@@ -7,6 +7,8 @@ namespace evorace.Runner.Host.Configuration
     {
         public string HostUrl { get; set; } = string.Empty;
 
+        public bool UseEpaperDisplay { get; set; } = false;
+
         public Directories Directories { get; set; } = new Directories();
 
         public CustomProcessStartInfo WorkerProcessInfo { get; set; } = new CustomProcessStartInfo();

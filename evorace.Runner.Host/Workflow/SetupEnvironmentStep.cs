@@ -1,28 +1,23 @@
 ﻿using evorace.Runner.Host.Configuration;
-using evorace.Runner.Host.Connection;
 using evorace.Runner.Host.Core;
 using evorace.Runner.Host.Extensions;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace evorace.Runner.Host.Workflow
 {
-    public sealed class LoadStep : IResolvable
+    public sealed class SetupEnvironmentStep : IResolvable
     {
-        public LoadStep(HostConfiguration config, WebAppConnector webApp, FileManager fileManager)
+        public SetupEnvironmentStep(HostConfiguration config)
         {
             myConfig = config;
-            myWebApp = webApp;
-            myFileManager = fileManager;
         }
 
-        public async Task<FileInfo> ExecuteAsync(string submissionId)
+        public FileInfo Execute(FileInfo sourceFileInfo)
         {
-            using var disposableValue = await myWebApp.DownloadSubmissionAsync(submissionId).WithProgressLog($"Downlading submission {submissionId}");
-            var (fileName, downloadStream) = disposableValue.Value;
-            var sourceFileInfo = await myFileManager.SaveSubmissionAsync(submissionId, downloadStream, fileName).WithProgressLog($"Saving submission file {fileName}");
-            var targetFileInfo = LoggerExtensions.WithProgressLog("Setting up environment", () => SetupEnvironment(sourceFileInfo));
+            var targetFileInfo = LoggerExtensions.WithProgressLog("Setting up environment", () =>
+                SetupEnvironment(sourceFileInfo)
+            );
 
             return targetFileInfo;
         }
@@ -47,7 +42,5 @@ namespace evorace.Runner.Host.Workflow
         }
 
         private readonly HostConfiguration myConfig;
-        private readonly WebAppConnector myWebApp;
-        private readonly FileManager myFileManager;
     }
 }

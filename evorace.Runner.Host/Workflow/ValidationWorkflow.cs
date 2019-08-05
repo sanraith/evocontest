@@ -16,10 +16,11 @@ namespace evorace.Runner.Host.Workflow
 {
     public sealed class ValidationWorkflow : IResolvable
     {
-        public ValidationWorkflow(HostConfiguration config, WebAppConnector webApp, LoadStep loadStep)
+        public ValidationWorkflow(HostConfiguration config, WebAppConnector webApp, DownloadSubmissionStep downloadStep, SetupEnvironmentStep setupEnvironmentStep)
         {
             myConfig = config;
-            myLoadStep = loadStep;
+            myDownloadStep = downloadStep;
+            mySetupEnvironmentStep = setupEnvironmentStep;
             myServer = webApp.WorkerHubServer ?? throw new ArgumentException(nameof(webApp));
             myPipeServer = null!;
             myWorkerProcess = null!;
@@ -27,7 +28,8 @@ namespace evorace.Runner.Host.Workflow
 
         public async Task ExecuteAsync(string submissionId)
         {
-            var targetFile = await myLoadStep.ExecuteAsync(submissionId);
+            var sourceFile = await myDownloadStep.ExecuteAsync(submissionId);
+            var targetFile = mySetupEnvironmentStep.Execute(sourceFile);
 
             Console.WriteLine($"Validating {targetFile.Name}...");
 
@@ -112,7 +114,8 @@ namespace evorace.Runner.Host.Workflow
         private Process myWorkerProcess;
         private PipeServer myPipeServer;
         private readonly HostConfiguration myConfig;
+        private readonly DownloadSubmissionStep myDownloadStep;
+        private readonly SetupEnvironmentStep mySetupEnvironmentStep;
         private readonly IWorkerHubServer myServer;
-        private readonly LoadStep myLoadStep;
     }
 }

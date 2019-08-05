@@ -1,4 +1,7 @@
-﻿using Autofac;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Autofac;
 using evorace.Runner.Host.Configuration;
 using evorace.Runner.Host.Connection;
 using evorace.Runner.Host.Core;
@@ -10,9 +13,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.Primitives;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
+using ImageSharpConfig = SixLabors.ImageSharp.Configuration;
 
 namespace evorace.Runner.Host
 {
@@ -30,13 +31,14 @@ namespace evorace.Runner.Host
             using (var scope = container.BeginLifetimeScope())
             {
                 var screen = container.Resolve<IEpaperDisplay>();
-                using (var image = new Image<Rgba32>(SixLabors.ImageSharp.Configuration.Default, screen.Width, screen.Height, Rgba32.White))
+                using (var image = new Image<Rgba32>(ImageSharpConfig.Default, screen.Width, screen.Height, Rgba32.White))
                 {
-                    image.Mutate(x => x.DrawText(new TextGraphicsOptions { Antialias = false }, 
-                        "evorace Runner", 
+                    image.Mutate(x => x.DrawText(new TextGraphicsOptions { Antialias = false },
+                        "evorace Runner",
                         RpiFonts.Roboto.CreateFont(24), Rgba32.Black, new PointF(10, 10)));
 
                     await screen.InitializeAsync(RefreshMode.Full);
+                    await screen.DrawAsync(image.ToBlackAndWhitePixels());
                     await screen.SleepAsync();
                 }
 
@@ -47,6 +49,7 @@ namespace evorace.Runner.Host
 
         private static IContainer CreateContainer()
         {
+            var config = HostConfiguration.Load();
             var builder = new ContainerBuilder();
 
             // Simple resolvables
@@ -60,12 +63,21 @@ namespace evorace.Runner.Host
                            .GetGenericArguments().Single());
 
             // Complex resolvables
-            builder.RegisterInstance(HostConfiguration.Load());
+            builder.RegisterInstance(config);
             builder.RegisterType<HostApp>().InstancePerLifetimeScope();
             builder.RegisterType<WebAppConnector>().InstancePerLifetimeScope()
                 .OnRelease(x => x.DisposeAsync().GetAwaiter().GetResult());
-            builder.RegisterType<Waveshare213EpaperDisplay>().As<IEpaperDisplay>().SingleInstance()
-                .OnRelease(x => x.DisposeAsync().GetAwaiter().GetResult());
+
+            // Conditional resolvables
+            if (config.UseEpaperDisplay)
+            {
+                builder.RegisterType<Waveshare213EpaperDisplay>().As<IEpaperDisplay>().SingleInstance()
+                    .OnRelease(x => x.DisposeAsync().GetAwaiter().GetResult());
+            }
+            else
+            {
+                builder.RegisterType<DummyEpaperDisplay>().As<IEpaperDisplay>();
+            }
 
             var container = builder.Build();
             return container;

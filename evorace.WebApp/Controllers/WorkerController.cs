@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using evorace.WebApp.Common;
 using evorace.WebApp.Core;
 using evorace.WebApp.Data;
 using evorace.WebApp.Data.Helper;
@@ -43,14 +44,14 @@ namespace evorace.WebApp.Controllers
                 .GroupBy(x => x.User)
                 .Select(x => x.OrderBy(x => x.UploadDate).Last());
 
-            return new JsonResult(new
+            return new JsonResult(new GetValidSubmissionsResult
             {
-                submissions = activeSubmissions.Select(x => new
+                Submissions = activeSubmissions.Select(x => new GetValidSubmissionsResult.Submission
                 {
-                    id = x.Id,
-                    isValid = x.IsValid,
-                    uploadDate = x.UploadDate
-                }).ToArray()
+                    Id = x.Id,
+                    IsValid = x.IsValid,
+                    UploadDate = x.UploadDate
+                }).ToList()
             });
         }
 

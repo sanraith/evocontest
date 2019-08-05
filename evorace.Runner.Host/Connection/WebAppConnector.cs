@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
@@ -28,6 +29,7 @@ namespace evorace.Runner.Host.Connection
             myLoginUri = new Uri(hostUri, Constants.LoginRoute);
             mySignalrUri = new Uri(hostUri, Constants.WorkerHubRoute);
             myDownloadSubmissionUri = new Uri(hostUri, Constants.DownloadSubmissionRoute);
+            myGetValidSubmissionsUri = new Uri(hostUri, Constants.GetValidSubmissionsRoute);
         }
 
         public async Task LoginAsync(string email, string password)
@@ -91,6 +93,16 @@ namespace evorace.Runner.Host.Connection
             return DisposableValue.Create((fileName, downloadStream), downloadStream, response);
         }
 
+        public async Task<GetValidSubmissionsResult> GetValidSubmissionsAsync()
+        {
+            using var request = new HttpRequestMessage { Method = HttpMethod.Get, RequestUri = myGetValidSubmissionsUri };
+            using var response = await myHttpClient.SendAsync(request);
+            var jsonResponse = await response.Content.ReadAsStreamAsync();
+            var result = await JsonSerializer.DeserializeAsync<GetValidSubmissionsResult>(jsonResponse);
+
+            return result;
+        }
+
         private async Task<string> GetRequestVerificationTokenAsync(Uri loginUri)
         {
             using var request = new HttpRequestMessage { Method = HttpMethod.Get, RequestUri = loginUri };
@@ -142,6 +154,7 @@ namespace evorace.Runner.Host.Connection
         private readonly Uri myLoginUri;
         private readonly Uri mySignalrUri;
         private readonly Uri myDownloadSubmissionUri;
+        private readonly Uri myGetValidSubmissionsUri;
         private readonly HttpClient myHttpClient;
         private readonly CookieContainer myCookieContainer;
     }
