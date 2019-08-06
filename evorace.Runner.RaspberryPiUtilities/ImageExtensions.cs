@@ -1,7 +1,7 @@
 ﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
-namespace evorace.Runner.Host.Extensions
+namespace evorace.Runner.RaspberryPiUtilities
 {
     public static class ImageExtensions
     {

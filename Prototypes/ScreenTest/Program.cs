@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using evorace.Runner.Host.Extensions;
 using evorace.Runner.RaspberryPiUtilities;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;

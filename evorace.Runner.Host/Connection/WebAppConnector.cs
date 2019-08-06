@@ -97,8 +97,8 @@ namespace evorace.Runner.Host.Connection
         {
             using var request = new HttpRequestMessage { Method = HttpMethod.Get, RequestUri = myGetValidSubmissionsUri };
             using var response = await myHttpClient.SendAsync(request);
-            var jsonResponse = await response.Content.ReadAsStreamAsync();
-            var result = await JsonSerializer.DeserializeAsync<GetValidSubmissionsResult>(jsonResponse);
+            await using var jsonStream = await response.Content.ReadAsStreamAsync();
+            var result = await JsonSerializer.DeserializeAsync<GetValidSubmissionsResult>(jsonStream);
 
             return result;
         }
