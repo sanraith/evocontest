@@ -16,9 +16,11 @@ namespace evorace.Runner.Host.Workflow
 
         public async Task<FileInfo> ExecuteAsync(string submissionId)
         {
-            using var disposableValue = await myWebApp.DownloadSubmissionAsync(submissionId).WithProgressLog($"Downlading submission {submissionId}");
+            using var disposableValue = await myWebApp.DownloadSubmissionAsync(submissionId)
+                .WithProgressLog($"Downloading submission {submissionId}");
             var (fileName, downloadStream) = disposableValue.Value;
-            var downloadedFileInfo = await myFileManager.SaveSubmissionAsync(submissionId, downloadStream, fileName).WithProgressLog($"Saving submission file {fileName}");
+            var downloadedFileInfo = await myFileManager.SaveSubmissionAsync(submissionId, downloadStream, fileName)
+                .WithProgressLog($"Saving submission file {fileName}");
 
             return downloadedFileInfo;
         }

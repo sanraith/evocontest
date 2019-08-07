@@ -6,10 +6,9 @@ namespace evorace.Runner.Host.Core
 {
     public sealed class FileManager : IResolvable
     {
-        public FileManager(HostConfiguration confg)
+        public FileManager(HostConfiguration config)
         {
-            myConfg = confg;
-            myTempDirectory = new DirectoryInfo(myConfg.Directories.Temp);
+            myTempDirectory = new DirectoryInfo(config.Directories.Temp);
         }
 
         public async Task<FileInfo> SaveSubmissionAsync(string submissionId, Stream downloadStream, string fileName)
@@ -18,16 +17,12 @@ namespace evorace.Runner.Host.Core
             var fileInfo = new FileInfo(Path.Combine(targetDirectory.FullName, fileName));
             if (!targetDirectory.Exists) { targetDirectory.Create(); }
 
-            using (downloadStream)
-            {
-                using var fileStream = File.Create(fileInfo.FullName);
-                await downloadStream.CopyToAsync(fileStream);
-            }
+            await using var fileStream = File.Create(fileInfo.FullName);
+            await downloadStream.CopyToAsync(fileStream);
 
             return fileInfo;
         }
           
-        private readonly HostConfiguration myConfg;
         private readonly DirectoryInfo myTempDirectory;
     }
 }
