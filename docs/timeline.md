@@ -14,7 +14,7 @@ section Misc
     Summer vacation: vacation, 2019-08-27, 6d
 
 section Challenge
-    Find a good challenge: active, crit, challengeFind, 2019-06-25, 2d
+    Find a good challenge: done, crit, challengeFind, 2019-08-10, 2d
     Solve varying time problem: challengeTime, after challengeFind, 2d
     Decide between avg/min time: 1d
     Alpha test: after challengeTime, 3d
