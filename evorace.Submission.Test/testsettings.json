@@ -1,0 +1,4 @@
+﻿{
+  // "TargetAssymbly" : "evorace.Submission.dll"
+  "TargetAssembly": "..\\..\\..\\..\\Prototypes\\MySubmission\\bin\\Debug\\netcoreapp3.0\\MySubmission.dll"
+}

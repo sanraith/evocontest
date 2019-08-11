@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace evorace.Common
+﻿namespace evorace.Common
 {
     public interface ISolution
     {
+        string Solve(string input);
     }
 }

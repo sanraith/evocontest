@@ -30,6 +30,7 @@ namespace evorace.Runner.Worker.Core
             {
                 using var disposableAssembly = AssemblyLoader.Load(loadMsg.TargetAssemblyPath);
                 var solutionType = disposableAssembly.Value.GetTypes().Single(x => typeof(ISolution).IsAssignableFrom(x));
+                var contestant = (ISolution?)Activator.CreateInstance(solutionType);
                 response = new OperationSuccessfulMessage(loadMsg.Id);
             }
             catch (Exception e)
