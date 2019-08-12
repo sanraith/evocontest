@@ -7,7 +7,7 @@ This document contains information about the general architecture of the compone
 ```mermaid
 graph LR
 
-subgraph Any client
+subgraph AnyClient
 	C(Web Browser)
 end
 
@@ -19,13 +19,11 @@ subgraph Azure
 	FE[evorace FE]
 	BE[evorace BE]
 	DB((Database))
-	FS((Filesystem))
 end
 
 C --> FE
 FE --> BE
 BE --> DB
-BE --> FS
 RPI --> BE
 ```
 
@@ -73,13 +71,14 @@ subgraph Raspberry
 	host[Runner.Host]
 	subgraph Sandbox
 		slave[Runner.Slave]
-		subgraph Assembly Load Context
+		subgraph AssemblyLoadContext
 			dll[Submitted library]
 		end
 	end
 end
 
 host -->|authenticated http| cloud
+cloud -->|authenticated signalR| host
 host -->|named pipe| slave
 slave --> dll
 ```

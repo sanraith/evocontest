@@ -2,6 +2,7 @@
 
 namespace evorace.Submission.Test.Tests
 {
+    [TestFixture]
     public sealed class SimpleSubmissionTest : TestBase
     {
         [Test]

@@ -19,9 +19,9 @@ namespace MySubmission
                 replacements[from] = to;
             }
             var duplicates = replacements.Where(kvp => replacements.Values.Count(v => v == kvp.Value) > 1).ToDictionary(x => x.Key, x => x.Value);
-            var text = new Regex(@"\((?'from'[^\)]*)\)").Replace(input, new MatchEvaluator(x =>
+            var text = new Regex(@"\((?'from'[^\)]*)\)").Replace(input, x =>
                 duplicates.ContainsKey(x.Groups["from"].Value) ? x.Value : string.Empty
-            ));
+            );
             duplicates.ToList().ForEach(x => replacements.Remove(x.Key));
 
             var hasReplacedAnything = true;
@@ -32,9 +32,7 @@ namespace MySubmission
                 hasReplacedAnything = false;
                 foreach (var (from, to) in replacements.OrderByDescending(x => x.Key.Length).ToList())
                 {
-                    var newText = text.Replace(from, to, StringComparison.OrdinalIgnoreCase);
-                    hasReplacedAnything |= text.Length != newText.Length;
-                    text = newText;
+                    hasReplacedAnything |= ReplaceInText(ref text, from, to);
                     hasReplacedAnything |= ReplaceInKeys(replacements, from, to);
 
                     if (hasReplacedAnything) { break; }
@@ -42,6 +40,15 @@ namespace MySubmission
             }
 
             return text;
+        }
+
+        private static bool ReplaceInText(ref string text, string from, string to)
+        {
+            var newText = text.Replace(from, to, StringComparison.OrdinalIgnoreCase);
+            var hasReplacedAnything = text != newText;
+            text = newText;
+
+            return hasReplacedAnything;
         }
 
         private static bool ReplaceInKeys(Dictionary<string, string> replacements, string from, string to)
