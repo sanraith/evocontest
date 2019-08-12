@@ -55,11 +55,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScreenTest", "Prototypes\Sc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "evorace.Runner.RaspberryPiUtilities", "evorace.Runner.RaspberryPiUtilities\evorace.Runner.RaspberryPiUtilities.csproj", "{9D43F797-F769-4D02-A003-8CF0139E6D72}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "evorace.Submission.Test", "evorace.Submission.Test\evorace.Submission.Test.csproj", "{CEC8C5B0-80FD-473F-A0DA-9AD19EB1BAE8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "evorace.Submission.Test", "evorace.Submission.Test\evorace.Submission.Test.csproj", "{CEC8C5B0-80FD-473F-A0DA-9AD19EB1BAE8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Submission", "Submission", "{9891A932-73D2-41AB-A42A-C501E1DE58FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "evorace.Submission", "evorace.Submission\evorace.Submission.csproj", "{7EEE357E-EDE8-44EF-A538-FF5768162C0E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "evorace.Submission", "evorace.Submission\evorace.Submission.csproj", "{7EEE357E-EDE8-44EF-A538-FF5768162C0E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InputGeneratorTest", "InputGeneratorTest\InputGeneratorTest.csproj", "{BA788D5A-BB75-4F06-A172-BA18E75B2EEE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -135,6 +137,10 @@ Global
 		{7EEE357E-EDE8-44EF-A538-FF5768162C0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7EEE357E-EDE8-44EF-A538-FF5768162C0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7EEE357E-EDE8-44EF-A538-FF5768162C0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA788D5A-BB75-4F06-A172-BA18E75B2EEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA788D5A-BB75-4F06-A172-BA18E75B2EEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA788D5A-BB75-4F06-A172-BA18E75B2EEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA788D5A-BB75-4F06-A172-BA18E75B2EEE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -157,6 +163,7 @@ Global
 		{9D43F797-F769-4D02-A003-8CF0139E6D72} = {CF0688A3-520B-4D8F-AC9E-24129751BC42}
 		{CEC8C5B0-80FD-473F-A0DA-9AD19EB1BAE8} = {5789610E-904A-4A82-ADAC-ED547F2A92A8}
 		{7EEE357E-EDE8-44EF-A538-FF5768162C0E} = {9891A932-73D2-41AB-A42A-C501E1DE58FD}
+		{BA788D5A-BB75-4F06-A172-BA18E75B2EEE} = {1C1EFE3A-0368-43C2-878C-A0AC1FDFD0CA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {27104867-D5A0-4652-B00E-91E995E65CF8}
