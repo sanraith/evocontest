@@ -8,6 +8,33 @@ namespace InputGeneratorTest
     {
         static void Main(string[] args)
         {
+            //var generatorConfig = new InputGeneratorConfig
+            //{
+            //    Seed = 1337,
+            //    InputLength = 180,
+            //    WordLength = new MinMaxPair(2, 10),
+            //    SentenceLength = new MinMaxPair(16, 120)
+            //};
+            //var generator = new InputGenerator(generatorConfig);
+            //var result = generator.Generate();
+            //Console.WriteLine(result.Input);
+
+            var generatorConfig = new InputGeneratorConfig
+            {
+                Seed = 1337,
+                InputLength = 180,
+                WordLength = new MinMaxPair(2, 10),
+                SentenceLength = new MinMaxPair(16, 120)
+            };
+            var generator = new StructuredInputGenerator(generatorConfig);
+            var result = generator.Generate();
+            Console.WriteLine(result.Input);
+
+            //RunPerformanceTest();
+        }
+
+        private static void RunPerformanceTest()
+        {
             var totalSw = Stopwatch.StartNew();
             for (var i = 19; i < 29; i++)
             {

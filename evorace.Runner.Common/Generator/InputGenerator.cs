@@ -2,13 +2,10 @@
 
 namespace evorace.Runner.Common.Generator
 {
-    public sealed class InputGenerator
+    public sealed class InputGenerator : InputGeneratorBase
     {
-        public InputGenerator(InputGeneratorConfig config)
-        {
-            myConfig = config;
-            myRandom = new Random(myConfig.Seed);
-        }
+        public InputGenerator(InputGeneratorConfig config) : base(config)
+        { }
 
         public GeneratorResult Generate()
         {
@@ -54,37 +51,5 @@ namespace evorace.Runner.Common.Generator
             }
             span[^1] = Period;
         }
-
-        private int GetLength(MinMaxPair targetLength, int absoluteMax, int minRemaining)
-        {
-            var maxLength = Math.Min(absoluteMax, targetLength.Max);
-            var minLength = Math.Min(targetLength.Min, maxLength);
-            var length = myRandom.Next(minLength, maxLength);
-            length = absoluteMax - length < minRemaining ? absoluteMax : length;
-
-            return length;
-        }
-
-        public void GenerateWord(Span<char> span, bool IsTitleCase = false)
-        {
-            var length = span.Length;
-            if (length == 0) { return; }
-
-            span[0] = IsTitleCase ? GetUpperCaseChar() : GetLowerCaseChar();
-            for (var i = 1; i < length; i++)
-            {
-                span[i] = GetLowerCaseChar();
-            }
-        }
-
-        private char GetUpperCaseChar() => (char)(myRandom.Next(26) + 65);
-
-        private char GetLowerCaseChar() => (char)(myRandom.Next(26) + 97);
-
-        private readonly Random myRandom;
-        private readonly InputGeneratorConfig myConfig;
-
-        private const char Period = '.';
-        private const char Space = ' ';
     }
 }
