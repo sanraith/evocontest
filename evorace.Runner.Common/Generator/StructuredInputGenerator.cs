@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace evorace.Runner.Common.Generator
 {
@@ -14,11 +13,12 @@ namespace evorace.Runner.Common.Generator
         {
             var allParts = new Dictionary<int, IPart>();
             var tree = GeneratePart(30, allParts);
-            var text = tree.ToText();
+            var span = new char[tree.GetLength()].AsSpan();
+            tree.RenderTo(span);
 
             return new GeneratorResult
             {
-                Input = text
+                Input = new string(span)
             };
         }
 
@@ -59,7 +59,9 @@ namespace evorace.Runner.Common.Generator
 
     public interface IPart
     {
-        string ToText();
+        int GetLength();
+
+        int RenderTo(Span<char> span);
 
         IPart[] Parts { get; }
     }
@@ -73,7 +75,13 @@ namespace evorace.Runner.Common.Generator
             myText = text;
         }
 
-        public string ToText() => myText;
+        public int RenderTo(Span<char> span)
+        {
+            myText.AsSpan().CopyTo(span);
+            return myText.Length;
+        }
+
+        public int GetLength() => myText.Length;
 
         private readonly string myText;
     }
@@ -87,9 +95,34 @@ namespace evorace.Runner.Common.Generator
             Parts = parts;
         }
 
-        public string ToText()
+        public int GetLength()
         {
-            return $"({string.Join(' ', Parts.Select(x => x.ToText()))})";
+            const int parentheses = 2;
+            var spaces = Parts.Length - 1;
+
+            return parentheses + spaces + Parts.Sum(x => x.GetLength());
+        }
+
+        public int RenderTo(Span<char> span)
+        {
+            var pos = 0;
+
+            span[pos++] = '(';
+
+            var needSpaceBefore = false;
+            foreach (var part in Parts)
+            {
+                if (needSpaceBefore)
+                {
+                    span[pos++] = ' ';
+                }
+                else { needSpaceBefore = true; }
+                pos += part.RenderTo(span.Slice(pos));
+            }
+
+            span[pos++] = ')';
+
+            return pos;
         }
     }
 }
