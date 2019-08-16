@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace evorace.Runner.Common.Generator
 {
@@ -11,18 +12,25 @@ namespace evorace.Runner.Common.Generator
 
         public GeneratorResult Generate()
         {
-            var allParts = new Dictionary<int, IPart>();
-            var tree = GeneratePart(30, allParts);
-            var span = new char[tree.GetLength()].AsSpan();
-            tree.RenderTo(span);
+            var tree = GeneratePart(15);
+
+            var sb = new StringBuilder();
+            foreach (IPart part in myParts.OfType<ComplexPart>())
+            {
+                sb.Append(part.ShortHand).Append('(').Append(part.Render()).Append("). ");
+            }
+            sb.Append(tree.Render());
 
             return new GeneratorResult
             {
-                Input = new string(span)
+                Input = sb.ToString()
             };
         }
 
-        private IPart GeneratePart(int level, Dictionary<int, IPart> allParts)
+        private HashSet<IPart> myParts = new HashSet<IPart>();
+        private List<IPart> myPartList = new List<IPart>();
+
+        private IPart GeneratePart(int level)
         {
             IPart result;
             if (level == 0)
@@ -37,20 +45,30 @@ namespace evorace.Runner.Common.Generator
                 for (int i = 0; i < partCount; i++)
                 {
                     IPart part;
-                    var shouldReusePart = myRandom.Next(3) == 0 && allParts.Any();
+                    var shouldReusePart = myRandom.Next(3) == 0 && myParts.Count > 0;
                     if (shouldReusePart)
                     {
-                        part = allParts[myRandom.Next(allParts.Count)];
+                        part = myPartList[myRandom.Next(myPartList.Count)];
                     }
                     else
                     {
                         var nextLevel = myRandom.Next(Math.Min(0, level - 1), level); // how deep the branch can be
-                        part = GeneratePart(nextLevel, allParts);
+                        part = GeneratePart(nextLevel);
                     }
                     parts[i] = part;
+                    if (myParts.Add(part))
+                    {
+                        myPartList.Add(part);
+                    }
                 }
-                result = new ComplexPart(parts);
-                allParts.Add(allParts.Count, result);
+
+                string shortHand;
+                do
+                {
+                    var wordLength = GetLength(myConfig.WordLength, myConfig.WordLength.Max, 0);
+                    shortHand = GenerateWord(wordLength);
+                } while (myParts.Any(x => x.ShortHand == shortHand));
+                result = new ComplexPart(shortHand, parts);
             }
 
             return result;
@@ -64,50 +82,62 @@ namespace evorace.Runner.Common.Generator
         int RenderTo(Span<char> span);
 
         IPart[] Parts { get; }
+
+        string ShortHand { get; }
+
+        string Render()
+        {
+            var partSpan = new char[GetLength()].AsSpan();
+            RenderTo(partSpan);
+            return new string(partSpan);
+        }
     }
 
     public class SimplePart : IPart
     {
+        public string ShortHand { get; }
+
         public IPart[] Parts { get; } = new IPart[0];
 
         public SimplePart(string text)
         {
-            myText = text;
+            ShortHand = text;
         }
 
         public int RenderTo(Span<char> span)
         {
-            myText.AsSpan().CopyTo(span);
-            return myText.Length;
+            ShortHand.AsSpan().CopyTo(span);
+            return ShortHand.Length;
         }
 
-        public int GetLength() => myText.Length;
-
-        private readonly string myText;
+        public int GetLength() => ShortHand.Length;
     }
 
     public class ComplexPart : IPart
     {
+        public string ShortHand { get; }
+
         public IPart[] Parts { get; }
 
-        public ComplexPart(params IPart[] parts)
+        public ComplexPart(string shortHand, params IPart[] parts)
         {
+            ShortHand = shortHand;
             Parts = parts;
         }
 
         public int GetLength()
         {
-            const int parentheses = 2;
             var spaces = Parts.Length - 1;
 
-            return parentheses + spaces + Parts.Sum(x => x.GetLength());
+            return spaces + ShortHand.Length + Parts.Sum(x => x.GetLength());
         }
 
         public int RenderTo(Span<char> span)
         {
             var pos = 0;
 
-            span[pos++] = '(';
+            ShortHand.AsSpan().CopyTo(span);
+            pos += ShortHand.Length;
 
             var needSpaceBefore = false;
             foreach (var part in Parts)
@@ -119,8 +149,6 @@ namespace evorace.Runner.Common.Generator
                 else { needSpaceBefore = true; }
                 pos += part.RenderTo(span.Slice(pos));
             }
-
-            span[pos++] = ')';
 
             return pos;
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using evorace.Runner.Common.Generator;
+using MySubmission;
 
 namespace InputGeneratorTest
 {
@@ -23,12 +24,14 @@ namespace InputGeneratorTest
             {
                 Seed = 1337,
                 InputLength = 180,
-                WordLength = new MinMaxPair(2, 10),
+                WordLength = new MinMaxPair(2, 5),
                 SentenceLength = new MinMaxPair(16, 120)
             };
             var generator = new StructuredInputGenerator(generatorConfig);
             var result = generator.Generate();
             Console.WriteLine(result.Input);
+
+            var solved = new MySolution().Solve(result.Input);
 
             //RunPerformanceTest();
         }
