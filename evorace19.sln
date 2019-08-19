@@ -61,7 +61,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Submission", "Submission", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "evorace.Submission", "evorace.Submission\evorace.Submission.csproj", "{7EEE357E-EDE8-44EF-A538-FF5768162C0E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InputGeneratorTest", "InputGeneratorTest\InputGeneratorTest.csproj", "{BA788D5A-BB75-4F06-A172-BA18E75B2EEE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InputGeneratorTest", "Prototypes\InputGeneratorTest\InputGeneratorTest.csproj", "{BA788D5A-BB75-4F06-A172-BA18E75B2EEE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

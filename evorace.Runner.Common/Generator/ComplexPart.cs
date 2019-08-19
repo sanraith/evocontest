@@ -33,11 +33,17 @@ namespace evorace.Runner.Common.Generator
                 }
                 else if (level == 0)
                 {
-                    length += part.Parts.Sum(x => x.ShortHand.Length);
+                    foreach (var nextPart in part.Parts)
+                    {
+                        length += nextPart.ShortHand.Length;
+                    }
                 }
                 else
                 {
-                    part.Parts.ForEach(x => queue.Enqueue((x, level - 1)));
+                    foreach (var nextPart in part.Parts)
+                    {
+                        queue.Enqueue((nextPart, level - 1));
+                    }
                 }
             }
 
@@ -50,19 +56,18 @@ namespace evorace.Runner.Common.Generator
             stack.Push((this, maxLevel));
 
             var pos = 0;
-            var needSpaceBefore = false;
             while (stack.Count > 0)
             {
                 var (part, level) = stack.Pop();
 
                 if (part.Parts.Count == 0)
                 {
-                    AddSpaceIfNeeded(span, ref pos);
+                    if (pos > 0) { span[pos++] = ' '; }
                     pos += part.RenderShortTo(span.Slice(pos));
                 }
                 else if (level == 0)
                 {
-                    AddSpaceIfNeeded(span, ref pos);
+                    if (pos > 0) { span[pos++] = ' '; }
                     for (var i = 0; i < part.Parts.Count; i++)
                     {
                         if (i != 0) { span[pos++] = ' '; }
@@ -79,12 +84,6 @@ namespace evorace.Runner.Common.Generator
             }
 
             return pos;
-
-            void AddSpaceIfNeeded(Span<char> span, ref int pos)
-            {
-                if (needSpaceBefore) { span[pos++] = ' '; }
-                else { needSpaceBefore = true; }
-            }
         }
     }
 }
