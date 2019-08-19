@@ -27,8 +27,34 @@ namespace evorace.Runner.Common.Generator
             };
         }
 
-        private HashSet<IPart> myParts = new HashSet<IPart>();
-        private List<IPart> myPartList = new List<IPart>();
+        public GeneratorResult Generate2(int maxLevel)
+        {
+            var tree = GenerateRecursivePart();
+            var sb = new StringBuilder();
+            foreach (IPart part in myParts.OfType<ComplexPart>())
+            {
+                sb.Append(part.ShortHand).Append('(').Append(part.Render(0)).Append("). ");
+            }
+            sb.Append(tree.Render(maxLevel));
+
+            Console.WriteLine($"Size: {sb.Length}");
+
+            return new GeneratorResult { Input = sb.ToString() };
+        }
+
+        private IPart GenerateRecursivePart()
+        {
+            var e = new ComplexPart("EEE", new SimplePart("FFFF"));
+            var b = new ComplexPart("BB", new SimplePart("DD"), e);
+            var a = new ComplexPart("A", b, new SimplePart("CC"));
+            e.Parts.Add(a);
+
+            myParts.Add(a);
+            myParts.Add(b);
+            myParts.Add(e);
+
+            return a;
+        }
 
         private IPart GeneratePart(int level)
         {
@@ -73,84 +99,8 @@ namespace evorace.Runner.Common.Generator
 
             return result;
         }
-    }
 
-    public interface IPart
-    {
-        int GetLength();
-
-        int RenderTo(Span<char> span);
-
-        IPart[] Parts { get; }
-
-        string ShortHand { get; }
-
-        string Render()
-        {
-            var partSpan = new char[GetLength()].AsSpan();
-            RenderTo(partSpan);
-            return new string(partSpan);
-        }
-    }
-
-    public class SimplePart : IPart
-    {
-        public string ShortHand { get; }
-
-        public IPart[] Parts { get; } = new IPart[0];
-
-        public SimplePart(string text)
-        {
-            ShortHand = text;
-        }
-
-        public int RenderTo(Span<char> span)
-        {
-            ShortHand.AsSpan().CopyTo(span);
-            return ShortHand.Length;
-        }
-
-        public int GetLength() => ShortHand.Length;
-    }
-
-    public class ComplexPart : IPart
-    {
-        public string ShortHand { get; }
-
-        public IPart[] Parts { get; }
-
-        public ComplexPart(string shortHand, params IPart[] parts)
-        {
-            ShortHand = shortHand;
-            Parts = parts;
-        }
-
-        public int GetLength()
-        {
-            var spaces = Parts.Length - 1;
-
-            return spaces + ShortHand.Length + Parts.Sum(x => x.GetLength());
-        }
-
-        public int RenderTo(Span<char> span)
-        {
-            var pos = 0;
-
-            ShortHand.AsSpan().CopyTo(span);
-            pos += ShortHand.Length;
-
-            var needSpaceBefore = false;
-            foreach (var part in Parts)
-            {
-                if (needSpaceBefore)
-                {
-                    span[pos++] = ' ';
-                }
-                else { needSpaceBefore = true; }
-                pos += part.RenderTo(span.Slice(pos));
-            }
-
-            return pos;
-        }
+        private HashSet<IPart> myParts = new HashSet<IPart>();
+        private List<IPart> myPartList = new List<IPart>();
     }
 }

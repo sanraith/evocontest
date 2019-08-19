@@ -27,7 +27,7 @@ namespace MySubmission
             var hasReplacedAnything = true;
             while (hasReplacedAnything)
             {
-                Console.WriteLine(text);
+                //Console.WriteLine(text);
 
                 hasReplacedAnything = false;
                 foreach (var (from, to) in replacements.OrderByDescending(x => x.Key.Length).ToList())
