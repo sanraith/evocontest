@@ -12,10 +12,13 @@ namespace evorace.Runner.Common.Generator
             myRandom = new Random(myConfig.Seed);
         }
 
-        protected int GetLength(MinMaxPair targetLength, int absoluteMax, int minRemaining)
+        protected int GetRandomFromRange(MinMaxPair targetPair) => GetRandomFromRange(targetPair, targetPair.Max, 0);
+
+        protected int GetRandomFromRange(MinMaxPair targetPair, int absoluteMax, int minRemaining = 0)
         {
-            var maxLength = Math.Min(absoluteMax, targetLength.Max);
-            var minLength = Math.Min(targetLength.Min, maxLength);
+            var maxLength = Math.Min(absoluteMax, targetPair.Max);
+            maxLength = maxLength < int.MaxValue ? maxLength + 1 : maxLength;
+            var minLength = Math.Min(targetPair.Min, maxLength);
             var length = myRandom.Next(minLength, maxLength);
             length = absoluteMax - length < minRemaining ? absoluteMax : length;
 

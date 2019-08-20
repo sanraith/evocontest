@@ -9,22 +9,31 @@ namespace InputGeneratorTest
     {
         static void Main(string[] args)
         {
+            Test2();
+        }
+
+        private static void Test2()
+        {
             var generatorConfig = new InputGeneratorConfig
             {
                 Seed = 1337,
-                InputLength = 180,
+                InputLength = 1024 * 1024 * 5,
                 WordLength = new MinMaxPair(2, 5),
                 SentenceLength = new MinMaxPair(16, 120)
             };
-            var generator = new StructuredInputGenerator(generatorConfig);
-            var result = generator.Generate2(1);
-            Console.WriteLine(result.Input);
 
+            GeneratorResult result;
+            int treeLevel = 0;
+            do
+            {
+                treeLevel++;
+                var generator = new StructuredInputGenerator(generatorConfig);
+                result = generator.Generate(treeLevel);
+                Console.WriteLine(treeLevel);
+            } while (result.Input.Length < generatorConfig.InputLength / 2);
+            //Console.WriteLine(result.Input);
             var solved = new MySolution().Solve(result.Input);
-            Console.WriteLine(solved);
-            //var solved = new MySolution().Solve("A(BB CC). BB(DDD EEE). DDD FFFF DDD FFFF DDD FFFF DDD FFFF DDD FFFF DDD FFFF DDD FFFF DDD FFFF DDD FFFF A CC CC CC CC CC CC CC CC CC. EEE(FFFF A).");
-
-            RunPerformanceTest();
+            //Console.WriteLine(solved);
         }
 
         private static void RunPerformanceTest()
@@ -42,7 +51,7 @@ namespace InputGeneratorTest
                     SentenceLength = new MinMaxPair(16, 120)
                 };
                 var generator = new StructuredInputGenerator(generatorConfig);
-                var result = generator.Generate2(maxTreeLevel);
+                var result = generator.Generate(maxTreeLevel);
                 sw.Stop();
                 Console.WriteLine($"Length: {result.Input.Length * 2.0 / 1024 / 1024:0.00} Mb Time: {sw.ElapsedMilliseconds}");
             }

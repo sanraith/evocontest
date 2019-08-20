@@ -70,5 +70,27 @@ namespace evorace.Submission.Test.Tests
             const string expected = "SIMPLE. COMPLEX. COMPLEX.";
             AssertSolve(input, expected);
         }
+
+        [Test]
+        public void TODO_Solve_RecursiveAbbreviations_AreReplaced()
+        {
+            // A D D A D D D A D D A D D
+            // C   D C   D D C   D C   D
+
+            // C D C D D C D C D
+            // B   B   D B   B
+
+            // B B D B B
+
+            //const string input = "A(B C). B(C D). C(A D). A D D A D.";
+            const string input = "A(B C). B(C D). C(A D). B C D D B C D.";
+            //const string input = "A(B C). B(C D). C(A D). A D D A D D D A D D A D D."; // TODO Multiple result!!!
+            //const string input = "A(B C). B(C D). C(A D). C D C D D C D C D.";
+            //const string input = "A(B C). B(C D). C(A D). B B D B B.";
+
+
+            const string expected = "A. B. C. A.";
+            AssertSolve(input, expected);
+        }
     }
 }

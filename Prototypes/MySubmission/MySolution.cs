@@ -35,33 +35,45 @@ namespace MySubmission
                     hasReplacedAnything |= ReplaceInText(ref text, from, to);
                     hasReplacedAnything |= ReplaceInKeys(replacements, from, to);
 
+                    replacements.Where(x => x.Key == x.Value).Select(x => x.Key).ToList().ForEach(x => replacements.Remove(x));
                     if (hasReplacedAnything) { break; }
                 }
             }
 
+            Console.WriteLine($"Steps: {myReplaceCount}");
+
             return text;
         }
 
-        private static bool ReplaceInText(ref string text, string from, string to)
+        private bool ReplaceInText(ref string text, string from, string to)
         {
             var newText = text.Replace(from, to, StringComparison.OrdinalIgnoreCase);
             var hasReplacedAnything = text != newText;
             text = newText;
 
+            myReplaceCount += hasReplacedAnything ? 1 : 0;
+
             return hasReplacedAnything;
         }
 
-        private static bool ReplaceInKeys(Dictionary<string, string> replacements, string from, string to)
+        private bool ReplaceInKeys(Dictionary<string, string> replacements, string from, string to)
         {
             var hasReplacedAnything = false;
             foreach (var kvp in replacements.Where(k => k.Key.Contains(from, StringComparison.OrdinalIgnoreCase) && k.Value != to).ToList())
             {
                 hasReplacedAnything = true;
+                myReplaceCount++;
                 replacements.Remove(kvp.Key);
-                replacements.Add(kvp.Key.Replace(from, to, StringComparison.OrdinalIgnoreCase), kvp.Value);
+                var newKey = kvp.Key.Replace(from, to, StringComparison.OrdinalIgnoreCase);
+                if (newKey != kvp.Value)
+                {
+                    replacements.Add(newKey, kvp.Value);
+                }
             }
 
             return hasReplacedAnything;
         }
+
+        private int myReplaceCount;
     }
 }

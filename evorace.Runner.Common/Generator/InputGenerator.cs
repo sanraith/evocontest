@@ -28,7 +28,7 @@ namespace evorace.Runner.Common.Generator
             var pos = 0;
             while (pos < length)
             {
-                var sentenceLength = GetLength(sentenceTargetLength, absoluteMax: length - pos, minRemaining: sentenceTargetLength.Min + 1);
+                var sentenceLength = GetRandomFromRange(sentenceTargetLength, absoluteMax: length - pos, minRemaining: sentenceTargetLength.Min + 1);
                 GenerateSentence(span.Slice(pos, sentenceLength));
                 pos += sentenceLength + 1;
                 if (pos - 1 < length) { span[pos - 1] = Space; }
@@ -44,7 +44,7 @@ namespace evorace.Runner.Common.Generator
             int pos = 0;
             while (pos < length)
             {
-                var wordLength = GetLength(wordTargetLength, absoluteMax: length - pos, minRemaining: wordTargetLength.Min + 1);
+                var wordLength = GetRandomFromRange(wordTargetLength, absoluteMax: length - pos, minRemaining: wordTargetLength.Min + 1);
                 GenerateWord(span.Slice(pos, wordLength), pos == 0);
                 pos += wordLength + 1;
                 if (pos - 1 < length) { span[pos - 1] = Space; }

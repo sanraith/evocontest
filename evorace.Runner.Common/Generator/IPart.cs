@@ -6,6 +6,8 @@ namespace evorace.Runner.Common.Generator
 
     public interface IPart
     {
+        HashSet<IPart> Users => new HashSet<IPart>();
+
         int GetLength(int level);
 
         int RenderTo(Span<char> span, int maxLevel);

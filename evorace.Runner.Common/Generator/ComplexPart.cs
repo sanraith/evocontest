@@ -8,12 +8,15 @@ namespace evorace.Runner.Common.Generator
     {
         public string ShortHand { get; }
 
+        public HashSet<IPart> Users { get; }
+
         public List<IPart> Parts { get; }
 
         public ComplexPart(string shortHand, params IPart[] parts)
         {
             ShortHand = shortHand;
             Parts = parts.ToList();
+            Users = new HashSet<IPart>();
         }
 
         public int GetLength(int maxLevel)
@@ -63,7 +66,7 @@ namespace evorace.Runner.Common.Generator
                 if (part.Parts.Count == 0)
                 {
                     if (pos > 0) { span[pos++] = ' '; }
-                    pos += part.RenderShortTo(span.Slice(pos));
+                    if (!TryRenderShortTo(part, span.Slice(pos), ref pos)) { return pos; }
                 }
                 else if (level == 0)
                 {
@@ -71,7 +74,7 @@ namespace evorace.Runner.Common.Generator
                     for (var i = 0; i < part.Parts.Count; i++)
                     {
                         if (i != 0) { span[pos++] = ' '; }
-                        pos += part.Parts[i].RenderShortTo(span.Slice(pos));
+                        if (!TryRenderShortTo(part.Parts[i], span.Slice(pos), ref pos)) { return pos; }
                     }
                 }
                 else
@@ -84,6 +87,21 @@ namespace evorace.Runner.Common.Generator
             }
 
             return pos;
+        }
+
+        private static bool TryRenderShortTo(IPart part, Span<char> span, ref int pos)
+        {
+            if (part.ShortHand.Length > span.Length)
+            {
+                return false;
+            }
+            pos += part.RenderShortTo(span);
+            return true;
+        }
+
+        public override string? ToString()
+        {
+            return $"{ShortHand}({string.Join(' ', Parts.Select(x => x.ShortHand))})";
         }
     }
 }
