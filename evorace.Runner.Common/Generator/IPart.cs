@@ -22,8 +22,6 @@ namespace evorace.Runner.Common.Generator
 
         string ShortHand { get; }
 
-        string Render() => Render(int.MaxValue);
-
         string Render(int maxLevel)
         {
             var partSpan = new char[GetLength(maxLevel)].AsSpan();
