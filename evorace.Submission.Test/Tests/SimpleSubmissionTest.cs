@@ -52,8 +52,9 @@ namespace evorace.Submission.Test.Tests
             AssertSolve(input, expected);
         }
 
+        // TODO enforce in input generation
         [Test]
-        public void Solve_ConflictingAbbreviations_NotRemovedNotReplaced()
+        public void TODO_Solve_ConflictingAbbreviations_NotRemovedNotReplaced()
         {
             const string input = "Apple(the iPhone company) makes money. Apple(the red fruit) tastes good. " +
                                  "The iPhone company is not the same as the red fruit.";
@@ -61,8 +62,14 @@ namespace evorace.Submission.Test.Tests
             AssertSolve(input, expected);
         }
 
+        // TODO consider removing this option
+        // Pro:
+        //      Simpler sample code
+        // Contra:
+        //      Simpler solutions => faster completion for everyone?
+        //      More complex input generation
         [Test]
-        public void Solve_ComplexAbbreviations_AreReplaced()
+        public void TODO_Solve_ComplexAbbreviations_AreReplaced()
         {
             const string input = "SIMPLE(Simple abbreviation). " +
                                  "COMPLEX(complex includes simple abbreviation). " +
@@ -71,8 +78,9 @@ namespace evorace.Submission.Test.Tests
             AssertSolve(input, expected);
         }
 
+        // TODO enforce this in input generation
         [Test]
-        public void TODO_Solve_RecursiveAbbreviations_AreReplaced()
+        public void TODO_Solve_RecursiveAbbreviations_MultipleSolution()
         {
             // A D D A D D D A D D A D D
             // C   D C   D D C   D C   D
@@ -90,6 +98,24 @@ namespace evorace.Submission.Test.Tests
 
 
             const string expected = "A. B. C. A.";
+            AssertSolve(input, expected);
+        }
+
+        [Test]
+        public void TODO_Solve_ComplexAbbreviation_MultipleSolution() // May be resolved by longest rule
+        {
+            const string input = "B(C D). Z(B C D). B C D.";
+            const string expected = "B. Z. Z.";
+
+            AssertSolve(input, expected);
+        }
+
+        [Test]
+        public void TODO_Solve_ComplexAbbreviation_MultipleSolution2()
+        {
+            const string input = "X(A B). Y(B C). Z(A Y). A B C.";
+            const string expected = "X. Y. Z. Z.";
+
             AssertSolve(input, expected);
         }
     }
