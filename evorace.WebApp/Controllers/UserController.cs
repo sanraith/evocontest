@@ -34,7 +34,7 @@ namespace evorace.WebApp.Controllers
         public async Task<IActionResult> Submit()
         {
             var user = await myUserManager.GetUserAsync(HttpContext.User);
-            var latestSubmission = myDb.Query(user, u => u.Submissions).LastOrDefault(x => !x.IsDeleted);
+            var latestSubmission = myDb.Query(user, u => u.Submissions).OrderBy(x => x.UploadDate).LastOrDefault(x => !x.IsDeleted);
 
             var viewModel = new SubmitViewModel { LatestSubmission = latestSubmission };
             return View(viewModel);
