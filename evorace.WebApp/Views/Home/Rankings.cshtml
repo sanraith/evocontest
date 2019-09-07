@@ -1,0 +1,33 @@
+﻿@model IEnumerable<evorace.WebApp.Data.Match>
+
+@{
+    ViewData["Title"] = "Rankings";
+}
+
+<h1>Rankings</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.MatchDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.JsonResult)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.MatchDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.JsonResult)
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

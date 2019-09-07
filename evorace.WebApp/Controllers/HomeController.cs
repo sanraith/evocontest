@@ -5,14 +5,27 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using evorace.WebApp.Models;
+using evorace.WebApp.Data;
 
 namespace evorace.WebApp.Controllers
 {
     public class HomeController : Controller
     {
+        public HomeController(ContestDb database)
+        {
+            myDb = database;
+        }
+
         public IActionResult Index()
         {
             return View();
+        }
+
+        public IActionResult Rankings()
+        {
+            var matches = myDb.Matches.ToList();
+
+            return View(matches);
         }
 
         public IActionResult Privacy()
@@ -25,5 +38,7 @@ namespace evorace.WebApp.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        private readonly ContestDb myDb;
     }
 }

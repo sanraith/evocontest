@@ -12,6 +12,10 @@ namespace evorace.WebApp.Data
     {
         public virtual DbSet<Submission> Submissions { get; set; }
 
+        public virtual DbSet<Match> Matches { get; set; }
+
+        public virtual DbSet<Measurement> Measurements { get; set; }
+
         public ContestDb(DbContextOptions<ContestDb> options)
             : base(options)
         { }

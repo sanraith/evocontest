@@ -18,7 +18,7 @@ namespace evorace.WebApp.Controllers
     [Authorize(Roles = Roles.Admin)]
     public class AdminController : Controller
     {
-        public AdminController(ContestDb db, IFileManager fileManager, UserManager<ApplicationUser> userManager, 
+        public AdminController(ContestDb db, IFileManager fileManager, UserManager<ApplicationUser> userManager,
             IHubContext<WorkerHub, IWorkerHubClient> workerHub)
         {
             myDb = db;

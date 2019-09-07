@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using evorace.WebApp.Common;
@@ -30,6 +31,29 @@ namespace evorace.WebApp.Controllers
 
             var fileStream = fileInfo.CreateReadStream();
             return File(fileStream, "application/x-msdownload", submission.OriginalFileName);
+        }
+
+        // TODO use actual data
+        public async Task<IActionResult> UploadMatch()
+        {
+            var match = new Match
+            {
+                MatchDate = DateTime.Now,
+                JsonResult = "{}"
+            };
+            await myDb.Matches.AddAsync(match);
+
+            var submission = await myDb.Submissions.FirstAsync(x => !x.IsDeleted);
+            var measurement = new Measurement
+            {
+                Match = match,
+                Submission = submission,
+                JsonResult = "{}"
+            };
+            await myDb.Measurements.AddAsync(measurement);
+            await myDb.SaveChangesAsync();
+
+            return Ok();
         }
 
         public async Task<JsonResult> GetValidSubmissions()
