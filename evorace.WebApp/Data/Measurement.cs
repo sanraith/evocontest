@@ -1,7 +1,10 @@
-﻿using System;
+﻿using evorace.WebApp.Common.Data;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace evorace.WebApp.Data
@@ -24,6 +27,10 @@ namespace evorace.WebApp.Data
         public Measurement()
         {
             Id = Guid.NewGuid().ToString();
+            MeasurementResultLazy = new Lazy<MeasurementContainer>(() => JsonSerializer.Deserialize<MeasurementContainer>(JsonResult));
         }
+
+        [NotMapped]
+        public Lazy<MeasurementContainer> MeasurementResultLazy { get; }
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using evorace.WebApp.Models;
 using evorace.WebApp.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace evorace.WebApp.Controllers
 {
@@ -21,9 +22,13 @@ namespace evorace.WebApp.Controllers
             return View();
         }
 
-        public IActionResult Rankings()
+        public async Task<IActionResult> Rankings()
         {
-            var matches = myDb.Matches.ToList();
+            var matches = await myDb.Matches
+                .Include(x => x.Measurements)
+                    .ThenInclude(x => x.Submission)
+                        .ThenInclude(x => x.User)
+                .ToListAsync();
 
             return View(matches);
         }

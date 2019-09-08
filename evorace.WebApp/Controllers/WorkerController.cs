@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using evorace.WebApp.Common;
+using evorace.WebApp.Common.Data;
 using evorace.WebApp.Core;
 using evorace.WebApp.Data;
 using evorace.WebApp.Data.Helper;
@@ -36,23 +38,78 @@ namespace evorace.WebApp.Controllers
         // TODO use actual data
         public async Task<IActionResult> UploadMatch()
         {
+            var submission = await myDb.Submissions.FirstAsync(x => !x.IsDeleted);
+            var submissions = await myDb.Submissions.Where(x => !x.IsDeleted).ToListAsync();
+
+            #region test match data
+            var matchResult = new MatchContainer
+            {
+                Measurements = new List<MeasurementContainer>
+                {
+                    new MeasurementContainer
+                    {
+                        SubmissionId = submissions[0].Id,
+                        Rounds = new List<MeasurementRoundContainer>
+                        {
+                            new MeasurementRoundContainer
+                            {
+                                DifficultyLevel = 0,
+                                TotalMilliseconds = TimeSpan.FromMilliseconds(100).TotalMilliseconds
+                            },
+                            new MeasurementRoundContainer{
+                                DifficultyLevel = 1,
+                                TotalMilliseconds = TimeSpan.FromMilliseconds(499).TotalMilliseconds
+                            },
+                            new MeasurementRoundContainer{
+                                DifficultyLevel = 2,
+                                TotalMilliseconds = TimeSpan.FromMilliseconds(600).TotalMilliseconds
+                            }
+
+                        }
+                    },
+                    new MeasurementContainer
+                    {
+                        SubmissionId = submissions[1].Id,
+                        Rounds = new List<MeasurementRoundContainer>
+                        {
+                            new MeasurementRoundContainer
+                            {
+                                DifficultyLevel = 0,
+                                TotalMilliseconds = TimeSpan.FromMilliseconds(100).TotalMilliseconds
+                            },
+                            new MeasurementRoundContainer{
+                                DifficultyLevel = 1,
+                                TotalMilliseconds = TimeSpan.FromMilliseconds(300).TotalMilliseconds
+                            },
+                            new MeasurementRoundContainer{
+                                DifficultyLevel = 2,
+                                TotalMilliseconds = TimeSpan.FromMilliseconds(302).TotalMilliseconds
+                            }
+                        }
+                    }
+                }
+            };
+            #endregion
+
             var match = new Match
             {
                 MatchDate = DateTime.Now,
-                JsonResult = "{}"
+                JsonResult = JsonSerializer.Serialize(matchResult)
             };
             await myDb.Matches.AddAsync(match);
 
-            var submission = await myDb.Submissions.FirstAsync(x => !x.IsDeleted);
-            var measurement = new Measurement
+            foreach (var mContainer in matchResult.Measurements)
             {
-                Match = match,
-                Submission = submission,
-                JsonResult = "{}"
-            };
-            await myDb.Measurements.AddAsync(measurement);
-            await myDb.SaveChangesAsync();
+                var measurement = new Measurement
+                {
+                    Match = match,
+                    Submission = submissions.First(x => x.Id == mContainer.SubmissionId),
+                    JsonResult = JsonSerializer.Serialize(mContainer)
+                };
+                await myDb.Measurements.AddAsync(measurement);
+            }
 
+            await myDb.SaveChangesAsync();
             return Ok();
         }
 

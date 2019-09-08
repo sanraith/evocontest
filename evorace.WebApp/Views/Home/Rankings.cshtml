@@ -2,9 +2,39 @@
 
 @{
     ViewData["Title"] = "Rankings";
+
+    var lastMatch = Model.OrderByDescending(x => x.MatchDate).First();
+    var orderedMeasurements = lastMatch.Measurements
+        .OrderByDescending(x => x.MeasurementResultLazy.Value.Result.DifficultyLevel)
+        .ThenBy(x => x.MeasurementResultLazy.Value.Result.TotalMilliseconds);
 }
 
-<h1>Rankings</h1>
+<h1>Rangsor</h1>
+
+    <table class="table table-responsive table-hover table-striped">
+        <tr>
+            <th style="text-align: center">
+                #
+            </th>
+            <th>
+                Készítő
+            </th>
+            <th style="text-align: center; max-width: 100px">
+                Idő
+            </th>
+        </tr>
+        @foreach (var (measurement, place) in orderedMeasurements.Select((x, i) => (x, i + 1)))
+        {
+            <tr>
+                <td style="font-weight: bold; font-size: 20px; vertical-align: middle; text-align: center">@place.</td>
+                <td>@measurement.Submission.User.Email</td>
+                <td>
+                    (@measurement.MeasurementResultLazy.Value.Result.DifficultyLevel)
+                    @measurement.MeasurementResultLazy.Value.Result.TotalMilliseconds ms
+                </td>
+            </tr>
+        }
+    </table>
 
 <table class="table">
     <thead>
@@ -19,15 +49,16 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.MatchDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.JsonResult)
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.MatchDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.JsonResult)
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
