@@ -57,4 +57,11 @@
     <Copy SourceFiles="@(SignalRJSClientFiles)" DestinationFolder="$(MSBuildThisFileDirectory)wwwroot\lib\signalr" />
   </Target>
 
+  <Target Name="CopyChartJs" BeforeTargets="AfterBuild">
+    <ItemGroup>
+      <ChartJsFiles Include="$(MSBuildThisFileDirectory)node_modules\chart.js\dist\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(ChartJsFiles)" DestinationFolder="$(MSBuildThisFileDirectory)wwwroot\lib\chart.js" />
+  </Target>
+  
 </Project>

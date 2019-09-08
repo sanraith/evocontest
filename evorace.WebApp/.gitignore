@@ -4,5 +4,6 @@ _Store/**/*.dll
 # npm packages
 node_modules/
 
-# client side signalr
+# client side libraries
 wwwroot/lib/signalr
+wwwroot/lib/chart.js

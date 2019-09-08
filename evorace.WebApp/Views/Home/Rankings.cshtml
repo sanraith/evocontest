@@ -8,33 +8,61 @@
         .OrderByDescending(x => x.MeasurementResultLazy.Value.Result.DifficultyLevel)
         .ThenBy(x => x.MeasurementResultLazy.Value.Result.TotalMilliseconds);
 }
+<script src="~/lib/chart.js/Chart.min.js"></script>
 
 <h1>Rangsor</h1>
 
-    <table class="table table-responsive table-hover table-striped">
+<canvas id="rankingsChart" width="400" height="400"></canvas>
+<table id="rankingsTable" class="table table-responsive table-hover table-striped">
+    <tr>
+        <th style="text-align: center">
+            #
+        </th>
+        <th>
+            Készítő
+        </th>
+        <th style="text-align: center; max-width: 100px">
+            Idő
+        </th>
+    </tr>
+    @foreach (var (measurement, place) in orderedMeasurements.Select((x, i) => (x, i + 1)))
+    {
         <tr>
-            <th style="text-align: center">
-                #
-            </th>
-            <th>
-                Készítő
-            </th>
-            <th style="text-align: center; max-width: 100px">
-                Idő
-            </th>
+            <td style="font-weight: bold; font-size: 20px; vertical-align: middle; text-align: center">@place.</td>
+            <td>@measurement.Submission.User.Email</td>
+            <td>
+                (@measurement.MeasurementResultLazy.Value.Result.DifficultyLevel)
+                @measurement.MeasurementResultLazy.Value.Result.TotalMilliseconds ms
+
+                <span style="display:none">
+                    <input type="text" name="name" value="@measurement.Submission.User.Email" />
+                    <input type="text" name="score" value="@(1000/measurement.MeasurementResultLazy.Value.Result.TotalMilliseconds*1000)" />
+                </span>
+            </td>
         </tr>
-        @foreach (var (measurement, place) in orderedMeasurements.Select((x, i) => (x, i + 1)))
-        {
-            <tr>
-                <td style="font-weight: bold; font-size: 20px; vertical-align: middle; text-align: center">@place.</td>
-                <td>@measurement.Submission.User.Email</td>
-                <td>
-                    (@measurement.MeasurementResultLazy.Value.Result.DifficultyLevel)
-                    @measurement.MeasurementResultLazy.Value.Result.TotalMilliseconds ms
-                </td>
-            </tr>
+    }
+</table>
+
+<script>
+    var labels = $("#rankingsTable input[name=name]").map(function () { return $(this).val(); }).toArray();
+    var scores = $("#rankingsTable input[name=score]").map(function () { return parseFloat($(this).val()); }).toArray();
+
+    var ctx = document.getElementById('rankingsChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'horizontalBar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Solved /1000s',
+                data: scores,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: { yAxes: [{ ticks: { beginAtZero: true } }] }
         }
-    </table>
+    });
+</script>
 
 <table class="table">
     <thead>
