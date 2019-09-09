@@ -28,8 +28,8 @@ namespace evorace.Runner.Host.Workflow
                 await listener.WaitUntilRunRaceReceivedAsync();
                 await listener.StopAsync();
 
-                var racer = scope.Resolve<RaceWorkflow>();
-                await racer.ExecuteAsync();
+                var matcher = scope.Resolve<MatchWorkflow>();
+                await matcher.ExecuteAsync();
             }
         }
 

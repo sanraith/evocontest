@@ -1,4 +1,5 @@
-﻿@model IEnumerable<evorace.WebApp.Data.Match>
+﻿@using System.Globalization;
+@model IEnumerable<evorace.WebApp.Data.Match>
 
 @{
     ViewData["Title"] = "Rankings";
@@ -11,41 +12,43 @@
 <script src="~/lib/chart.js/Chart.min.js"></script>
 
 <h1>Rangsor</h1>
+<div style="display:flex">
+    <div style="flex:50%">
+        <table id="rankingsTable" class="table table-hover table-striped">
+            <tr>
+                <th style="text-align: center">#</th>
+                <th>Készítő</th>
+                <th style="text-align: center; max-width: 100px">Idő</th>
+            </tr>
+            @foreach (var (measurement, place) in orderedMeasurements.Select((x, i) => (x, i + 1)))
+            {
+                var result = measurement.MeasurementResultLazy.Value.Result;
+                var solvedPerSecString = (1000 / result.TotalMilliseconds).ToString("#.####", CultureInfo.InvariantCulture);
+                <tr>
+                    <td style="font-weight: bold; font-size: 20px; vertical-align: middle; text-align: center">@place.</td>
+                    <td>@measurement.Submission.User.Email</td>
+                    <td>
+                        (@result.DifficultyLevel)
+                        @result.TotalMilliseconds ms
 
-<canvas id="rankingsChart" width="400" height="400"></canvas>
-<table id="rankingsTable" class="table table-responsive table-hover table-striped">
-    <tr>
-        <th style="text-align: center">
-            #
-        </th>
-        <th>
-            Készítő
-        </th>
-        <th style="text-align: center; max-width: 100px">
-            Idő
-        </th>
-    </tr>
-    @foreach (var (measurement, place) in orderedMeasurements.Select((x, i) => (x, i + 1)))
-    {
-        <tr>
-            <td style="font-weight: bold; font-size: 20px; vertical-align: middle; text-align: center">@place.</td>
-            <td>@measurement.Submission.User.Email</td>
-            <td>
-                (@measurement.MeasurementResultLazy.Value.Result.DifficultyLevel)
-                @measurement.MeasurementResultLazy.Value.Result.TotalMilliseconds ms
+                        <span style="display:none">
+                            <input type="text" name="name" value="@measurement.Submission.User.Email" />
+                            <input type="text" name="score" value="@solvedPerSecString" />
+                        </span>
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
 
-                <span style="display:none">
-                    <input type="text" name="name" value="@measurement.Submission.User.Email" />
-                    <input type="text" name="score" value="@(1000/measurement.MeasurementResultLazy.Value.Result.TotalMilliseconds*1000)" />
-                </span>
-            </td>
-        </tr>
-    }
-</table>
+    <div style="flex:50%">
+        <canvas id="rankingsChart" />
+    </div>
+</div>
 
 <script>
-    var labels = $("#rankingsTable input[name=name]").map(function () { return $(this).val(); }).toArray();
-    var scores = $("#rankingsTable input[name=score]").map(function () { return parseFloat($(this).val()); }).toArray();
+    var labels = $("#rankingsTable input[name=name]").map((_, x) => $(x).val()).toArray();
+    var scores = $("#rankingsTable input[name=score]").map((_, x) => parseFloat($(x).val())).toArray();
 
     var ctx = document.getElementById('rankingsChart').getContext('2d');
     var myChart = new Chart(ctx, {
@@ -53,9 +56,17 @@
         data: {
             labels: labels,
             datasets: [{
-                label: 'Solved /1000s',
+                label: 'Solved/sec',
                 data: scores,
-                borderWidth: 1
+                borderWidth: 1,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ]
             }]
         },
         options: {

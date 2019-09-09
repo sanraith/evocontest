@@ -12,6 +12,7 @@ using evorace.Runner.Host.Extensions;
 using System.IO;
 using evorace.Runner.Host.Configuration;
 using evorace.Runner.Common.Utility;
+using evorace.WebApp.Common.Data;
 
 namespace evorace.Runner.Host.Connection
 {
@@ -30,6 +31,7 @@ namespace evorace.Runner.Host.Connection
             mySignalrUri = new Uri(hostUri, Constants.WorkerHubRoute);
             myDownloadSubmissionUri = new Uri(hostUri, Constants.DownloadSubmissionRoute);
             myGetValidSubmissionsUri = new Uri(hostUri, Constants.GetValidSubmissionsRoute);
+            myUploadMatchResultsUri = new Uri(hostUri, Constants.UploadMatchResultsRoute);
         }
 
         public async Task LoginAsync(string email, string password)
@@ -103,6 +105,24 @@ namespace evorace.Runner.Host.Connection
             return result;
         }
 
+        public async Task UploadMatchResults(MatchContainer matchResult)
+        {
+            using var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = myUploadMatchResultsUri,
+                Content = new FormUrlEncodedContent(new Dictionary<string, string>
+                {
+                    { "matchResults", JsonSerializer.Serialize(matchResult) },
+                })
+            };
+            using var response = await myHttpClient.SendAsync(request);
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                throw new InvalidOperationException();
+            }
+        }
+
         private async Task<string> GetRequestVerificationTokenAsync(Uri loginUri)
         {
             using var request = new HttpRequestMessage { Method = HttpMethod.Get, RequestUri = loginUri };
@@ -153,6 +173,7 @@ namespace evorace.Runner.Host.Connection
         private HubConnection? myHubConn;
         private readonly Uri myLoginUri;
         private readonly Uri mySignalrUri;
+        private readonly Uri myUploadMatchResultsUri;
         private readonly Uri myDownloadSubmissionUri;
         private readonly Uri myGetValidSubmissionsUri;
         private readonly HttpClient myHttpClient;

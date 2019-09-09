@@ -6,5 +6,6 @@
         public static readonly string WorkerHubRoute = "/workerhub";
         public static readonly string DownloadSubmissionRoute = "/Worker/DownloadSubmission";
         public static readonly string GetValidSubmissionsRoute = "/Worker/GetValidSubmissions";
+        public static readonly string UploadMatchResultsRoute = "/Worker/UploadMatchResults";
     }
 }

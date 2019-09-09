@@ -35,84 +35,6 @@ namespace evorace.WebApp.Controllers
             return File(fileStream, "application/x-msdownload", submission.OriginalFileName);
         }
 
-        // TODO use actual data
-        public async Task<IActionResult> UploadMatch()
-        {
-            var submission = await myDb.Submissions.FirstAsync(x => !x.IsDeleted);
-            var submissions = await myDb.Submissions.Where(x => !x.IsDeleted).ToListAsync();
-
-            #region test match data
-            var matchResult = new MatchContainer
-            {
-                Measurements = new List<MeasurementContainer>
-                {
-                    new MeasurementContainer
-                    {
-                        SubmissionId = submissions[0].Id,
-                        Rounds = new List<MeasurementRoundContainer>
-                        {
-                            new MeasurementRoundContainer
-                            {
-                                DifficultyLevel = 0,
-                                TotalMilliseconds = TimeSpan.FromMilliseconds(100).TotalMilliseconds
-                            },
-                            new MeasurementRoundContainer{
-                                DifficultyLevel = 1,
-                                TotalMilliseconds = TimeSpan.FromMilliseconds(499).TotalMilliseconds
-                            },
-                            new MeasurementRoundContainer{
-                                DifficultyLevel = 2,
-                                TotalMilliseconds = TimeSpan.FromMilliseconds(600).TotalMilliseconds
-                            }
-
-                        }
-                    },
-                    new MeasurementContainer
-                    {
-                        SubmissionId = submissions[1].Id,
-                        Rounds = new List<MeasurementRoundContainer>
-                        {
-                            new MeasurementRoundContainer
-                            {
-                                DifficultyLevel = 0,
-                                TotalMilliseconds = TimeSpan.FromMilliseconds(100).TotalMilliseconds
-                            },
-                            new MeasurementRoundContainer{
-                                DifficultyLevel = 1,
-                                TotalMilliseconds = TimeSpan.FromMilliseconds(300).TotalMilliseconds
-                            },
-                            new MeasurementRoundContainer{
-                                DifficultyLevel = 2,
-                                TotalMilliseconds = TimeSpan.FromMilliseconds(302).TotalMilliseconds
-                            }
-                        }
-                    }
-                }
-            };
-            #endregion
-
-            var match = new Match
-            {
-                MatchDate = DateTime.Now,
-                JsonResult = JsonSerializer.Serialize(matchResult)
-            };
-            await myDb.Matches.AddAsync(match);
-
-            foreach (var mContainer in matchResult.Measurements)
-            {
-                var measurement = new Measurement
-                {
-                    Match = match,
-                    Submission = submissions.First(x => x.Id == mContainer.SubmissionId),
-                    JsonResult = JsonSerializer.Serialize(mContainer)
-                };
-                await myDb.Measurements.AddAsync(measurement);
-            }
-
-            await myDb.SaveChangesAsync();
-            return Ok();
-        }
-
         public async Task<JsonResult> GetValidSubmissions()
         {
             IEnumerable<Submission> activeSubmissions = await myDb.Submissions
@@ -134,6 +56,38 @@ namespace evorace.WebApp.Controllers
                     UploadDate = x.UploadDate
                 }).ToList()
             });
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> UploadMatchResults([Bind(Prefix = "matchResults")] string matchResultsJson)
+        {
+            var matchResults = JsonSerializer.Deserialize<MatchContainer>(matchResultsJson);
+            var requiredSubmissionIds = matchResults.Measurements.Select(x => x.SubmissionId).ToList();
+            var submissions = await myDb.Submissions
+                .Where(x => requiredSubmissionIds.Contains(x.Id))
+                .ToDictionaryAsync(x => x.Id, x => x);
+
+            var match = new Match
+            {
+                MatchDate = DateTime.Now,
+                JsonResult = JsonSerializer.Serialize(matchResults)
+            };
+            await myDb.Matches.AddAsync(match);
+
+            foreach (var mContainer in matchResults.Measurements)
+            {
+                var measurement = new Measurement
+                {
+                    Match = match,
+                    Submission = submissions[mContainer.SubmissionId],
+                    JsonResult = JsonSerializer.Serialize(mContainer)
+                };
+                await myDb.Measurements.AddAsync(measurement);
+            }
+
+            await myDb.SaveChangesAsync();
+            return Ok();
         }
 
         private readonly ContestDb myDb;
