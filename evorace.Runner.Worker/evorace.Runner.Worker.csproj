@@ -9,6 +9,8 @@
   <ItemGroup>
     <ProjectReference Include="..\evorace.Common\evorace.Common.csproj" />
     <ProjectReference Include="..\evorace.Runner.Common\evorace.Runner.Common.csproj" />
+    <ProjectReference Include="..\evorace.Submission.Test\evorace.Submission.Test.csproj" />
+    <ProjectReference Include="..\evorace.Submission\evorace.Submission.csproj" />
   </ItemGroup>
 
 </Project>

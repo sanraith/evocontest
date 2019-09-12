@@ -9,7 +9,7 @@ namespace evorace.Submission.Test
 {
     public abstract class TestBase
     {
-        protected Type? SubmissionType { get; private set; }
+        public Type? SubmissionType { get; set; }
 
         protected ISolution? Submission { get; private set; }
 

@@ -33,16 +33,33 @@ namespace evorace.Runner.Host.Workflow
 
             Console.WriteLine($"Validating {targetFile.Name}...");
 
-            bool result;
+            var success = false;
+            var status = ValidationStateEnum.File;
             using (myWorkerProcess = StartWorkerProcess())
             using (myPipeServer = await StartPipeServerAsync())
             {
-                result = LoadSubmissionToWorker(targetFile);
+                // Load assembly
+                status = ValidationStateEnum.Static;
+                success = LoadSubmissionToWorker(targetFile);
+
+                // Run unit tests
+                if (success)
+                {
+                    status = ValidationStateEnum.UnitTest;
+                    success = RunUnitTestsInWorker();
+                }
+
+                // Validation completed
+                if (success)
+                {
+                    status = ValidationStateEnum.Completed;
+                }
+
                 StopWorkerProcess();
             }
 
             Console.WriteLine("Validation done.");
-            await myServer.UpdateStatus(submissionId, ValidationStateEnum.Static, result ? null : "error")
+            await myServer.UpdateStatus(submissionId, status, success ? null : "error")
                 .WithProgressLog("Sending validation result to server");
         }
 
@@ -51,14 +68,17 @@ namespace evorace.Runner.Host.Workflow
             var workerDirectory = new DirectoryInfo(myConfig.Directories.Worker);
             var relativePath = GetRelativePath(workerDirectory, targetFile);
             myPipeServer.SendMessage(new LoadContextMessage(relativePath));
-
             var response = myPipeServer.ReceiveMessage();
-            return response switch
-            {
-                OperationSuccessfulMessage _ => true,
-                OperationFailedMessage _ => false,
-                _ => throw new InvalidOperationException(),
-            };
+
+            return ResponseToBool(response);
+        }
+
+        private bool RunUnitTestsInWorker()
+        {
+            myPipeServer.SendMessage(new RunUnitTestsMessage());
+            var response = myPipeServer.ReceiveMessage();
+
+            return ResponseToBool(response);
         }
 
         private void StopWorkerProcess()
@@ -109,6 +129,16 @@ namespace evorace.Runner.Host.Workflow
             var relativePath = Uri.UnescapeDataString(relativeUri.ToString().Replace('/', Path.DirectorySeparatorChar));
 
             return relativePath;
+        }
+
+        private static bool ResponseToBool(IMessage response)
+        {
+            return response switch
+            {
+                OperationSuccessfulMessage _ => true,
+                OperationFailedMessage _ => false,
+                _ => throw new InvalidOperationException(),
+            };
         }
 
         private Process myWorkerProcess;
