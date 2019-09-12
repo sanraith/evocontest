@@ -3,7 +3,6 @@ using evorace.Runner.Common.Messages;
 using evorace.Runner.Common.Utility;
 using System;
 using System.Linq;
-using System.Reflection;
 
 namespace evorace.Runner.Worker.Core
 {
@@ -60,7 +59,16 @@ namespace evorace.Runner.Worker.Core
             {
                 return new MessageHandlerResult(new OperationFailedMessage(runMsg.Id, "No assembly is loaded."));
             }
-            return new MessageHandlerResult(new OperationSuccessfulMessage(runMsg.Id)); //TODO
+
+            var testRunner = new UnitTestRunner(myLoadedSolutionType.Value);
+            var testResults = testRunner.RunTests();
+
+            var failedTests = testResults.Where(x => !x.Value).Select(x => x.Key).ToList();
+            if (failedTests.Any())
+            {
+                return new MessageHandlerResult(new OperationFailedMessage(runMsg.Id, $"Unit tests failed: {string.Join(", ", failedTests)}"));
+            }
+            return new MessageHandlerResult(new OperationSuccessfulMessage(runMsg.Id));
         }
 
         private void ClearLoadedAssembly()

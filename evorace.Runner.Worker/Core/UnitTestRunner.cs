@@ -2,23 +2,46 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace evorace.Runner.Worker.Core
 {
-    public sealed class UnitTestRunner 
+    public sealed class UnitTestRunner
     {
         public UnitTestRunner(Type solutionType)
         {
             mySolutionType = solutionType;
         }
 
-        public void RunTests()
+        public Dictionary<string, bool> RunTests()
         {
             var testClass = new SimpleSubmissionTest();
             testClass.SubmissionType = mySolutionType;
 
-            //var tests = typeof(SimpleSubmissionTest).GetMethods().Where(x=>x.GetCustomAttributes(false)) // TODO get tests
+            var tests = typeof(SimpleSubmissionTest).GetMethods()
+                .Where(x => x.CustomAttributes.Any(x => x.AttributeType.Name == "TestAttribute"))
+                .ToList();
+
+            var testResults = new Dictionary<string, bool>();
+            foreach (var testMethod in tests)
+            {
+                var success = false;
+                try
+                {
+                    testClass.Setup();
+                    testMethod.Invoke(testClass, new object[0]);
+                    success = true;
+                }
+                catch (Exception)
+                {
+                    break;
+                }
+                finally
+                {
+                    testResults.Add(testMethod.Name, success);
+                }
+            }
+
+            return testResults;
         }
 
         private readonly Type mySolutionType;

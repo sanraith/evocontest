@@ -94,7 +94,7 @@ namespace evorace.WebApp.Controllers
         public async Task<ActionResult> DoDelete(string submissionId)
         {
             var user = await myUserManager.GetUserAsync(HttpContext.User);
-            var submissionForDelete = myDb.Query(user, u => u.Submissions).LastOrDefault(x => x.Id == submissionId);
+            var submissionForDelete = myDb.Query(user, u => u.Submissions).OrderBy(x => x.UploadDate).LastOrDefault(x => x.Id == submissionId);
 
             if (submissionForDelete != null)
             {
