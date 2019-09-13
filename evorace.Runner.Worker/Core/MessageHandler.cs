@@ -10,20 +10,13 @@ namespace evorace.Runner.Worker.Core
     {
         public MessageHandlerResult Handle(IMessage message)
         {
-            switch (message)
+            return message switch
             {
-                case LoadContextMessage loadMsg:
-                    return HandleLoadContextMessage(loadMsg);
-
-                case RunUnitTestsMessage runMsg:
-                    return HandleRunUnitTestMessage(runMsg);
-
-                case TerminateMessage _:
-                    return new MessageHandlerResult(isDone: true);
-
-                default:
-                    throw new InvalidOperationException("Unknown message type!");
-            }
+                LoadContextMessage loadMsg => HandleUnknownErrors(loadMsg, HandleLoadContextMessage),
+                RunUnitTestsMessage runMsg => HandleUnknownErrors(runMsg, HandleRunUnitTestMessage),
+                TerminateMessage _ => new MessageHandlerResult(isDone: true),
+                _ => throw new InvalidOperationException("Unknown message type!"),
+            };
         }
 
         public void Dispose()
@@ -71,6 +64,19 @@ namespace evorace.Runner.Worker.Core
             return new MessageHandlerResult(new OperationSuccessfulMessage(runMsg.Id));
         }
 
+        private static MessageHandlerResult HandleUnknownErrors<TOriginalMessage>(TOriginalMessage message, Func<TOriginalMessage, MessageHandlerResult> originalHandler)
+            where TOriginalMessage : IMessage
+        {
+            try
+            {
+                return originalHandler(message);
+            }
+            catch (Exception ex)
+            {
+                return new MessageHandlerResult(new OperationFailedMessage(message.Id, $"Unhandled exception: {ex}"));
+            }
+        }
+
         private void ClearLoadedAssembly()
         {
             myLoadedSolutionType?.Dispose();
@@ -78,18 +84,5 @@ namespace evorace.Runner.Worker.Core
         }
 
         private DisposableValue<Type>? myLoadedSolutionType;
-    }
-
-    public sealed class MessageHandlerResult
-    {
-        public bool IsDone { get; }
-
-        public IMessage? Response { get; }
-
-        public MessageHandlerResult(IMessage? response = null, bool isDone = false)
-        {
-            Response = response;
-            IsDone = isDone;
-        }
     }
 }
