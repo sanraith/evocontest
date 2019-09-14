@@ -1,5 +1,7 @@
 ﻿using evorace.Common;
 using evorace.Runner.Common.Messages;
+using evorace.Runner.Common.Messages.Request;
+using evorace.Runner.Common.Messages.Response;
 using evorace.Runner.Common.Utility;
 using System;
 using System.Linq;
@@ -56,12 +58,7 @@ namespace evorace.Runner.Worker.Core
             var testRunner = new UnitTestRunner(myLoadedSolutionType.Value);
             var testResults = testRunner.RunTests();
 
-            var failedTests = testResults.Where(x => !x.Value).Select(x => x.Key).ToList();
-            if (failedTests.Any())
-            {
-                return new MessageHandlerResult(new OperationFailedMessage(runMsg.Id, $"Unit tests failed: {string.Join(", ", failedTests)}"));
-            }
-            return new MessageHandlerResult(new OperationSuccessfulMessage(runMsg.Id));
+            return new MessageHandlerResult(new UnitTestResultMessage(testResults));
         }
 
         private static MessageHandlerResult HandleUnknownErrors<TOriginalMessage>(TOriginalMessage message, Func<TOriginalMessage, MessageHandlerResult> originalHandler)

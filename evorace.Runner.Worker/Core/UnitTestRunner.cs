@@ -12,7 +12,7 @@ namespace evorace.Runner.Worker.Core
             mySolutionType = solutionType;
         }
 
-        public Dictionary<string, bool> RunTests()
+        public Dictionary<string, bool?> RunTests()
         {
             var testClass = new SimpleSubmissionTest();
             testClass.SubmissionType = mySolutionType;
@@ -21,7 +21,7 @@ namespace evorace.Runner.Worker.Core
                 .Where(x => x.CustomAttributes.Any(x => x.AttributeType.Name == "TestAttribute"))
                 .ToList();
 
-            var testResults = new Dictionary<string, bool>();
+            var testResults = tests.ToDictionary(x => x.Name, _ => (bool?)null);
             foreach (var testMethod in tests)
             {
                 var success = false;
@@ -37,7 +37,7 @@ namespace evorace.Runner.Worker.Core
                 }
                 finally
                 {
-                    testResults.Add(testMethod.Name, success);
+                    testResults[testMethod.Name] = success;
                 }
             }
 

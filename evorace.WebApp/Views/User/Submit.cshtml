@@ -15,7 +15,11 @@
     {
         <p class="card-header">
             Feltöltött dll: @sub.OriginalFileName <br />
-            Validációs állapot: @sub.ValidationState @(sub.IsValid.HasValue ? (sub.IsValid.Value ? "ok" : "failed") : "pending") <br />
+            Validációs állapot: @sub.ValidationState @(sub.IsValid.HasValue ? (sub.IsValid.Value ? "kész" : "sikertelen") : "folyamatban") <br />
+            @if (sub.IsValid == false)
+            {
+                <span class="font-weight-bold">@(sub.Error)</span><br />
+            }
             <input type="submit" value="Törlés"
                    class="btn btn-warning"
                    onclick="return confirm('Biztos törölni szeretnéd a benevezett DLL-ed?')" />

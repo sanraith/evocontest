@@ -1,4 +1,4 @@
-using evorace.Runner.Common.Messages;
+using evorace.Runner.Common.Messages.Request;
 using evorace.Runner.Worker.Core;
 using NUnit.Framework;
 

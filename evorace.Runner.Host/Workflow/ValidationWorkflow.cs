@@ -4,6 +4,8 @@ using System.IO;
 using System.Threading.Tasks;
 using evorace.Runner.Common.Connection;
 using evorace.Runner.Common.Messages;
+using evorace.Runner.Common.Messages.Request;
+using evorace.Runner.Common.Messages.Response;
 using evorace.Runner.Host.Configuration;
 using evorace.Runner.Host.Connection;
 using evorace.Runner.Host.Core;
@@ -34,32 +36,42 @@ namespace evorace.Runner.Host.Workflow
             Console.WriteLine($"Validating {targetFile.Name}...");
 
             var success = false;
+            string errorMessage;
             var status = ValidationStateEnum.File;
+
             using (myWorkerProcess = StartWorkerProcess())
             using (myPipeServer = await StartPipeServerAsync())
             {
-                // Load assembly
-                status = ValidationStateEnum.Static;
-                success = LoadSubmissionToWorker(targetFile);
-
-                // Run unit tests
-                if (success)
+                try
                 {
-                    status = ValidationStateEnum.UnitTest;
-                    success = RunUnitTestsInWorker();
-                }
+                    // Load assembly
+                    errorMessage = "Nem sikerült betölteni a szerelvényt.";
+                    status = ValidationStateEnum.Static;
+                    success = LoadSubmissionToWorker(targetFile);
 
-                // Validation completed
-                if (success)
+                    // Run unit tests
+                    if (success)
+                    {
+                        status = ValidationStateEnum.UnitTest;
+                        var unitTestResult = RunUnitTestsInWorker();
+                        success = unitTestResult.IsAllPassed;
+                        errorMessage = $"Helytelen eredmény a következő unit testekre: {string.Join(", ", unitTestResult.FailedTests)}";
+                    }
+
+                    // Validation completed
+                    if (success)
+                    {
+                        status = ValidationStateEnum.Completed;
+                    }
+                }
+                finally
                 {
-                    status = ValidationStateEnum.Completed;
+                    StopWorkerProcess();
                 }
-
-                StopWorkerProcess();
             }
 
             Console.WriteLine("Validation done.");
-            await myServer.UpdateStatus(submissionId, status, success ? null : "error")
+            await myServer.UpdateStatus(submissionId, status, success ? null : errorMessage)
                 .WithProgressLog("Sending validation result to server");
         }
 
@@ -73,12 +85,12 @@ namespace evorace.Runner.Host.Workflow
             return ResponseToBool(response);
         }
 
-        private bool RunUnitTestsInWorker()
+        private UnitTestResultMessage RunUnitTestsInWorker()
         {
             myPipeServer.SendMessage(new RunUnitTestsMessage());
             var response = myPipeServer.ReceiveMessage();
 
-            return ResponseToBool(response);
+            return (UnitTestResultMessage)response;
         }
 
         private void StopWorkerProcess()
