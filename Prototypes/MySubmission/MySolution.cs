@@ -6,7 +6,7 @@ using evorace.Common;
 
 namespace MySubmission
 {
-    public class MySolution : ISolution
+    public class MySolution// : ISolution
     {
         public string Solve(string input)
         {

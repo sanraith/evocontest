@@ -10,13 +10,18 @@ namespace PerformanceTest
     {
         static void Main(string[] args)
         {
-            var input = "A PDSC(Patient Data Service Client) segítségével lehet csatlakozni a Patient Data Servicehez. A világ legjobb dolga a PDS(Patient Data Service). Tehát a PDS Client az egyik leghasznosabb dolog.";
+            var input = "Alma Aroma Bor Bagatell. Alma Aroma Apple. AA Bor.";
             Console.WriteLine(input);
-            var solved = new MySolution().Solve(input);
+            var solved = new MyNewSolution().Solve(input);
+            //Console.WriteLine(solved);
 
-            var benchmark = new Benchmark.Core.Benchmark(Spin);
-            var result = benchmark.Run();
-            Console.WriteLine(result);
+            //var input = "A PDSC(Patient Data Service Client) segítségével lehet csatlakozni a Patient Data Servicehez. A világ legjobb dolga a PDS(Patient Data Service). Tehát a PDS Client az egyik leghasznosabb dolog.";
+            //Console.WriteLine(input);
+            //var solved = new MySolution().Solve(input);
+
+            //var benchmark = new Benchmark.Core.Benchmark(Spin);
+            //var result = benchmark.Run();
+            //Console.WriteLine(result);
         }
 
         private static void Spin()
