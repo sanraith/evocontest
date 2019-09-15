@@ -13,6 +13,7 @@ using System.IO;
 using evorace.Runner.Host.Configuration;
 using evorace.Runner.Common.Utility;
 using evorace.WebApp.Common.Data;
+using evorace.WebApp.Common.Hub;
 
 namespace evorace.Runner.Host.Connection
 {

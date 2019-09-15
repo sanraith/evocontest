@@ -1,8 +1,8 @@
-﻿using evorace.WebApp.Common;
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using evorace.Runner.Host.Core;
 using evorace.Runner.Host.Workflow;
+using evorace.WebApp.Common.Hub;
 
 namespace evorace.Runner.Host.Connection
 {

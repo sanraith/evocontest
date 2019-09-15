@@ -2,7 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using evorace.WebApp.Common;
+using evorace.WebApp.Common.Hub;
 using evorace.WebApp.Core;
 using evorace.WebApp.Data;
 using evorace.WebApp.Data.Helper;

@@ -11,7 +11,7 @@ using evorace.Runner.Host.Connection;
 using evorace.Runner.Host.Core;
 using evorace.Runner.Host.Extensions;
 using evorace.WebApp.Common;
-
+using evorace.WebApp.Common.Hub;
 using RunnerConstants = evorace.Runner.Common.Constants;
 
 namespace evorace.Runner.Host.Workflow
@@ -47,21 +47,17 @@ namespace evorace.Runner.Host.Workflow
                     // Load assembly
                     errorMessage = "Nem sikerült betölteni a szerelvényt.";
                     status = ValidationStateEnum.Static;
+                    await myServer.UpdateStatus(submissionId, status, null);
                     success = LoadSubmissionToWorker(targetFile);
 
                     // Run unit tests
                     if (success)
                     {
                         status = ValidationStateEnum.UnitTest;
+                        await myServer.UpdateStatus(submissionId, status, null);
                         var unitTestResult = RunUnitTestsInWorker();
                         success = unitTestResult.IsAllPassed;
                         errorMessage = $"Helytelen eredmény a következő unit testekre: {string.Join(", ", unitTestResult.FailedTests)}";
-                    }
-
-                    // Validation completed
-                    if (success)
-                    {
-                        status = ValidationStateEnum.Completed;
                     }
                 }
                 finally
@@ -70,6 +66,8 @@ namespace evorace.Runner.Host.Workflow
                 }
             }
 
+            // Validation completed
+            status = success ? ValidationStateEnum.Completed : status;
             Console.WriteLine("Validation done.");
             await myServer.UpdateStatus(submissionId, status, success ? null : errorMessage)
                 .WithProgressLog("Sending validation result to server");

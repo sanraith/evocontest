@@ -1,0 +1,93 @@
+﻿.multi-steps > li.is-active:before, .multi-steps > li.is-active ~ li:before, .multi-steps > li.is-done ~ li:before {
+    /* Number in node */
+    content: counter(stepNum);
+    font-family: inherit;
+    font-weight: 700;
+}
+
+.multi-steps > li.is-active:after, .multi-steps > li.is-active ~ li:after {
+    background-color: #ededed;
+}
+
+.multi-steps {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+}
+
+    .multi-steps > li {
+        counter-increment: stepNum;
+        text-align: center;
+        display: table-cell;
+        position: relative;
+        color: tomato;
+    }
+
+        .multi-steps > li:before { /* node */
+            content: '\f00c';
+            content: '\2713;';
+            content: '\10003';
+            content: '\10004';
+            content: '\2713';
+            display: block;
+            margin: 0 auto 4px;
+            background-color: #fff;
+            width: 36px;
+            height: 36px;
+            line-height: 32px;
+            text-align: center;
+            font-weight: bold;
+            border-width: 2px;
+            border-style: solid;
+            border-color: tomato;
+            border-radius: 50%;
+        }
+
+        .multi-steps > li:after { /* line after node */
+            content: '';
+            height: 2px;
+            width: 100%;
+            background-color: tomato;
+            position: absolute;
+            top: 16px;
+            left: 50%;
+            z-index: -1;
+        }
+
+        .multi-steps > li:last-child:after { /* no line after last node */
+            display: none;
+        }
+
+        .multi-steps > li.is-active:before { /* node for active */
+            background-color: #fff;
+            border-color: tomato;
+        }
+
+        .multi-steps > li.is-active ~ li { /* Text after active */
+            color: #808080;
+        }
+
+            .multi-steps > li.is-active ~ li:before { /* Nodes after active */
+                background-color: #ededed;
+                border-color: #ededed;
+            }
+
+
+
+        .multi-steps > li.is-done:before { /* node for is-done */
+            background-color: #fff;
+            border-color: green;
+        }
+
+        .multi-steps > li ~ li.is-done { /* text for is-done */
+            color: green;
+        }
+
+        .multi-steps > li.is-done ~ li { /* text after is-done */
+            color: #808080;
+        }
+
+            .multi-steps > li.is-done ~ li:before { /* nodes after is-done */
+                background-color: #ededed;
+                border-color: #ededed;
+            }

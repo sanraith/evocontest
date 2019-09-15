@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using evorace.WebApp.Common;
+using evorace.WebApp.Common.Hub;
 using evorace.WebApp.Core;
 using evorace.WebApp.Data;
 using evorace.WebApp.Hubs;
@@ -119,7 +120,7 @@ namespace evorace.WebApp.Controllers
                     StoredFileName = savedFile.Name,
                     FileSize = (int)savedFile.Length,
                     UploadDate = timeStamp,
-                    ValidationState = ValidationStateEnum.File
+                    ValidationState = ValidationStateEnum.Static
                 };
 
                 myDb.Submissions.Add(submission);

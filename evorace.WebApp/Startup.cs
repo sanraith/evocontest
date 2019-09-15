@@ -97,6 +97,7 @@ namespace evorace.WebApp
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
                 endpoints.MapHub<WorkerHub>(Constants.WorkerHubRoute);
+                endpoints.MapHub<UserHub>(Constants.UserHubRoute);
             });
         }
 

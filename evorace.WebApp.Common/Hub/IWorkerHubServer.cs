@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace evorace.WebApp.Common
+namespace evorace.WebApp.Common.Hub
 {
     public interface IWorkerHubServer
     {

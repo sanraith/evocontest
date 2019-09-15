@@ -9,8 +9,16 @@ $(function () {
     var _status = null;
     var _progressBar = null;
     var _progressStatus = null;
+    
+    function setProgressItemActive(index) {
+        $(".is-active").removeClass("is-active");
+        $("#progressItem-" + index).addClass("is-active");
+        //$(".is-done").removeClass("is-done");
+        //$("#progressItem-" + state).addClass("is-done");
+    }
 
     function uploadFile() {
+        setProgressItemActive(1);
         _progressBar.value = 0;
         setProgressDisplay(true);
         setSubmitEnabled(false);
@@ -41,6 +49,7 @@ $(function () {
     function completeHandler(event) {
         setProgressDisplay(false);
         if (event.target.status == 200) {
+            setProgressItemActive(2);
             countDown("Sikeres feltöltés.");
         } else {
             var result;
@@ -51,6 +60,7 @@ $(function () {
             }
             var message = result.error ? result.error : "Ismeretlen hiba történt a feltöltés során.";
             _status.innerHTML = message;
+            $("#btn-back").show();
         }
     }
 
@@ -126,6 +136,18 @@ $(function () {
             uploadFile();
         });
     }
+
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/userhub")
+        .build();
+
+    connection.start().then(function () {
+        console.log("connected");
+    });
+
+    connection.on("UpdateUploadStatus", (state, isValid, error) => {
+        setProgressItemActive(state);
+    });
 
     initUploadForm();
 });
