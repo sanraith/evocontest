@@ -1,5 +1,4 @@
-﻿using evorace.WebApp.Common;
-using evorace.WebApp.Common.Hub;
+﻿using evorace.WebApp.Common.Hub;
 using evorace.WebApp.Data;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +28,7 @@ namespace evorace.WebApp.Hubs
                 .Where(x => x.User.Id == userId && !x.IsDeleted)
                 .OrderBy(x => x.UploadDate)
                 .LastOrDefaultAsync();
+
             if (sub != null)
             {
                 await Clients.Caller.UpdateUploadStatus(sub.ValidationState, sub.IsValid, sub.Error);

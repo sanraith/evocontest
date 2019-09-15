@@ -63,6 +63,7 @@ namespace evorace.WebApp.Hubs
             else if (state == ValidationStateEnum.Completed)
             {
                 isValid = true;
+                submission.IsValid = isValid;
             }
 
             await myDb.SaveChangesAsync();

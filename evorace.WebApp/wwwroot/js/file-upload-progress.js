@@ -9,12 +9,17 @@ $(function () {
     var _status = null;
     var _progressBar = null;
     var _progressStatus = null;
-    
-    function setProgressItemActive(index) {
+
+    function setProgressItemActive(index, isValid) {
         $(".is-active").removeClass("is-active");
-        $("#progressItem-" + index).addClass("is-active");
-        //$(".is-done").removeClass("is-done");
-        //$("#progressItem-" + state).addClass("is-done");
+        $(".is-done").removeClass("is-done");
+        if (isValid === null) {
+            $("#progressItem-" + index).addClass("is-active");
+        } else if (isValid) { 
+            $("#progressItem-" + index).addClass("is-done");
+        } else {
+            $("#progressItem-" + index).addClass("is-active"); // TODO error state
+        }
     }
 
     function uploadFile() {
@@ -146,7 +151,7 @@ $(function () {
     });
 
     connection.on("UpdateUploadStatus", (state, isValid, error) => {
-        setProgressItemActive(state);
+        setProgressItemActive(state, isValid);
     });
 
     initUploadForm();
