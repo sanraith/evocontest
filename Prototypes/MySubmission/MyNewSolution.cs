@@ -13,12 +13,11 @@ namespace MySubmission
         public string Solve(string input)
         {
             var text = input;
-            ConcurrentDictionary<Expression, int> occurences;
-
+            IDictionary<Expression, int> occurences;
             do
             {
                 var sentences = GetSentences(text);
-                occurences = GetMultipleOccuringExpressions(sentences);
+                occurences = GetMultipleOccurringExpressions(sentences);
                 text = ReplaceExpressionsWithAcronyms(text, occurences.Keys);
                 PrintState(text, occurences);
             } while (occurences.Any());
@@ -28,17 +27,13 @@ namespace MySubmission
 
         private static List<string> GetSentences(string text)
         {
-            return text
-                .Split('.', StringSplitOptions.RemoveEmptyEntries)
-                .Select(x => x.Trim())
-                .ToList();
+            return text.Split('.', StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToList();
         }
 
-        private static ConcurrentDictionary<Expression, int> GetMultipleOccuringExpressions(List<string> sentences)
+        private static IDictionary<Expression, int> GetMultipleOccurringExpressions(List<string> sentences)
         {
-            var occurences = new ConcurrentDictionary<Expression, int>();
-
-            // Gather expression occurences.
+            // Gather expression occurrences.
+            var occurrences = new ConcurrentDictionary<Expression, int>();
             foreach (var sentence in sentences)
             {
                 var words = sentence.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -48,17 +43,17 @@ namespace MySubmission
                     for (var length = 2; length <= words.Length - index; length++)
                     {
                         var expression = new Expression(words[index..(index + length)]);
-                        occurences.AddOrUpdate(expression, 1, (_, current) => current + 1);
+                        occurrences.AddOrUpdate(expression, 1, (_, count) => count + 1);
                     }
                 }
             }
 
-            // Keep only expressions with multiple occurences.
-            occurences
+            // Keep only expressions with multiple occurrences.
+            occurrences
                 .Where(kvp => kvp.Value <= 1).ToList()
-                .ForEach(x => occurences.Remove(x.Key, out _));
+                .ForEach(x => occurrences.Remove(x.Key, out _));
 
-            return occurences;
+            return occurrences;
         }
 
         private static string ReplaceExpressionsWithAcronyms(string text, IEnumerable<Expression> expressions)
@@ -66,17 +61,16 @@ namespace MySubmission
             foreach (var expression in expressions)
             {
                 var expressionString = expression.ToString();
-                var acronym = string.Concat(expression.Words.Select(x => x[0..1])).ToUpperInvariant();
-                text = text.Replace(expressionString, acronym, StringComparison.OrdinalIgnoreCase);
+                text = text.Replace(expressionString, expression.Acronym, StringComparison.OrdinalIgnoreCase);
             }
 
             return text;
         }
 
-        private static void PrintState(string text, ConcurrentDictionary<Expression, int> occurences)
+        private static void PrintState(string text, IDictionary<Expression, int> occurrences)
         {
-            occurences.ToList().ForEach(kvp => Console.WriteLine($"{kvp.Key}: {kvp.Value}"));
-            if (occurences.Any()) { Console.WriteLine(text); }
+            occurrences.ToList().ForEach(kvp => Console.WriteLine($"{kvp.Key}: {kvp.Value}"));
+            if (occurrences.Any()) { Console.WriteLine(text); }
         }
     }
 }

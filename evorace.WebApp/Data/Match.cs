@@ -28,6 +28,10 @@ namespace evorace.WebApp.Data
             Id = Guid.NewGuid().ToString();
         }
 
-        public MatchContainer GetMatchResult() => JsonSerializer.Deserialize<MatchContainer>(JsonResult);
+        [NotMapped]
+        public MatchContainer MatchResult => myMatchResult ?? (myMatchResult = JsonSerializer.Deserialize<MatchContainer>(JsonResult));
+
+        [NotMapped]
+        private MatchContainer myMatchResult;
     }
 }

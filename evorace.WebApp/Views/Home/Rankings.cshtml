@@ -6,8 +6,8 @@
 
     var lastMatch = Model.OrderByDescending(x => x.MatchDate).FirstOrDefault();
     var orderedMeasurements = lastMatch?.Measurements
-        .OrderByDescending(x => x.MeasurementResultLazy.Value.Result.DifficultyLevel)
-        .ThenBy(x => x.MeasurementResultLazy.Value.Result.TotalMilliseconds);
+        .OrderByDescending(x => x.MeasurementResult.Result.DifficultyLevel)
+        .ThenBy(x => x.MeasurementResult.Result.TotalMilliseconds);
 }
 @section Head
 {
@@ -28,7 +28,7 @@
                 </tr>
                 @foreach (var (measurement, place) in orderedMeasurements.Select((x, i) => (x, i + 1)))
                 {
-                    var result = measurement.MeasurementResultLazy.Value.Result;
+                    var result = measurement.MeasurementResult.Result;
                     var solvedPerSecString = (1000 / result.TotalMilliseconds).ToString("#.####", CultureInfo.InvariantCulture);
                     <tr>
                         <td style="font-weight: bold; font-size: 20px; vertical-align: middle; text-align: center">@place.</td>

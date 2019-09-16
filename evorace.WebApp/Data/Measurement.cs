@@ -27,10 +27,12 @@ namespace evorace.WebApp.Data
         public Measurement()
         {
             Id = Guid.NewGuid().ToString();
-            MeasurementResultLazy = new Lazy<MeasurementContainer>(() => JsonSerializer.Deserialize<MeasurementContainer>(JsonResult));
         }
 
         [NotMapped]
-        public Lazy<MeasurementContainer> MeasurementResultLazy { get; }
+        public MeasurementContainer MeasurementResult => myMeasurementResult ?? (myMeasurementResult = JsonSerializer.Deserialize<MeasurementContainer>(JsonResult));
+
+        [NotMapped]
+        private MeasurementContainer myMeasurementResult;
     }
 }

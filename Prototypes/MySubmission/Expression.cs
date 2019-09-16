@@ -12,9 +12,12 @@ namespace MySubmission
     {
         public IReadOnlyList<string> Words { get; }
 
+        public string Acronym { get; }
+
         public Expression(IEnumerable<string> words)
         {
             Words = words.Select(x => x.ToLowerInvariant()).ToList();
+            Acronym = string.Concat(Words.Select(x => x[0..1])).ToUpperInvariant();
             myHashCode = Words.Aggregate(0, (sum, word) => sum ^ word.GetHashCode());
         }
 
