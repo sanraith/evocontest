@@ -4,47 +4,54 @@
 @{
     ViewData["Title"] = "Rankings";
 
-    var lastMatch = Model.OrderByDescending(x => x.MatchDate).First();
-    var orderedMeasurements = lastMatch.Measurements
+    var lastMatch = Model.OrderByDescending(x => x.MatchDate).FirstOrDefault();
+    var orderedMeasurements = lastMatch?.Measurements
         .OrderByDescending(x => x.MeasurementResultLazy.Value.Result.DifficultyLevel)
         .ThenBy(x => x.MeasurementResultLazy.Value.Result.TotalMilliseconds);
 }
-<script src="~/lib/chart.js/Chart.min.js"></script>
+@section Head
+{
+    <script src="~/lib/chart.js/Chart.min.js"></script>
+}
 
 <h1>Rangsor</h1>
-<div style="display:flex">
-    <div style="flex:50%">
-        <table id="rankingsTable" class="table table-hover table-striped">
-            <tr>
-                <th style="text-align: center">#</th>
-                <th>Készítő</th>
-                <th style="text-align: center; max-width: 100px">Idő</th>
-            </tr>
-            @foreach (var (measurement, place) in orderedMeasurements.Select((x, i) => (x, i + 1)))
-            {
-                var result = measurement.MeasurementResultLazy.Value.Result;
-                var solvedPerSecString = (1000 / result.TotalMilliseconds).ToString("#.####", CultureInfo.InvariantCulture);
+
+@if (lastMatch != null)
+{
+    <div style="display:flex">
+        <div style="flex:50%">
+            <table id="rankingsTable" class="table table-hover table-striped">
                 <tr>
-                    <td style="font-weight: bold; font-size: 20px; vertical-align: middle; text-align: center">@place.</td>
-                    <td>@measurement.Submission.User.Email</td>
-                    <td>
-                        (@result.DifficultyLevel)
-                        @result.TotalMilliseconds ms
-
-                        <span style="display:none">
-                            <input type="text" name="name" value="@measurement.Submission.User.Email" />
-                            <input type="text" name="score" value="@solvedPerSecString" />
-                        </span>
-                    </td>
+                    <th style="text-align: center">#</th>
+                    <th>Készítő</th>
+                    <th style="text-align: center; max-width: 100px">Idő</th>
                 </tr>
-            }
-        </table>
-    </div>
+                @foreach (var (measurement, place) in orderedMeasurements.Select((x, i) => (x, i + 1)))
+                {
+                    var result = measurement.MeasurementResultLazy.Value.Result;
+                    var solvedPerSecString = (1000 / result.TotalMilliseconds).ToString("#.####", CultureInfo.InvariantCulture);
+                    <tr>
+                        <td style="font-weight: bold; font-size: 20px; vertical-align: middle; text-align: center">@place.</td>
+                        <td>@measurement.Submission.User.Email</td>
+                        <td>
+                            (@result.DifficultyLevel)
+                            @result.TotalMilliseconds ms
 
-    <div style="flex:50%">
-        <canvas id="rankingsChart" />
+                            <span style="display:none">
+                                <input type="text" name="name" value="@measurement.Submission.User.Email" />
+                                <input type="text" name="score" value="@solvedPerSecString" />
+                            </span>
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+
+        <div style="flex:50%">
+            <canvas id="rankingsChart" />
+        </div>
     </div>
-</div>
+}
 
 <script>
     var labels = $("#rankingsTable input[name=name]").map((_, x) => $(x).val()).toArray();
