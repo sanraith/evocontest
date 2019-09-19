@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Text;
 
 namespace MySubmission
 {
@@ -14,10 +15,10 @@ namespace MySubmission
 
         public string Acronym { get; }
 
-        public Expression(IEnumerable<string> words)
+        public Expression(IReadOnlyCollection<string> words)
         {
+            Acronym = GenerateAcronym(words);
             Words = words.Select(x => x.ToLowerInvariant()).ToList();
-            Acronym = string.Concat(Words.Select(x => x[0..1])).ToUpperInvariant();
             myHashCode = Words.Aggregate(0, (sum, word) => sum ^ word.GetHashCode());
         }
 
@@ -31,25 +32,34 @@ namespace MySubmission
 
         public override bool Equals(object obj)
         {
-            if (obj is Expression exp)
-            {
-                return Equals(exp);
-            }
+            if (obj is Expression exp) { return Equals(exp); }
             return base.Equals(obj);
         }
 
-        public override int GetHashCode()
-        {
-            return myHashCode;
-        }
-
-
-        public override string ToString()
-        {
-            return string.Join(" ", Words);
-        }
+        public override int GetHashCode() => myHashCode;
+        
+        public override string ToString() => string.Join(" ", Words);
 
         #endregion
+
+        private static string GenerateAcronym(IEnumerable<string> words)
+        {
+            var sb = new StringBuilder();
+            foreach (var word in words)
+            {
+                if (IsAcronym(word))
+                {
+                    sb.Append(word);
+                }
+                else
+                {
+                    sb.Append(char.ToUpper(word[0]));
+                }
+            }
+            return sb.ToString();
+        }
+
+        private static bool IsAcronym(string word) => word.All(char.IsUpper);
 
         private readonly int myHashCode;
     }

@@ -32,7 +32,7 @@ namespace MySubmission
 
         private static IDictionary<Expression, int> GetMultipleOccurringExpressions(List<string> sentences)
         {
-            // Gather expression occurrences.
+            // Gather expressions.
             var occurrences = new ConcurrentDictionary<Expression, int>();
             foreach (var sentence in sentences)
             {
@@ -48,17 +48,19 @@ namespace MySubmission
                 }
             }
 
-            // Keep only expressions with multiple occurrences.
-            occurrences
-                .Where(kvp => kvp.Value <= 1).ToList()
-                .ForEach(x => occurrences.Remove(x.Key, out _));
+            // Remove expressions with only 1 occurrence.
+            occurrences.Where(kvp => kvp.Value < 2).ToList().ForEach(x => occurrences.Remove(x.Key, out _));
+            
+            // Remove expressions with non-unique acronyms.
+            occurrences.Keys.Where(expr => occurrences.Keys.Count(x => x.Acronym == expr.Acronym) > 1).ToList().ForEach(expr => occurrences.Remove(expr, out _));
 
             return occurrences;
         }
 
         private static string ReplaceExpressionsWithAcronyms(string text, IEnumerable<Expression> expressions)
         {
-            foreach (var expression in expressions)
+            // Replace longer expressions first.
+            foreach (var expression in expressions.OrderByDescending(x => x.Words.Count))
             {
                 var expressionString = expression.ToString();
                 text = text.Replace(expressionString, expression.Acronym, StringComparison.OrdinalIgnoreCase);

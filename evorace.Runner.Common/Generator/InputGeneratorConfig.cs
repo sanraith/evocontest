@@ -10,8 +10,14 @@ namespace evorace.Runner.Common.Generator
 
         public int InputLength { get; set; }
 
+        /// <summary>
+        /// Word length in characters.
+        /// </summary>
         public MinMaxPair WordLength { get; set; }
 
+        /// <summary>
+        /// Sentence length in characters.
+        /// </summary>
         public MinMaxPair SentenceLength { get; set; }
     }
 }
