@@ -11,7 +11,7 @@ namespace evorace.WebApp.Hubs
 {
     public class UserHub : Hub<IUserHubClient>, IUserHubServer
     {
-        public static ConcurrentDictionary<string, string> UserIdToConnectionId { get; } = new ConcurrentDictionary<string, string>();
+        public static ConcurrentDictionary<string, string> UserToConnectionId { get; } = new ConcurrentDictionary<string, string>();
 
         public UserHub(ContestDb contestDb)
         {
@@ -21,14 +21,10 @@ namespace evorace.WebApp.Hubs
         public override async Task OnConnectedAsync()
         {
             string userId = Context.UserIdentifier;
-            UserIdToConnectionId.TryAdd(userId, Context.ConnectionId);
+            UserToConnectionId.TryAdd(userId, Context.ConnectionId);
             await base.OnConnectedAsync();
 
-            var sub = await myDb.Submissions
-                .Where(x => x.User.Id == userId && !x.IsDeleted)
-                .OrderBy(x => x.UploadDate)
-                .LastOrDefaultAsync();
-
+            Submission sub = await GetSubmissionForUserId(userId);
             if (sub != null)
             {
                 await Clients.Caller.UpdateUploadStatus(sub.ValidationState, sub.IsValid, sub.Error);
@@ -37,8 +33,16 @@ namespace evorace.WebApp.Hubs
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
-            UserIdToConnectionId.TryRemove(Context.UserIdentifier, out var _);
+            UserToConnectionId.TryRemove(Context.UserIdentifier, out var _);
             return base.OnDisconnectedAsync(exception);
+        }
+
+        private Task<Submission> GetSubmissionForUserId(string userId)
+        {
+            return myDb.Submissions
+                .Where(x => x.User.Id == userId && !x.IsDeleted)
+                .OrderBy(x => x.UploadDate)
+                .LastOrDefaultAsync();
         }
 
         private readonly ContestDb myDb;

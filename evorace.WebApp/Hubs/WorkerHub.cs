@@ -69,7 +69,7 @@ namespace evorace.WebApp.Hubs
             await myDb.SaveChangesAsync();
 
             await Clients.Others.ReceiveMessage($"UpdateStatus ID:{submissionId}, State:{state}, Error:{error}");
-            if (UserHub.UserIdToConnectionId.TryGetValue(submission.User.Id, out var connectionId))
+            if (UserHub.UserToConnectionId.TryGetValue(submission.User.Id, out var connectionId))
             {
                 await myUserHub.Clients.Client(connectionId).UpdateUploadStatus(state, isValid, error);
             }
