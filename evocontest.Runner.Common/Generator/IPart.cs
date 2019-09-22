@@ -1,0 +1,32 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace evocontest.Runner.Common.Generator
+{
+
+    public interface IPart
+    {
+        HashSet<IPart> Users => new HashSet<IPart>();
+
+        int GetLength(int level);
+
+        int RenderTo(Span<char> span, int maxLevel);
+
+        int RenderShortTo(Span<char> span)
+        {
+            ShortHand.AsSpan().CopyTo(span);
+            return ShortHand.Length;
+        }
+
+        List<IPart> Parts { get; }
+
+        string ShortHand { get; }
+
+        string Render(int maxLevel)
+        {
+            var partSpan = new char[GetLength(maxLevel)].AsSpan();
+            RenderTo(partSpan, maxLevel);
+            return new string(partSpan);
+        }
+    }
+}

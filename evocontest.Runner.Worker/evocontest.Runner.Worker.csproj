@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\evocontest.Common\evocontest.Common.csproj" />
+    <ProjectReference Include="..\evocontest.Runner.Common\evocontest.Runner.Common.csproj" />
+    <ProjectReference Include="..\evocontest.Submission.Test\evocontest.Submission.Test.csproj" />
+    <ProjectReference Include="..\evocontest.Submission\evocontest.Submission.csproj" />
+  </ItemGroup>
+
+</Project>

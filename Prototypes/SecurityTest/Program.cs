@@ -1,11 +1,11 @@
-﻿using evorace.Runner.Common.Connection;
+﻿using evocontest.Runner.Common.Connection;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using evorace.Runner.Common.Messages.Request;
+using evocontest.Runner.Common.Messages.Request;
 
 namespace SecurityTest
 {

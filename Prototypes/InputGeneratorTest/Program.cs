@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using evorace.Runner.Common.Generator;
+using evocontest.Runner.Common.Generator;
 using MySubmission;
 
 namespace InputGeneratorTest

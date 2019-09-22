@@ -1,2 +1,2 @@
-# evorace19
+# evocontest19
 Coding contest for evosoft Hungary.

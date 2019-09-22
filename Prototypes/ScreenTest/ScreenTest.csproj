@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\evorace.Runner.RaspberryPiUtilities\evorace.Runner.RaspberryPiUtilities.csproj" />
+    <ProjectReference Include="..\..\evocontest.Runner.RaspberryPiUtilities\evocontest.Runner.RaspberryPiUtilities.csproj" />
   </ItemGroup>
 
 </Project>

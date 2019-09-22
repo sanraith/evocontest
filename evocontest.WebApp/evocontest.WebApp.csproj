@@ -1,0 +1,67 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <LangVersion>8.0</LangVersion>
+
+    <!-- Scaffolding is not ready for this... -->
+    <!--<Nullable>enable</Nullable>-->
+
+    <UserSecretsId>aspnet-evocontest.WebApp-2C38E50A-AB18-487C-8910-EAF3B9A1D150</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.0.0-rc1.19457.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.0.0-rc1.19457.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.0.0-rc1.19457.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.0.0-rc1.19456.14" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.0.0-rc1.19456.14">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.0.0-rc1.19456.10" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.0.0-rc1-19462-10" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\StringLibrary.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>StringLibrary.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\StringLibrary.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>StringLibrary.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="_Store\**\*.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\.vs\evocontest19\config\applicationhost.config" Link="applicationhost.config" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\evocontest.WebApp.Common\evocontest.WebApp.Common.csproj" />
+  </ItemGroup>
+
+  <Target Name="CopySignalR" BeforeTargets="AfterBuild">
+    <ItemGroup>
+      <SignalRJSClientFiles Include="$(MSBuildThisFileDirectory)node_modules\@aspnet\signalr\dist\browser\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(SignalRJSClientFiles)" DestinationFolder="$(MSBuildThisFileDirectory)wwwroot\lib\signalr" />
+  </Target>
+
+  <Target Name="CopyChartJs" BeforeTargets="AfterBuild">
+    <ItemGroup>
+      <ChartJsFiles Include="$(MSBuildThisFileDirectory)node_modules\chart.js\dist\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(ChartJsFiles)" DestinationFolder="$(MSBuildThisFileDirectory)wwwroot\lib\chart.js" />
+  </Target>
+  
+</Project>

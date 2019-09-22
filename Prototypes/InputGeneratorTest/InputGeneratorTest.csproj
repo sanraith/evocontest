@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\evorace.Runner.Common\evorace.Runner.Common.csproj" />
+    <ProjectReference Include="..\..\evocontest.Runner.Common\evocontest.Runner.Common.csproj" />
     <ProjectReference Include="..\..\Prototypes\MySubmission\MySubmission.csproj" />
   </ItemGroup>
 
