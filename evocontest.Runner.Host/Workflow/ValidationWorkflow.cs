@@ -30,6 +30,8 @@ namespace evocontest.Runner.Host.Workflow
 
         public async Task ExecuteAsync(string submissionId)
         {
+            var loadTimeout = TimeSpan.FromSeconds(5);
+            var unitTestTimeout = TimeSpan.FromSeconds(10);
             var sourceFile = await myDownloadStep.ExecuteAsync(submissionId);
             var targetFile = mySetupEnvironmentStep.Execute(sourceFile);
 
@@ -47,15 +49,16 @@ namespace evocontest.Runner.Host.Workflow
                     // Load assembly
                     errorMessage = "Nem sikerült betölteni a szerelvényt.";
                     status = ValidationStateEnum.Static;
+
                     await myServer.UpdateStatus(submissionId, status, null);
-                    success = LoadSubmissionToWorker(targetFile);
+                    success = await TimedTask(loadTimeout, () => LoadSubmissionToWorker(targetFile));
 
                     // Run unit tests
                     if (success)
                     {
                         status = ValidationStateEnum.UnitTest;
                         await myServer.UpdateStatus(submissionId, status, null);
-                        var unitTestResult = RunUnitTestsInWorker();
+                        var unitTestResult = await TimedTask(unitTestTimeout, RunUnitTestsInWorker);
                         success = unitTestResult.IsAllPassed;
                         errorMessage = $"Helytelen eredmény a következő unit testekre: {string.Join(", ", unitTestResult.FailedTests)}";
                     }
@@ -73,22 +76,27 @@ namespace evocontest.Runner.Host.Workflow
                 .WithProgressLog("Sending validation result to server");
         }
 
-        private bool LoadSubmissionToWorker(FileInfo targetFile)
+        private Task<bool> LoadSubmissionToWorker(FileInfo targetFile)
         {
             var workerDirectory = new DirectoryInfo(myConfig.Directories.Worker);
             var relativePath = GetRelativePath(workerDirectory, targetFile);
-            myPipeServer.SendMessage(new LoadContextMessage(relativePath));
-            var response = myPipeServer.ReceiveMessage();
 
-            return ResponseToBool(response);
+            return Task.Run(() =>
+            {
+                myPipeServer.SendMessage(new LoadContextMessage(relativePath));
+                var response = myPipeServer.ReceiveMessage();
+                return ResponseToBool(response);
+            });
         }
 
-        private UnitTestResultMessage RunUnitTestsInWorker()
+        private Task<UnitTestResultMessage> RunUnitTestsInWorker()
         {
-            myPipeServer.SendMessage(new RunUnitTestsMessage());
-            var response = myPipeServer.ReceiveMessage();
-
-            return (UnitTestResultMessage)response;
+            return Task.Run(() =>
+            {
+                myPipeServer.SendMessage(new RunUnitTestsMessage());
+                var response = myPipeServer.ReceiveMessage();
+                return (UnitTestResultMessage)response;
+            });
         }
 
         private void StopWorkerProcess()
@@ -149,6 +157,40 @@ namespace evocontest.Runner.Host.Workflow
                 OperationFailedMessage _ => false,
                 _ => throw new InvalidOperationException(),
             };
+        }
+
+        private static Task TimedTask(TimeSpan timeout, Func<Task> taskFunc)
+        {
+            return TimedTask(timeout, () => taskFunc().ContinueWith(_ => true));
+        }
+
+        private static async Task<TResult> TimedTask<TResult>(TimeSpan timeout, Func<Task<TResult>> workTaskGenerator)
+        {
+            Exception? disqualifyException = null;
+            Task<TResult> workTask;
+            Task timerTask;
+
+            try
+            {
+                timerTask = Task.Delay(timeout);
+                workTask = workTaskGenerator();
+                var completedTask = await Task.WhenAny(timerTask, workTask);
+                var success = workTask.Equals(completedTask);
+                if (success)
+                {
+                    return workTask.Result;
+                }
+            }
+            catch (Exception ex)
+            {
+                disqualifyException = ex;
+            }
+            finally
+            {
+                // TODO cancel task?
+            }
+
+            throw disqualifyException ?? new TimeoutException();
         }
 
         private Process myWorkerProcess;
