@@ -60,7 +60,7 @@ namespace evocontest.Submission.Test.Tests
         }
 
         [Test]
-        public void TODO_Solve_ConflictingAbbreviations_NotReplaced()
+        public void Solve_ConflictingAbbreviations_NotReplaced()
         {
             const string input = "Tim Cook. Tim Cook. Total Commander. Total Commander.";
             const string expected = "Tim Cook. Tim Cook. Total Commander. Total Commander.";
@@ -75,6 +75,12 @@ namespace evocontest.Submission.Test.Tests
             AssertSolve(input, expected);
         }
 
-        // TODO acronym vs word with same letters!
+        [Test]
+        public void TODO_Solve_ConflictingWordAndAcronym_WordNotReplaced()
+        {
+            const string input = "Aa bb cc aa bb cc. ABC dd ABC dd. Abc dd.";
+            const string expected = "ABC ABC. ABCD ABCD. Abc delta.";
+            AssertSolve(input, expected);
+        }
     }
 }
