@@ -14,10 +14,10 @@ namespace evocontest.Runner.Worker.Core
 
         public Dictionary<string, bool?> RunTests()
         {
-            var testClass = new SimpleSubmissionTest();
+            var testClass = new NewSubmissionTest();
             testClass.SubmissionType = mySolutionType;
 
-            var tests = typeof(SimpleSubmissionTest).GetMethods()
+            var tests = testClass.GetType().GetMethods()
                 .Where(x => x.CustomAttributes.Any(x => x.AttributeType.Name == "TestAttribute"))
                 .ToList();
 

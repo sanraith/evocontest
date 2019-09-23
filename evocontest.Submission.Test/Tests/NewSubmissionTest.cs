@@ -2,6 +2,16 @@
 
 namespace evocontest.Submission.Test.Tests
 {
+    /// <summary>
+    /// Rules:
+    /// - Word: >=2 character long string. Only lowercase [a-z] letters.
+    /// - Acronym: >=2 character long string formed from words and acronyms. Only UPPERCASE [A-Z] letters.
+    ///     - Acronyms can be formed from words by taking the first letter of each. E.g.: apple + pear = AP
+    ///     - Acronyms can be joined to form a new acronym. E.g.: AB + CD = ABCD
+    ///     - Acronyms and words can be joined to form a new acronym. E.g.: AB + car = ABC
+    /// - Sentence: >=1 word long string terminated by '.', where words are separated by ' '.
+    /// - Text: >=1 sentence long string where sentences are separated by ' '.
+    /// </summary>
     public sealed class NewSubmissionTest : TestBase
     {
         [Test]
@@ -13,7 +23,7 @@ namespace evocontest.Submission.Test.Tests
         [Test]
         public void Solve_NoAbbreviation_SameOutput()
         {
-            const string input = "Sample text without abbreviation.";
+            const string input = "sample text without abbreviation.";
             const string expected = input;
             AssertSolve(input, expected);
         }
@@ -21,16 +31,16 @@ namespace evocontest.Submission.Test.Tests
         [Test]
         public void Solve_SinglePhrase_Replaced()
         {
-            const string input = "The goal is to abbreviate Multi Word Phrases. " +
-                                 "Multi word phrases cause longer text.";
-            const string expected = "The goal is to abbreviate MWP. MWP cause longer text.";
+            const string input = "the goal is to abbreviate multi word phrases. " +
+                                 "multi word phrases cause longer text.";
+            const string expected = "the goal is to abbreviate MWP. MWP cause longer text.";
             AssertSolve(input, expected);
         }
 
         [Test]
         public void Solve_MultiplePhrases_Replaced()
         {
-            const string input = "First Phrase. Second phrase. First phrase. Second phrase.";
+            const string input = "first phrase. second phrase. first phrase. second phrase.";
             const string expected = "FP. SP. FP. SP.";
             AssertSolve(input, expected);
         }
@@ -38,7 +48,7 @@ namespace evocontest.Submission.Test.Tests
         [Test]
         public void Solve_SubsetPhrase_ParentAndChildReplaced()
         {
-            const string input = "Multi word long phrase. Long phrase. Multi word long phrase.";
+            const string input = "multi word long phrase. long phrase. multi word long phrase.";
             const string expected = "MWLP. LP. MWLP.";
             AssertSolve(input, expected);
         }
@@ -46,15 +56,15 @@ namespace evocontest.Submission.Test.Tests
         [Test]
         public void Solve_PhraseWithSuffx_NotReplaced()
         {
-            const string input = "Simple phrase. Simple phrases.";
-            const string expected = "Simple phrase. Simple phrases.";
+            const string input = "simple phrase. simple phrases.";
+            const string expected = "simple phrase. simple phrases.";
             AssertSolve(input, expected);
         }
 
         [Test]
         public void Solve_RecursivePhrases_Replaced()
         {
-            const string input = "Patient Data Service. Patient Data Service Handler. PDS Handler.";
+            const string input = "patient data service. patient data service handler. PDS handler.";
             const string expected = "PDS. PDSH. PDSH.";
             AssertSolve(input, expected);
         }
@@ -62,24 +72,24 @@ namespace evocontest.Submission.Test.Tests
         [Test]
         public void Solve_ConflictingAbbreviations_NotReplaced()
         {
-            const string input = "Tim Cook. Tim Cook. Total Commander. Total Commander.";
-            const string expected = "Tim Cook. Tim Cook. Total Commander. Total Commander.";
+            const string input = "tim cook. tim cook. total commander. total commander.";
+            const string expected = "tim cook. tim cook. total commander. total commander.";
             AssertSolve(input, expected);
         }
 
         [Test]
+        public void Solve_ConflictingWordAndAcronym_WordNotReplaced()
+        {
+            const string input = "aa bb aa bb. AB cc AB cc. ab cc.";
+            const string expected = "AB AB. ABC ABC. ab cc.";
+            AssertSolve(input, expected);
+        }
+
+        //[Test]
         public void TODO_Solve_OverlappingPhrases_LongerReplaced()
         {
-            const string input = "Multi word long phrase. Multi word long. Long phrase.";
-            const string expected = "MWL phrase. MWL. Long phrase.";
-            AssertSolve(input, expected);
-        }
-
-        [Test]
-        public void TODO_Solve_ConflictingWordAndAcronym_WordNotReplaced()
-        {
-            const string input = "Aa bb cc aa bb cc. ABC dd ABC dd. Abc dd.";
-            const string expected = "ABC ABC. ABCD ABCD. Abc delta.";
+            const string input = "multi word long phrase. multi word long. long phrase.";
+            const string expected = "MWL phrase. MWL. long phrase.";
             AssertSolve(input, expected);
         }
     }

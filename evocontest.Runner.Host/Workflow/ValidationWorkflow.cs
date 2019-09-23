@@ -31,7 +31,9 @@ namespace evocontest.Runner.Host.Workflow
         public async Task ExecuteAsync(string submissionId)
         {
             var loadTimeout = TimeSpan.FromSeconds(5);
-            var unitTestTimeout = TimeSpan.FromSeconds(10);
+            var unitTestTimeout = TimeSpan.FromSeconds(30);
+            
+            Console.WriteLine();
             var sourceFile = await myDownloadStep.ExecuteAsync(submissionId);
             var targetFile = mySetupEnvironmentStep.Execute(sourceFile);
 

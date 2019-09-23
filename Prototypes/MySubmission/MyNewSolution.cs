@@ -50,7 +50,7 @@ namespace MySubmission
 
             // Remove expressions with only 1 occurrence.
             occurrences.Where(kvp => kvp.Value < 2).ToList().ForEach(x => occurrences.Remove(x.Key, out _));
-            
+
             // Remove expressions with non-unique acronyms.
             occurrences.Keys.Where(expr => occurrences.Keys.Count(x => x.Acronym == expr.Acronym) > 1).ToList().ForEach(expr => occurrences.Remove(expr, out _));
 
@@ -63,7 +63,7 @@ namespace MySubmission
             foreach (var expression in expressions.OrderByDescending(x => x.Words.Count))
             {
                 var expressionString = expression.ToString();
-                text = text.Replace(expressionString, expression.Acronym, StringComparison.OrdinalIgnoreCase);
+                text = text.Replace(expressionString, expression.Acronym, StringComparison.Ordinal);
             }
 
             return text;

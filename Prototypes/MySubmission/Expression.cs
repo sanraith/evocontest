@@ -18,7 +18,7 @@ namespace MySubmission
         public Expression(IReadOnlyCollection<string> words)
         {
             Acronym = GenerateAcronym(words);
-            Words = words.Select(x => x.ToLowerInvariant()).ToList();
+            Words = words.ToList();
             myHashCode = Words.Aggregate(0, (sum, word) => sum ^ word.GetHashCode());
         }
 
