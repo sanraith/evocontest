@@ -45,6 +45,11 @@
     <input type="submit" value="Delete all submissions" onclick="return confirm('Biztos?')" />
 }
 
+@using (Html.BeginForm(nameof(AdminController.DoClearAllMatches), "Admin", FormMethod.Post))
+{
+    <input type="submit" value="Delete all matches" onclick="return confirm('Biztos?')" />
+}
+
 @using (Html.BeginForm(nameof(AdminController.DoRunRace), "Admin", FormMethod.Post))
 {
     <input type="submit" value="Run race" onclick="return confirm('Biztos?')" />

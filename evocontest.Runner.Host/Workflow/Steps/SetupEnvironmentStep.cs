@@ -4,7 +4,7 @@ using evocontest.Runner.Host.Extensions;
 using System.IO;
 using System.Linq;
 
-namespace evocontest.Runner.Host.Workflow
+namespace evocontest.Runner.Host.Workflow.Steps
 {
     public sealed class SetupEnvironmentStep : IResolvable
     {

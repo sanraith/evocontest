@@ -64,6 +64,16 @@ namespace evocontest.WebApp.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> DoClearAllMatches()
+        {
+            myDb.Matches.RemoveRange(myDb.Matches);
+            myDb.Measurements.RemoveRange(myDb.Measurements);
+            await myDb.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Admin));
+        }
+
+        [HttpPost]
         public async Task<IActionResult> DoRunRace()
         {
             await myWorkerHub.Clients.All.RunRace();

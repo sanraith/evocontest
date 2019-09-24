@@ -4,6 +4,7 @@ using evocontest.Runner.Common.Messages.Request;
 using evocontest.Runner.Common.Messages.Response;
 using evocontest.Runner.Common.Utility;
 using System;
+using System.Diagnostics;
 using System.Linq;
 
 namespace evocontest.Runner.Worker.Core
@@ -16,6 +17,7 @@ namespace evocontest.Runner.Worker.Core
             {
                 LoadContextMessage loadMsg => HandleUnknownErrors(loadMsg, HandleLoadContextMessage),
                 RunUnitTestsMessage runMsg => HandleUnknownErrors(runMsg, HandleRunUnitTestMessage),
+                MeasureSolveMessage solveMsg => HandleUnknownErrors(solveMsg, HandleMeasureSolveMessage),
                 TerminateMessage _ => new MessageHandlerResult(isDone: true),
                 _ => throw new InvalidOperationException("Unknown message type!"),
             };
@@ -60,6 +62,22 @@ namespace evocontest.Runner.Worker.Core
 
             return new MessageHandlerResult(new UnitTestResultMessage(testResults));
         }
+
+        private MessageHandlerResult HandleMeasureSolveMessage(MeasureSolveMessage solveMsg)
+        {
+            if (myLoadedSolutionType == null)
+            {
+                return new MessageHandlerResult(new OperationFailedMessage(solveMsg.Id, "No assembly is loaded."));
+            }
+
+            var sw = Stopwatch.StartNew();
+            var instance = (ISolution)Activator.CreateInstance(myLoadedSolutionType.Value)!;
+            var output = instance.Solve(solveMsg.Input); // TODO throw away input string
+            sw.Stop();
+
+            return new MessageHandlerResult(new MeasureSolveResultMessage(output, sw.Elapsed));
+        }
+
 
         private static MessageHandlerResult HandleUnknownErrors<TOriginalMessage>(TOriginalMessage message, Func<TOriginalMessage, MessageHandlerResult> originalHandler)
             where TOriginalMessage : IMessage

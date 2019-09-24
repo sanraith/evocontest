@@ -20,6 +20,7 @@ namespace evocontest.Runner.Host.Workflow
             {
                 using var scope = myContainer.BeginLifetimeScope();
 
+                System.Console.WriteLine();
                 var webApp = scope.Resolve<WebAppConnector>();
                 await webApp.LoginAsync(myConfig.Login.Email, myConfig.Login.Password);
 

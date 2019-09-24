@@ -4,7 +4,7 @@ using evocontest.Runner.Host.Connection;
 using evocontest.Runner.Host.Core;
 using evocontest.Runner.Host.Extensions;
 
-namespace evocontest.Runner.Host.Workflow
+namespace evocontest.Runner.Host.Workflow.Steps
 {
     public sealed class DownloadSubmissionStep : IResolvable
     {
