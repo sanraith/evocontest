@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace MySubmission
 {
-    public class MyNewSolution : ISolution
+    public class MyNewSolution// : ISolution
     {
         // TODO No overlapping should be allowed
 

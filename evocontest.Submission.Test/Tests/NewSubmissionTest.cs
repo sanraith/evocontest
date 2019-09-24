@@ -4,11 +4,14 @@ namespace evocontest.Submission.Test.Tests
 {
     /// <summary>
     /// Rules:
-    /// - Word: >=2 character long string. Only lowercase [a-z] letters.
+    /// - Word: >=2 character long string of lowercase [a-z] letters.
     /// - Acronym: >=2 character long string formed from words and acronyms. Only UPPERCASE [A-Z] letters.
-    ///     - Acronyms can be formed from words by taking the first letter of each. E.g.: apple + pear = AP
-    ///     - Acronyms can be joined to form a new acronym. E.g.: AB + CD = ABCD
-    ///     - Acronyms and words can be joined to form a new acronym. E.g.: AB + car = ABC
+    ///     - Acronyms can be formed from words by taking the first letter of each.
+    ///         E.g.: apple + pear = AP
+    ///     - Acronyms can be joined to form a new acronym.
+    ///         E.g.: AB + CD = ABCD
+    ///     - Acronyms and words can be joined to form a new acronym.
+    ///         E.g.: apple + BC + date = ABCD
     /// - Sentence: >=1 word long string terminated by '.', where words are separated by ' '.
     /// - Text: >=1 sentence long string where sentences are separated by ' '.
     /// </summary>
@@ -54,10 +57,10 @@ namespace evocontest.Submission.Test.Tests
         }
 
         [Test]
-        public void Solve_PhraseWithSuffx_NotReplaced()
+        public void Solve_PhraseWithSuffx_Replaced() //TODO
         {
             const string input = "simple phrase. simple phrases.";
-            const string expected = "simple phrase. simple phrases.";
+            const string expected = "SP. SPs.";
             AssertSolve(input, expected);
         }
 
@@ -66,6 +69,14 @@ namespace evocontest.Submission.Test.Tests
         {
             const string input = "patient data service. patient data service handler. PDS handler.";
             const string expected = "PDS. PDSH. PDSH.";
+            AssertSolve(input, expected);
+        }
+
+        [Test]
+        public void Solve_ComplexRecursivePhrases_Replaced()
+        {
+            const string input = "aa bb cc dd. aa bb cc dd. aa BCD. ABC dd.";
+            const string expected = "ABCD. ABCD. ABCD. ABCD.";
             AssertSolve(input, expected);
         }
 
