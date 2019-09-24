@@ -13,47 +13,53 @@ namespace MySubmission
         {
             var text = input;
 
-            while (true)
+            var sentences = GetSentences(text);
+            var possibleAcronyms = new Dictionary<string, List<string>>();
+            foreach (var sentence in sentences.Select(x => x.Split(' ', StringSplitOptions.RemoveEmptyEntries)))
             {
-                var sentences = GetSentences(text);
-                var possibleAcronyms = new ConcurrentDictionary<string, (List<string> Words, int Count)>();
-                foreach (var sentence in sentences)
+                for (var index = 0; index < sentence.Length; index++)
                 {
-                    var sentenceWords = sentence.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                    for (var index = 0; index < sentenceWords.Length; index++)
+                    for (var length = 2; length <= sentence.Length - index; length++)
                     {
-                        for (var length = 2; length <= sentenceWords.Length - index; length++)
+                        var acronymWords = sentence[index..(index + length)].ToList();
+                        var expression = string.Join(' ', acronymWords);
+                        var acronym = string.Concat(acronymWords.Select(GetAcronymPart));
+                        if (!possibleAcronyms.ContainsKey(acronym))
                         {
-                            var acronymWords = sentenceWords[index..(index + length)].ToList();
-                            var acronym = string.Concat(acronymWords.Select(GetAcronymPart));
-                            possibleAcronyms.AddOrUpdate(acronym, (acronymWords, 1), (_, x) => (x.Words, x.Count + 1));
+                            possibleAcronyms.Add(acronym, new List<string>());
                         }
+                        possibleAcronyms[acronym].Add(expression);
                     }
                 }
+            }
 
-                foreach (var word in sentences.SelectMany(x => x.Split(' ', StringSplitOptions.RemoveEmptyEntries)).Where(x => x.All(char.IsUpper)))
+            // Count existing acronyms
+            sentences.SelectMany(GetWords)
+                .Where(word => IsAcronym(word) && possibleAcronyms.ContainsKey(word)).ToList()
+                .ForEach(word => possibleAcronyms[word].Add(word));
+
+            // Remove expressions with only 1 occurrence
+            possibleAcronyms.Where(kvp => kvp.Value.Count < 2).ToList().ForEach(x => possibleAcronyms.Remove(x.Key, out _));
+
+            // Replace expressions with acronyms
+            foreach (var acronym in possibleAcronyms.OrderByDescending(x => x.Key.Length))
+            {
+                foreach (var expression in acronym.Value.Distinct().OrderByDescending(x => x.Length))
                 {
-                    if (possibleAcronyms.ContainsKey(word))
-                    {
-                        possibleAcronyms.AddOrUpdate(word, (new List<string>(), 1), (_, x) => (x.Words, x.Count + 1));
-                    }
-                }
-
-                // Remove expressions with only 1 occurrence.
-                possibleAcronyms.Where(kvp => kvp.Value.Count < 2).ToList().ForEach(x => possibleAcronyms.Remove(x.Key, out _));
-                if (!possibleAcronyms.Any()) { break; }
-
-                foreach (var acronym in possibleAcronyms.OrderByDescending(x => x.Value.Words.Count))
-                {
-                    text = text.Replace(string.Join(' ', acronym.Value.Words), acronym.Key);
+                    text = text.Replace(string.Join(' ', expression), acronym.Key);
                 }
             }
 
             return text;
         }
 
+
         private static List<string> GetSentences(string text) => text.Split('.', StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToList();
 
-        private static string GetAcronymPart(string word) => word.All(x => char.IsUpper(x)) ? word : word[0..1].ToUpper();
+        private static string[] GetWords(string sentence) => sentence.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+        private static string GetAcronymPart(string word) => IsAcronym(word) ? word : word[0..1].ToUpper();
+
+        private static bool IsAcronym(string word) => word.All(char.IsUpper);
     }
 }

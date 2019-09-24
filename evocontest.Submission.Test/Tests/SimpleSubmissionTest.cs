@@ -118,5 +118,13 @@ namespace evocontest.Submission.Test.Tests
 
             AssertSolve(input, expected);
         }
+
+        [Test]
+        public void Solve_RecursiveAbbreviation_Replaced()
+        {
+            const string input = "WINE(WINE is not an emulator). WINE is not an emulator is not an emulator is not an emulator is not an emulator.";
+            const string expected = "WINE. WINE.";
+            AssertSolve(input, expected);
+        }
     }
 }
