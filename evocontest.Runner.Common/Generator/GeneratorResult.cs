@@ -9,5 +9,7 @@ namespace evocontest.Runner.Common.Generator
         public string Input { get; set; }
 
         public string Output { get; set; }
+
+        public static GeneratorResult Empty => new GeneratorResult() { Input = string.Empty, Output = string.Empty };
     }
 }

@@ -89,10 +89,11 @@ namespace evocontest.Runner.Host.Workflow
             {
                 var pipeServer = disposablePipe.Value;
                 var success = await myLoadSubmissionStep.ExecuteAsync(pipeServer, targetFile);
+                // TODO check success
                 var timeSum = new TimeSpan();
 
                 // TODO Warmup
-                _ = await myMeasureSolveStep.ExecuteAsync(pipeServer, new GeneratorResult { Input = "", Output = "" });
+                _ = await myMeasureSolveStep.ExecuteAsync(pipeServer, GeneratorResult.Empty);
 
                 // TODO double check time
                 // TODO check result

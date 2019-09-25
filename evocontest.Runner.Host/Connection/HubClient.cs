@@ -8,7 +8,7 @@ namespace evocontest.Runner.Host.Connection
 {
     public class HubClient : IWorkerHubClient, IResolvable
     {
-        public event EventHandler RunRaceReceived;
+        public event EventHandler? RunRaceReceived;
 
         public HubClient(ValidationJobHandler validationJobQueue)
         {

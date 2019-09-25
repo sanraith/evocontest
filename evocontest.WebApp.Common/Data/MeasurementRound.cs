@@ -9,5 +9,7 @@ namespace evocontest.WebApp.Common.Data
         public int DifficultyLevel { get; set; }
 
         public double TotalMilliseconds { get; set; }
+
+        public string? Error { get; set; }
     }
 }
