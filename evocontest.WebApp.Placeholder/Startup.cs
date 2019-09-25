@@ -50,6 +50,7 @@ namespace evocontest.WebApp.Placeholder
             }
 
             app.UseHttpsRedirection();
+            //app.UseDefaultFiles();
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
