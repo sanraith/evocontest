@@ -4,52 +4,58 @@
     ViewData["Title"] = "evocontest";
 }
 
-<div class="text-center" style="padding-top: 1em; padding-bottom: 2em">
-    <h1 class="display-4">evocontest</h1>
-    <h2>Rövidíts egy Rövidért!</h2>
-</div>
-
-<div style="max-width: 50vw; min-width:30em; margin-left:auto; margin-right:auto">
-    <p style="font-size: 18px">Indulás: <span id="countdown"></span> múlva!</p>
-    <div class="clearfix">
-        @*      <img width="200" src="~/pic/evosoft_logo_coloured_transparent.png" class="float-right" />*@
+<div style="max-width: 55em; margin-left:auto; margin-right:auto; margin-top: 0em">
+    <div class="text-center" style=" padding-top: 2em; padding-bottom: 3em">
+        <div style="float:right; font-size: 18px; margin-left: -100%; margin-top:5px; text-align: right">
+            <span id="countdown">&nbsp;</span>
+        </div>
+        <img src="~/pic/title.png" style="margin-left: auto; margin-right: auto" width="75%" />
+        <h3 style="font-family: 'Lucida Console', Monaco, monospace">
+            evosoft programozó verseny
+        </h3>
+    </div>
+    <div class="clearfix" style="margin-top: 3em">
+        <img height="400px" src="~/pic/thinking.png" class="float-right" style="margin-left: -40px" />
         <h2>A verseny</h2>
         <p>
-            A résztvevőknek két hét alatt kell minél hatékonyabb megoldást adni a versenyfeladatra. A leggyorsabb program nyer.
-            A feltöltött szerelvények minden nap szembe szállnak egymással, az eredmények alapján pedig a versenyzők folyamatosan figyelhetik az erőviszonyokat.
-            A győztesek egy utolsó, élő összecsapás keretében kerülnek ki.
+            Csatlakozz a 2019-es miskolci evosoft .NET programozó versenyéhez!
+        </p>
+        <p class="text-justify">
+            A verseny résztvevőinek két hét alatt kell minél hatékonyabb megoldást adniuk egy programozási feladatra.
+            A feltöltött programok nap mint nap automatikusan össze fognak csapni egymással,
+            a csaták ereménye alapján pedig folyamatosan figyelemmel kísérhetjük az erőviszonyokat. A verseny végén a leggyorsabb algoritmus nyer.
+        </p><p>
+            <span class="font-italic">Jelentkezni a verseny nevezési időszaka alatt, ezen az oldalon keresztül fogsz tudni!</span>
         </p>
     </div>
-    <div class="clearfix">
-        @*        <img width="200" src="~/pic/evosoft_logo_coloured_transparent.png" class="float-right" />*@
+    <div class="clearfix" style="margin-top: 0em">
         <h2>Technológiák</h2>
-        <p>
+        <p class="text-justify">
             A megoldásokat C# nyelven, .NET Core 3.0 keretrendszerben kell elkészíteni.
-            A friss keretrendszerrel éles helyzetben is kipróbálhatsz majd olyan nyelvi elemeket,
+            A friss keretrendszerrel éles helyzetben is kipróbálhatsz majd olyan új nyelvi elemeket,
             mint a <a href="https://www.stevejgordon.co.uk/an-introduction-to-optimising-code-using-span-t">Span&lt;T&gt;</a>,
             <a href="https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8#indices-and-ranges">Range és Index kifejezések</a>,
             <a href="https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8#nullable-reference-types">Nullable referencia típusok</a>,
             és <a href="https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8">egyebek</a>.
-        </p><p>
-            A részvételhez ajánlott letölteni a legfrissebb
-            <a href="https://visualstudio.microsoft.com/vs/"><span class="font-weight-bold text-nowrap">Visual Studio 2019</span></a>
+        </p><p class="text-justify">
+            A részvételhez ajánlott letölteni a legújabb
+            <a href="https://visualstudio.microsoft.com/vs/"><span class="text-nowrap">Visual Studio 2019</span></a>
             <span class="small">(v16.3+)</span> környezetet, ami párhuzamosan más Visual Studio verziók mellé is telepíthető.
         </p>
     </div>
-    <div class="clearfix">
-        @*    <img width="200" src="~/pic/evosoft_logo_coloured_transparent.png" class="float-right" />*@
+    <div class="clearfix" style="margin-top: 5em">
+        <img width="200" src="~/pic/whisky.png" class="float-left" style="margin-right: 40px; margin-top: -20px" />
         <h2>Nyeremények</h2>
-        <p>
+        <p class="text-justify">
             A felbecsülhetetlen értékű dicsőség mellett a dobogós résztvevők értékes nyereményben is részesülnek:
-            <ul>
+            <ul style="list-style-position: inside;">
                 <li>Első helyezett: <span class="font-weight-bold" style="color: darkgoldenrod">Johnnie Walker Gold Label</span></li>
                 <li>Második helyezett: <span class="font-weight-bold">Johnnie Walker Black Label</span></li>
                 <li>Harmadik helyezett: <span class="font-weight-bold" style="color: darkred">Johnnie Walker Red Label</span></li>
             </ul>
         </p>
     </div>
-    <div class="clearfix">
-        @*  <img width="200" src="~/pic/evosoft_logo_coloured_transparent.png" class="float-right" />*@
+    <div class="clearfix" style="margin-top: 3em">
         <h2>Időzítés</h2>
         <p>
             <ul>
@@ -59,17 +65,22 @@
             </ul>
         </p>
     </div>
+    <p style="margin-top: 3em">
+        Ha bárminyen kérdésed van, keress minket az
+        <a href="mailto:evocontest@evosoft.com">evocontest@evosoft.com</a>
+        címen!
+    </p>
 </div>
 
-<div class="text-center" style="margin-top: -1em; margin-bottom: -8em">
+<div class="text-center" style="margin-top: 1em;">
     <p>
-        <img width="200" src="~/pic/evosoft_logo_coloured_transparent.png" style="margin-left: auto; margin-right:auto; " />
+        <img width="200" src="~/pic/evosoft_logo_coloured_transparent.png" style="margin-left: auto; margin-right:auto; margin-bottom:-80px" />
     </p>
 </div>
 
 <script>
     // Set the date we're counting down to
-    var countDownDate = new Date("Oct 7, 2019 00:00:00").getTime();
+    var countDownDate = new Date("Oct 4, 2019 16:00:00").getTime();
 
     // Update the count down every 1 second
     var x = setInterval(function () {
@@ -87,12 +98,16 @@
         var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
         // Display the result in the element with id="demo"
-        document.getElementById("countdown").innerHTML = days + " nap " + hours + " óra " + minutes + " perc ";// + seconds + " másodperc";
+        document.getElementById("countdown").innerHTML = "Még "
+            + days + " nap "
+            + hours + " óra "
+            // + seconds + " másodperc"
+            + " az indulásig...";
 
         // If the count down is finished, write some text
         if (distance < 0) {
             clearInterval(x);
-            document.getElementById("countdown").innerHTML = "hamarosan...";
+            document.getElementById("countdown").innerHTML = "Indulás pillanatokon belül...";
         }
     }, 1000);
 </script>
