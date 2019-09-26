@@ -19,12 +19,16 @@ namespace evocontest.Runner.Host.Workflow.Steps
             myWorkerProcess = null!;
         }
 
+        /// <summary>
+        /// Starts the worker process, and returns a disposable pipe connection. Disposing the connection will also destroy the worker process.
+        /// </summary>
+        /// <returns>A pipe connection to the worker process.</returns>
         public async Task<DisposableValue<PipeServer>> ExecuteAsync()
         {
             myWorkerProcess = StartWorkerProcess();
             myPipeServer = await StartPipeServerAsync();
 
-            return new DisposableValue<PipeServer>(myPipeServer, pipeServer =>
+            return DisposableValue.Create(myPipeServer, pipeServer =>
             {
                 StopWorkerProcess();
                 myPipeServer?.Dispose();

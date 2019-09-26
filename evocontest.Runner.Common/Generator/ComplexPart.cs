@@ -66,7 +66,7 @@ namespace evocontest.Runner.Common.Generator
                 if (part.Parts.Count == 0)
                 {
                     if (pos > 0) { span[pos++] = ' '; }
-                    if (!TryRenderShortTo(part, span.Slice(pos), ref pos)) { return pos; }
+                    if (!TryRenderShortTo(part, span[pos..], ref pos)) { return pos; }
                 }
                 else if (level == 0)
                 {
@@ -74,7 +74,7 @@ namespace evocontest.Runner.Common.Generator
                     for (var i = 0; i < part.Parts.Count; i++)
                     {
                         if (i != 0) { span[pos++] = ' '; }
-                        if (!TryRenderShortTo(part.Parts[i], span.Slice(pos), ref pos)) { return pos; }
+                        if (!TryRenderShortTo(part.Parts[i], span[pos..], ref pos)) { return pos; }
                     }
                 }
                 else

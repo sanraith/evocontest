@@ -16,11 +16,18 @@ namespace evocontest.Runner.Common.Utility
 
     }
 
+    /// <summary>
+    /// Represents a value with attached disposable instances and logic.
+    /// When this instance is disposed:<para />
+    ///     1. The onDispose action is executed.<para />
+    ///     2. The items of the disposables array are disposed in order.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the contained value.</typeparam>
     public sealed class DisposableValue<TValue> : IDisposable
     {
         public TValue Value { get; }
 
-        public DisposableValue(TValue value, Action<TValue>? onDispose, params IDisposable[] disposables)
+        internal DisposableValue(TValue value, Action<TValue>? onDispose, params IDisposable[] disposables)
         {
             Value = value;
             myOnDispose = onDispose;
