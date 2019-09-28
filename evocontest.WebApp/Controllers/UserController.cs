@@ -116,7 +116,7 @@ namespace evocontest.WebApp.Controllers
                 var submission = new Submission
                 {
                     User = user,
-                    OriginalFileName = file.FileName,
+                    OriginalFileName = FileManager.GetFileName(file),
                     StoredFileName = savedFile.Name,
                     FileSize = (int)savedFile.Length,
                     UploadDate = timeStamp,

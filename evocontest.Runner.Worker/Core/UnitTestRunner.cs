@@ -1,4 +1,4 @@
-﻿using evocontest.Submission.Test.Tests;
+﻿using evocontest.Submission.Test.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,8 +14,8 @@ namespace evocontest.Runner.Worker.Core
 
         public Dictionary<string, bool?> RunTests()
         {
-            var testClass = new NewSubmissionTest();
-            testClass.SubmissionType = mySolutionType;
+            var testClass = new SubmissionTestBase();
+            testClass.TestedType = mySolutionType;
 
             var tests = testClass.GetType().GetMethods()
                 .Where(x => x.CustomAttributes.Any(x => x.AttributeType.Name == "TestAttribute"))

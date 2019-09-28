@@ -3,9 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.FileProviders;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -29,24 +27,25 @@ namespace evocontest.WebApp.Core
             {
                 return SubmissionFileCheckResult.NoFile;
             }
+            var fileName = GetFileName(file);
 
             if (file.Length <= 0 || file.Length >= MaxSubmittedFileSize)
             {
                 return SubmissionFileCheckResult.InvalidSize;
             }
 
-            if (file.FileName.Length <= 0 || file.FileName.Length > MaxFileNameLength)
+            if (fileName.Length <= 0 || fileName.Length > MaxFileNameLength)
             {
                 return SubmissionFileCheckResult.InvalidFileNameLength;
             }
 
-            if (!string.Equals(".dll", new FileInfo(file.FileName).Extension, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(".dll", new FileInfo(fileName).Extension, StringComparison.OrdinalIgnoreCase))
             {
                 return SubmissionFileCheckResult.InvalidFileExtension;
             }
 
             var fileNameRegex = new Regex(@"^[\w\-. ]+\.(?i)(dll)$");
-            if (!fileNameRegex.IsMatch(file.FileName))
+            if (!fileNameRegex.IsMatch(fileName))
             {
                 return SubmissionFileCheckResult.InvalidFileName;
             }
@@ -97,6 +96,19 @@ namespace evocontest.WebApp.Core
         private DirectoryInfo GetUserDir(ApplicationUser user)
         {
             return new DirectoryInfo(Path.Combine(myStoreRootPath, SubmissionFolderName, user.UploadFolderName));
+        }
+
+        public static string GetFileName(IFormFile formFile)
+        {
+            try
+            {
+                var fileInfo = new FileInfo(formFile.FileName);
+                return fileInfo.Name;
+            }
+            catch (Exception)
+            {
+                return @"\\//\\ INVALID FILENAME //\\//";
+            }
         }
 
         private static string CreateFileName(DateTime timeStamp)

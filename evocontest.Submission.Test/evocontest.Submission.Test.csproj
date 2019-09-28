@@ -15,14 +15,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\evocontest.Common\evocontest.Common.csproj" />
+    <ProjectReference Include="..\evocontest.Submission.Sample\evocontest.Submission.Sample.csproj" />
     <ProjectReference Include="..\evocontest.Submission\evocontest.Submission.csproj" />
-    <ProjectReference Include="..\Prototypes\MySubmission\MySubmission.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <None Update="testsettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>
