@@ -14,8 +14,10 @@ namespace evocontest.Runner.Worker.Core
 
         public Dictionary<string, bool?> RunTests()
         {
-            var testClass = new SubmissionTestBase();
-            testClass.TestedType = mySolutionType;
+            var testClass = new AnySubmissionTest
+            {
+                TestedType = mySolutionType
+            };
 
             var tests = testClass.GetType().GetMethods()
                 .Where(x => x.CustomAttributes.Any(x => x.AttributeType.Name == "TestAttribute"))
@@ -43,6 +45,9 @@ namespace evocontest.Runner.Worker.Core
 
             return testResults;
         }
+
+        private sealed class AnySubmissionTest : SubmissionTestBase
+        { }
 
         private readonly Type mySolutionType;
     }

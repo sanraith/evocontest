@@ -87,17 +87,27 @@ namespace evocontest.Submission.Test.Core
         public void Solve_ConflictingAbbreviations_NotReplaced2()
         {
             const string input = "apple banana cold. apple banana cold. AB connor. AB connor.";
-            const string expected = "apple banana cold. apple banana cold. AB connor. AB connor.";
+            const string expected = "AB cold. AB cold. AB connor. AB connor.";
             AssertSolve(input, expected);
         }
 
         [Test]
-        public void Solve_PhraseWithPerfixSuffx_NotReplaced()
+        public void Solve_PhraseWithPrefix_PrefixedWordNotReplaced()
         {
-            const string input = "simple phrase. megasimple phrase. simple phrases.";
-            const string expected = "simple phrase. megasimple phrase. simple phrases. ";
+            const string input = "simple phrase. simple phrase. megasimple phrase.";
+            const string expected = "SP. SP. megasimple phrase.";
             AssertSolve(input, expected);
         }
+
+        [Test]
+        public void Solve_PhraseWithSuffix_NoneReplaced()
+        {
+            // SP would be conflicting for "simple phrase" and "simple phrases"
+            const string input = "simple phrase. simple phrase. simple phrases.";
+            const string expected = "simple phrase. simple phrase. simple phrases.";
+            AssertSolve(input, expected);
+        }
+
 
         [Test]
         public void Solve_SubsetPhrase_OnlyParentIsReplaced()
