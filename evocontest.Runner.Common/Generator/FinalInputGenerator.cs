@@ -28,14 +28,15 @@ namespace evocontest.Runner.Common.Generator
 
             // Build skeleton
             var skeleton = GenerateSkeleton();
+            var sentenceLengths = GetSlices(skeleton.Count, myConfig.SentenceLength);
 
             // GenerateSolution
             // TODO add dots...
-            var solution = GenerateSolution(skeleton);
+            var solution = GenerateSolution(skeleton, sentenceLengths);
 
             // Render
             // - Split them into sentences (respect phrase borders)
-            var input = GenerateInput(skeleton);
+            var input = GenerateInput(skeleton, sentenceLengths);
 
             return new GeneratorResult
             {
@@ -44,13 +45,15 @@ namespace evocontest.Runner.Common.Generator
             };
         }
 
-        private string GenerateInput(IEnumerable<Phrase> phrases)
+        private string GenerateInput(IEnumerable<Phrase> phrases, IEnumerable<int> sentenceLengths)
         {
             var renderedPhrases = new HashSet<Phrase>();
-
+            var endPoints = new HashSet<int>();
+            _ = sentenceLengths.Aggregate(0, (sum, length) => { sum += length; endPoints.Add(sum); return sum; });
+            
             var sb = new StringBuilder();
             var isFirst = true;
-            foreach (var phrase in phrases)
+            foreach (var (phrase, phraseIndex) in phrases.WithIndex())
             {
                 if (isFirst) { isFirst = false; } else { sb.Append(' '); }
                 switch (phrase)
@@ -81,16 +84,23 @@ namespace evocontest.Runner.Common.Generator
                         }
                         break;
                 }
+                if (endPoints.Contains(phraseIndex + 1))
+                {
+                    sb.Append('.');
+                }
             }
 
             return sb.ToString();
         }
 
-        private string GenerateSolution(IEnumerable<Phrase> phrases)
+        private string GenerateSolution(List<Phrase> phrases, IEnumerable<int> sentenceLengths)
         {
+            var endPoints = new HashSet<int>();
+            _ = sentenceLengths.Aggregate(0, (sum, length) => { sum += length; endPoints.Add(sum); return sum; });
+
             var sb = new StringBuilder();
             var isFirst = true;
-            foreach (var phrase in phrases)
+            foreach (var (phrase, phraseIndex) in phrases.WithIndex())
             {
                 if (isFirst) { isFirst = false; } else { sb.Append(' '); }
                 if (phrase is NormalPhrase)
@@ -100,6 +110,10 @@ namespace evocontest.Runner.Common.Generator
                 else
                 {
                     sb.AppendJoin(' ', phrase.Words);
+                }
+                if (endPoints.Contains(phraseIndex + 1))
+                {
+                    sb.Append('.');
                 }
             }
 
@@ -144,7 +158,7 @@ namespace evocontest.Runner.Common.Generator
 
         private List<Phrase> GenerateDecoyPhrases()
         {
-            var decoyCount = 10;
+            var decoyCount = GetRandomFromRange(myConfig.DecoyPhraseCount);
             var decoyPhrases = new List<Phrase>();
 
             for (int decoyIndex = 0; decoyIndex < decoyCount; decoyIndex++)
@@ -157,8 +171,12 @@ namespace evocontest.Runner.Common.Generator
                 myConflictingAcronymSet.Add(phrase.Acronym);
                 decoyPhrases.Add(phrase);
 
-                var similarPhrase = new DecoyPhrase(phrase.Words.Select(GenerateSimilarNewWord));
-                decoyPhrases.Add(similarPhrase);
+                var decoyRepeatCount = GetRandomFromRange(myConfig.DecoyRepeatCount);
+                for (int repeatIndex = 0; repeatIndex < decoyRepeatCount; repeatIndex++)
+                {
+                    var similarPhrase = new DecoyPhrase(phrase.Words.Select(GenerateSimilarNewWord));
+                    decoyPhrases.Add(similarPhrase);
+                }
             }
 
             return decoyPhrases;
@@ -217,7 +235,7 @@ namespace evocontest.Runner.Common.Generator
 
             return similarWord;
         }
-        
+
         private IList<int> GetSlices(int totalLength, MinMaxPair sliceLength)
         {
             var slices = new List<int>();
@@ -242,10 +260,10 @@ namespace evocontest.Runner.Common.Generator
             myConflictingAcronymSet = new HashSet<string>();
         }
 
-        public List<Phrase> myPhrases;
-        public HashSet<string> myWordSet;
-        public HashSet<string> myValidAcronymSet;
-        public List<Phrase> myDecoyPhrases;
-        public HashSet<string> myConflictingAcronymSet;
+        private List<Phrase> myPhrases;
+        private HashSet<string> myWordSet;
+        private HashSet<string> myValidAcronymSet;
+        private List<Phrase> myDecoyPhrases;
+        private HashSet<string> myConflictingAcronymSet;
     }
 }

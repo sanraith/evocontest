@@ -6,6 +6,11 @@ namespace evocontest.Runner.Common.Extensions
 {
     public static class EnumerableExtensions
     {
+        public static IEnumerable<(TSource Item, int Index)> WithIndex<TSource>(this IEnumerable<TSource> sequence)
+        {
+            return sequence.Select((item, index) => (Item: item, Index: index));
+        }
+
         /// <summary>
         /// Shuffles the specified sequence using the given random number generator.
         /// </summary>

@@ -16,16 +16,19 @@ namespace evocontest.Runner.Common.Generator
         public MinMaxPair WordLength { get; set; }
 
         /// <summary>
-        /// Sentence length in characters.
+        /// Sentence length in phrases.
         /// </summary>
-        public MinMaxPair SentenceLength { get; set; }
+        public MinMaxPair SentenceLength { get; set; } = new MinMaxPair(50, 100);
 
         public double PhraseCollapseChance { get; set; } = .2;
 
+        /// <summary>
+        /// Phrase length in words
+        /// </summary>
         public MinMaxPair PhraseLength { get; set; } = new MinMaxPair(2, 5);
-
         public MinMaxPair PhraseCount { get; set; } = new MinMaxPair(10, 20);
-
         public MinMaxPair PhraseRepeatCount { get; set; } = new MinMaxPair(2, 10);
+        public MinMaxPair DecoyPhraseCount { get; set; } = new MinMaxPair(5, 20);
+        public MinMaxPair DecoyRepeatCount { get; set; } = new MinMaxPair(2, 5);
     }
 }
