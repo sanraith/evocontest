@@ -18,6 +18,23 @@ namespace evocontest.Runner.Common.Extensions
             return sequence.ShuffleIterator(random);
         }
 
+        /// <summary>
+        /// Shuffles the specified list by reordering the values within the same instance.
+        /// </summary>
+        /// <typeparam name="TSource">The type of the elements in the given list.</typeparam>
+        /// <param name="list">The sequence to transform.</param>
+        /// <param name="random">The random number generator.</param>
+        /// <returns>The original instance, shuffled.</returns>
+        public static IList<TSource> ShuffleInPlace<TSource>(this IList<TSource> list, Random random)
+        {
+            for (int i = 0; i < list.Count; i++)
+            {
+                int j = random.Next(i, list.Count);
+                (list[j], list[i]) = (list[i], list[j]);
+            }
+            return list;
+        }
+
         private static IEnumerable<T> ShuffleIterator<T>(this IEnumerable<T> source, Random rng)
         {
             var buffer = source.ToList();

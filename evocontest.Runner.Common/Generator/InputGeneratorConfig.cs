@@ -20,6 +20,8 @@ namespace evocontest.Runner.Common.Generator
         /// </summary>
         public MinMaxPair SentenceLength { get; set; }
 
+        public double PhraseCollapseChance { get; set; } = .2;
+
         public MinMaxPair PhraseLength { get; set; } = new MinMaxPair(2, 5);
 
         public MinMaxPair PhraseCount { get; set; } = new MinMaxPair(10, 20);

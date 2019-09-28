@@ -34,7 +34,6 @@ namespace evocontest.Runner.Common.Generator
             var solution = GenerateSolution(skeleton);
 
             // Render
-            // - Use multiple level of extraction (take extra care for decoy phrases)
             // - Split them into sentences (respect phrase borders)
             var input = GenerateInput(skeleton);
 
@@ -61,15 +60,25 @@ namespace evocontest.Runner.Common.Generator
                         sb.AppendJoin(' ', phrase.Words);
                         break;
                     case NormalPhrase np:
-                        if (renderedPhrases.Add(np))
+                        var shouldCollapse = myRandom.NextDouble() < myConfig.PhraseCollapseChance;
+                        if (renderedPhrases.Add(np) || !shouldCollapse)
                         {
-                            // TODO keep
+                            sb.AppendJoin(' ', np.Words);
                         }
                         else
                         {
-                            // TODO change 
+                            var wordArray = np.Words.ToArray();
+                            var slices = GetSlices(wordArray.Length, new MinMaxPair(2, wordArray.Length));
+                            var parts = new List<string>();
+                            var pos = 0;
+                            foreach (var slice in slices)
+                            {
+                                var words = wordArray[pos..(pos + slice)];
+                                parts.Add(Phrase.GetWordOrAcronym(words));
+                                pos += slice;
+                            }
+                            sb.AppendJoin(' ', parts);
                         }
-                        sb.AppendJoin(' ', np.Words);
                         break;
                 }
             }
@@ -111,7 +120,7 @@ namespace evocontest.Runner.Common.Generator
             }
             phrasesToUse.AddRange(myDecoyPhrases);
 
-            phrasesToUse = phrasesToUse.Shuffle(myRandom).SelectMany(phrase =>
+            phrasesToUse = phrasesToUse.ShuffleInPlace(myRandom).SelectMany(phrase =>
             {
                 var wordLength = GetRandomFromRange(myConfig.WordLength);
                 var junkWord = GenerateNewWord(wordLength);
@@ -207,6 +216,19 @@ namespace evocontest.Runner.Common.Generator
             } while (myWordSet.Contains(similarWord));
 
             return similarWord;
+        }
+        
+        private IList<int> GetSlices(int totalLength, MinMaxPair sliceLength)
+        {
+            var slices = new List<int>();
+            while (totalLength > 0)
+            {
+                var slice = GetRandomFromRange(sliceLength, totalLength);
+                totalLength -= slice;
+                slices.Add(slice);
+            }
+
+            return slices.ShuffleInPlace(myRandom);
         }
 
         private void Init()

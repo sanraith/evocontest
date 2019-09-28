@@ -12,7 +12,7 @@ namespace evocontest.Runner.Common.Generator
         public Phrase(IEnumerable<string> words)
         {
             Words = words.ToList();
-            Acronym = Words.Count > 1 ? string.Concat(Words.Select(x => x[0])).ToUpper() : Words[0];
+            Acronym = GetWordOrAcronym(Words);
             myHashCode = Words.Aggregate(0, (sum, word) => sum ^ word.GetHashCode());
         }
 
@@ -28,6 +28,11 @@ namespace evocontest.Runner.Common.Generator
         public override int GetHashCode()
         {
             return myHashCode;
+        }
+
+        public static string GetWordOrAcronym(IReadOnlyList<string> words)
+        {
+            return words.Count > 1 ? string.Concat(words.Select(x => x[0])).ToUpper() : words[0];
         }
 
         private readonly int myHashCode;
