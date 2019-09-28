@@ -23,5 +23,7 @@ namespace evocontest.Runner.Common.Generator
         public MinMaxPair PhraseLength { get; set; } = new MinMaxPair(2, 5);
 
         public MinMaxPair PhraseCount { get; set; } = new MinMaxPair(10, 20);
+
+        public MinMaxPair PhraseRepeatCount { get; set; } = new MinMaxPair(2, 10);
     }
 }

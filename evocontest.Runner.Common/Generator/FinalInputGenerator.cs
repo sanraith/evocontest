@@ -1,6 +1,8 @@
-﻿using System;
+﻿using evocontest.Runner.Common.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace evocontest.Runner.Common.Generator
 {
@@ -11,49 +13,149 @@ namespace evocontest.Runner.Common.Generator
             Init();
         }
 
-        public void Generate()
+        public GeneratorResult Generate()
         {
             Init();
-            // Generate phrases
-            // - Distinct acronyms
-            // - No overlap
-            // - No subset
-            myPhrases = GeneratePhrases();
 
+            // Generate phrases
+            myPhrases = GenerateNormalPhrases();
             // - Add partially conflicted acronyms
 
             // Generate decoy phrases
-            // - May PARTIALLY overlap with normal phrases
-            // - 1. not distinct acronym // should have minimal difference in them
+            myDecoyPhrases = GenerateDecoyPhrases();
             // - 2. normal acronym is part of it
             // - 3. same word as an acronym
 
-            // Build text map
-            // - Add >=2 occurence to all normal phrases
-            // - Add >=2 occurence to decoy phrases
-            // - Use multiple level of extraction (take extra care for decoy phrases)
-            // - Add junk words between
+            // Build skeleton
+            var skeleton = GenerateSkeleton();
 
-            // Split them into sentences (respect phrase borders)
+            // GenerateSolution
+            // TODO add dots...
+            var solution = GenerateSolution(skeleton);
+
+            // Render
+            // - Use multiple level of extraction (take extra care for decoy phrases)
+            // - Split them into sentences (respect phrase borders)
+            var input = GenerateInput(skeleton);
+
+            return new GeneratorResult
+            {
+                Input = input,
+                Solution = solution
+            };
         }
 
-        private List<Phrase> GenerateDecoys()
+        private string GenerateInput(IEnumerable<Phrase> phrases)
         {
-            var decoyCount = 10; // GetRandomFromRange(myConfig.PhraseCount);
+            var renderedPhrases = new HashSet<Phrase>();
+
+            var sb = new StringBuilder();
+            var isFirst = true;
+            foreach (var phrase in phrases)
+            {
+                if (isFirst) { isFirst = false; } else { sb.Append(' '); }
+                switch (phrase)
+                {
+                    case SinglePhrase sp:
+                    case DecoyPhrase dp:
+                        sb.AppendJoin(' ', phrase.Words);
+                        break;
+                    case NormalPhrase np:
+                        if (renderedPhrases.Add(np))
+                        {
+                            // TODO keep
+                        }
+                        else
+                        {
+                            // TODO change 
+                        }
+                        sb.AppendJoin(' ', np.Words);
+                        break;
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        private string GenerateSolution(IEnumerable<Phrase> phrases)
+        {
+            var sb = new StringBuilder();
+            var isFirst = true;
+            foreach (var phrase in phrases)
+            {
+                if (isFirst) { isFirst = false; } else { sb.Append(' '); }
+                if (phrase is NormalPhrase)
+                {
+                    sb.Append(phrase.Acronym);
+                }
+                else
+                {
+                    sb.AppendJoin(' ', phrase.Words);
+                }
+            }
+
+            return sb.ToString();
+        }
+
+
+        private List<Phrase> GenerateSkeleton()
+        {
+            var phrasesToUse = new List<Phrase>();
+            foreach (var phrase in myPhrases)
+            {
+                var repeatCount = GetRandomFromRange(myConfig.PhraseRepeatCount);
+                for (int i = 0; i < repeatCount; i++)
+                {
+                    phrasesToUse.Add(phrase);
+                }
+            }
+            phrasesToUse.AddRange(myDecoyPhrases);
+
+            phrasesToUse = phrasesToUse.Shuffle(myRandom).SelectMany(phrase =>
+            {
+                var wordLength = GetRandomFromRange(myConfig.WordLength);
+                var junkWord = GenerateNewWord(wordLength);
+                return new[] { phrase, new SinglePhrase(junkWord) };
+            }).ToList();
+
+            // Generate junk words
+            var length = phrasesToUse.Sum(x => x.Words.Count + x.Words.Sum(x => x.Length));
+            var lengthToFill = Math.Max(0, myConfig.InputLength - length);
+            while (lengthToFill > 0)
+            {
+                var wordLength = GetRandomFromRange(myConfig.WordLength);
+                var junkWord = GenerateNewWord(wordLength);
+                phrasesToUse.Add(new SinglePhrase(junkWord));
+                lengthToFill -= wordLength + 1;
+            }
+
+            return phrasesToUse.ToList();
+        }
+
+
+        private List<Phrase> GenerateDecoyPhrases()
+        {
+            var decoyCount = 10;
             var decoyPhrases = new List<Phrase>();
+
             for (int decoyIndex = 0; decoyIndex < decoyCount; decoyIndex++)
             {
                 Phrase phrase;
                 do
                 {
-                    phrase = GeneratePhrase();
-                } while (!myValidAcronymSet.Add(phrase.Acronym));
+                    phrase = new DecoyPhrase(GeneratePhraseWords());
+                } while (myValidAcronymSet.Contains(phrase.Acronym));
+                myConflictingAcronymSet.Add(phrase.Acronym);
+                decoyPhrases.Add(phrase);
+
+                var similarPhrase = new DecoyPhrase(phrase.Words.Select(GenerateSimilarNewWord));
+                decoyPhrases.Add(similarPhrase);
             }
 
-            return null;
+            return decoyPhrases;
         }
 
-        private List<Phrase> GeneratePhrases()
+        private List<Phrase> GenerateNormalPhrases()
         {
             var phrases = new List<Phrase>();
             var phraseCount = GetRandomFromRange(myConfig.PhraseCount);
@@ -62,7 +164,7 @@ namespace evocontest.Runner.Common.Generator
                 Phrase phrase;
                 do
                 {
-                    phrase = GeneratePhrase();
+                    phrase = new NormalPhrase(GeneratePhraseWords());
                 } while (!myValidAcronymSet.Add(phrase.Acronym));
                 phrases.Add(phrase);
             }
@@ -70,64 +172,58 @@ namespace evocontest.Runner.Common.Generator
             return phrases;
         }
 
-        private Phrase GeneratePhrase()
+        private List<string> GeneratePhraseWords()
         {
             var phraseWords = new List<string>();
             var wordCount = GetRandomFromRange(myConfig.PhraseLength);
             for (int wordIndex = 0; wordIndex < wordCount; wordIndex++)
             {
                 var wordLength = GetRandomFromRange(myConfig.WordLength);
-                string word;
-                do
-                {
-                    word = GenerateWord(wordLength);
-                } while (!myWordSet.Add(word));
-                phraseWords.Add(word);
+                phraseWords.Add(GenerateNewWord(wordLength));
             }
 
-            return new Phrase(phraseWords);
+            return phraseWords;
+        }
+
+        private string GenerateNewWord(int wordLength)
+        {
+            string word;
+            do
+            {
+                word = GenerateWord(wordLength);
+            } while (!myWordSet.Add(word));
+            return word;
+        }
+
+        private string GenerateSimilarNewWord(string word)
+        {
+            Span<char> similarWordSpan = word.ToArray();
+            string similarWord;
+            do
+            {
+                var pos = myRandom.Next(1, word.Length);
+                similarWordSpan[pos] = (char)(((similarWordSpan[pos] - 96) % 25) + 97);
+                similarWord = similarWordSpan.ToString();
+            } while (myWordSet.Contains(similarWord));
+
+            return similarWord;
         }
 
         private void Init()
         {
             myPhrases = new List<Phrase>();
+
             myWordSet = new HashSet<string>();
             myValidAcronymSet = new HashSet<string>();
+
+            myDecoyPhrases = new List<Phrase>();
+            myConflictingAcronymSet = new HashSet<string>();
         }
 
-        private List<Phrase> myPhrases;
-        private HashSet<string> myWordSet;
-        private HashSet<string> myValidAcronymSet;
-
-        // ---------------------------------------
-        private sealed class Phrase
-        {
-            public IReadOnlyList<string> Words { get; }
-
-            public string Acronym { get; }
-
-            public Phrase(IEnumerable<string> words)
-            {
-                Words = words.ToList();
-                Acronym = string.Concat(Words.Select(x => x[0])).ToUpper();
-                myHashCode = Words.Aggregate(0, (sum, word) => sum ^ word.GetHashCode());
-            }
-
-            public override bool Equals(object? obj)
-            {
-                if (obj is Phrase other)
-                {
-                    return Words.SequenceEqual(other.Words);
-                }
-                return base.Equals(obj);
-            }
-
-            public override int GetHashCode()
-            {
-                return myHashCode;
-            }
-
-            private readonly int myHashCode;
-        }
+        public List<Phrase> myPhrases;
+        public HashSet<string> myWordSet;
+        public HashSet<string> myValidAcronymSet;
+        public List<Phrase> myDecoyPhrases;
+        public HashSet<string> myConflictingAcronymSet;
     }
 }

@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\evocontest.Runner.Common\evocontest.Runner.Common.csproj" />
+    <ProjectReference Include="..\..\evocontest.Submission.Sample\evocontest.Submission.Sample.csproj" />
     <ProjectReference Include="..\..\Prototypes\MySubmission\MySubmission.csproj" />
   </ItemGroup>
 

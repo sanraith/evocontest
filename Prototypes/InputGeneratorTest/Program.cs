@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Diagnostics;
 using evocontest.Runner.Common.Generator;
 using MySubmission;
+using evocontest.Submission.Sample;
 
 namespace InputGeneratorTest
 {
@@ -22,7 +24,17 @@ namespace InputGeneratorTest
             };
 
             var generator = new FinalInputGenerator(generatorConfig);
-            generator.Generate();
+            var pair = generator.Generate();
+            Console.WriteLine(pair.Input);
+            Console.WriteLine();
+            Console.WriteLine(pair.Solution);
+            Console.WriteLine();
+
+            var solver = new SampleSubmission();
+            var result = solver.Solve(pair.Input);
+
+            Console.WriteLine(result);
+            Console.WriteLine(result == pair.Solution);
         }
 
         private static void Test2()

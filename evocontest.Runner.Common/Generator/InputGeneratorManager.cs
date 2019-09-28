@@ -22,7 +22,7 @@ namespace evocontest.Runner.Common.Generator
                 results.Add(new GeneratorResult
                 {
                     Input = dummyInput,
-                    Output = dummyOutput
+                    Solution = dummyOutput
                 });
             }
 

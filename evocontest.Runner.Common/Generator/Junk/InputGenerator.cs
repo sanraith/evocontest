@@ -16,7 +16,7 @@ namespace evocontest.Runner.Common.Generator
             return new GeneratorResult
             {
                 Input = inputString,
-                Output = inputString
+                Solution = inputString
             };
         }
 
