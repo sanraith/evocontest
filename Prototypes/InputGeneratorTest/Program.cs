@@ -9,7 +9,20 @@ namespace InputGeneratorTest
     {
         static void Main(string[] args)
         {
-            Test2();
+            Test3();
+        }
+
+        private static void Test3()
+        {
+            var generatorConfig = new InputGeneratorConfig
+            {
+                Seed = 1337,
+                WordLength = new MinMaxPair(3, 5),
+                PhraseLength = new MinMaxPair(3, 6)
+            };
+
+            var generator = new FinalInputGenerator(generatorConfig);
+            generator.Generate();
         }
 
         private static void Test2()

@@ -19,5 +19,9 @@ namespace evocontest.Runner.Common.Generator
         /// Sentence length in characters.
         /// </summary>
         public MinMaxPair SentenceLength { get; set; }
+
+        public MinMaxPair PhraseLength { get; set; } = new MinMaxPair(2, 5);
+
+        public MinMaxPair PhraseCount { get; set; } = new MinMaxPair(10, 20);
     }
 }

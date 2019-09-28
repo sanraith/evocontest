@@ -35,7 +35,7 @@ namespace evocontest.Submission.Test.Core
         }
 
         [Test]
-        public void Solve_SinglePhrase_Replaced()
+        public void Solve_SinglePhrase_IsReplaced()
         {
             const string input = "the goal is to abbreviate multi word phrases. " +
                                  "multi word phrases cause longer text.";
@@ -44,7 +44,7 @@ namespace evocontest.Submission.Test.Core
         }
 
         [Test]
-        public void Solve_MultiplePhrases_Replaced()
+        public void Solve_MultiplePhrases_AreReplaced()
         {
             const string input = "first phrase. second phrase. first phrase. second phrase.";
             const string expected = "FP. SP. FP. SP.";
@@ -52,7 +52,7 @@ namespace evocontest.Submission.Test.Core
         }
 
         [Test]
-        public void Solve_ComplexPhrases_Replaced()
+        public void Solve_ComplexPhrases_AreReplaced()
         {
             const string input = "patient data service. patient data service handler. PDS handler.";
             const string expected = "PDS. PDSH. PDSH.";
@@ -60,7 +60,7 @@ namespace evocontest.Submission.Test.Core
         }
 
         [Test]
-        public void Solve_ComplexPhrases_Replaced2()
+        public void Solve_ComplexPhrases_AreReplaced2()
         {
             const string input = "aa bb cc dd. aa bb cc dd. aa BCD. ABC dd.";
             const string expected = "ABCD. ABCD. ABCD. ABCD.";
@@ -86,8 +86,16 @@ namespace evocontest.Submission.Test.Core
         [Test]
         public void Solve_ConflictingAbbreviations_NotReplaced2()
         {
-            const string input = "apple banana cold. apple banana cold. AB connor. AB connor.";
-            const string expected = "AB cold. AB cold. AB connor. AB connor.";
+            const string input = "apple banana cold. apple banana cold AB connor. AB connor.";
+            const string expected = "AB cold. AB cold AB connor. AB connor.";
+            AssertSolve(input, expected);
+        }
+
+        [Test]
+        public void Solve_PartiallyConflictingAbbreviations_AreReplaced()
+        {
+            const string input = "apple apple pear apple apple pear. aa aa cc aa aa cc.";
+            const string expected = "AAP AAP. AAC AAC.";
             AssertSolve(input, expected);
         }
 
