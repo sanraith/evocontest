@@ -44,7 +44,7 @@ namespace evocontest.Runner.Worker.Core
             }
             catch (Exception e)
             {
-                response = new OperationFailedMessage(loadMsg.Id, e.ToString());
+                response = new OperationFailedMessage(loadMsg.Id, e.ToString(), e);
             }
 
             return new MessageHandlerResult(response);
@@ -88,7 +88,7 @@ namespace evocontest.Runner.Worker.Core
             }
             catch (Exception ex)
             {
-                return new MessageHandlerResult(new OperationFailedMessage(message.Id, $"Unhandled exception: {ex}"));
+                return new MessageHandlerResult(new OperationFailedMessage(message.Id, $"Unhandled exception: {ex}", ex));
             }
         }
 

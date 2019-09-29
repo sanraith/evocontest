@@ -12,15 +12,18 @@ namespace evocontest.Runner.Common.Messages.Response
 
         public string? ErrorMessage { get; set; }
 
+        public Exception? Exception { get; set; }
+
         private OperationFailedMessage()
         {
             ErrorMessage = null!;
         }
 
-        public OperationFailedMessage(Guid targetMessageId, string errorMessage)
+        public OperationFailedMessage(Guid targetMessageId, string errorMessage, Exception exception = null)
         {
             TargetMessageId = targetMessageId;
             ErrorMessage = errorMessage;
+            Exception = exception;
         }
     }
 }

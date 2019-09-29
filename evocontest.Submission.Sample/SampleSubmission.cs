@@ -27,7 +27,7 @@ namespace evocontest.Submission.Sample
             {
                 foreach (var phrase in phrases.Distinct())
                 {
-                    // No pre-, or postfix letters allowed
+                    // Phrase have to be standalone, without preceding or following letters
                     var replaceRegex = new Regex($"(?<![a-zA-Z]){phrase}(?![a-zA-Z])");
                     result = replaceRegex.Replace(result, acronym);
                 }
@@ -41,7 +41,7 @@ namespace evocontest.Submission.Sample
         /// </summary>
         private static Dictionary<string, List<string>> GetPossibleAcronyms(string text)
         {
-            var sentences = text.Split('.').Select(sentence => sentence.Trim()).Select(sentence => GetWords(sentence)).ToList();
+            var sentences = text.Split('.').Select(sentence => sentence.Trim()).Select(GetWords).ToList();
             var acronyms = new Dictionary<string, List<string>>();
             foreach (var sentence in sentences)
             {

@@ -42,6 +42,7 @@ namespace evocontest.Runner.Host.Workflow
             string errorMessage;
             var status = ValidationStateEnum.File;
 
+            // TODO handle timeout exception...
             using (var disposablePipe = await myStartWorkerProcessStep.ExecuteAsync())
             {
                 myPipeServer = disposablePipe.Value;

@@ -17,6 +17,7 @@ namespace evocontest.Submission.Test.Core
     /// 
     /// 3. make rule, that longer abbreviations are replaced first
     /// Longer = number of words, or first occurence
+    /// no overlap allowed
     /// </summary>
     public abstract class SubmissionTestBase : TestBase
     {
@@ -54,16 +55,32 @@ namespace evocontest.Submission.Test.Core
         [Test]
         public void Solve_ComplexPhrases_AreReplaced()
         {
+            const string input = "aa bb cc dd. aa bb cc dd. aa BCD. ABC dd.";
+            const string expected = "ABCD. ABCD. ABCD. ABCD.";
+            AssertSolve(input, expected);
+        }
+
+        [Test]
+        public void Solve_SubsetPhrase_ParentAndChildIsReplaced()
+        {
             const string input = "patient data service. patient data service handler. PDS handler.";
             const string expected = "PDS. PDSH. PDSH.";
             AssertSolve(input, expected);
         }
 
         [Test]
-        public void Solve_ComplexPhrases_AreReplaced2()
+        public void Solve_SubsetPhrase_ParentAndChildIsReplaced2()
         {
-            const string input = "aa bb cc dd. aa bb cc dd. aa BCD. ABC dd.";
-            const string expected = "ABCD. ABCD. ABCD. ABCD.";
+            const string input = "patient data service. patient data service handler. patient data service handler.";
+            const string expected = "PDS. PDSH. PDSH.";
+            AssertSolve(input, expected);
+        }
+        
+        [Test]
+        public void Solve_SubsetPhrase_ParentAndChildIsReplaced3()
+        {
+            const string input = "patient data service handler. patient data service patient data service. patient data service handler.";
+            const string expected = "PDSH. PDS PDS. PDSH.";
             AssertSolve(input, expected);
         }
 
@@ -115,38 +132,5 @@ namespace evocontest.Submission.Test.Core
             const string expected = "simple phrase. simple phrase. simple phrases.";
             AssertSolve(input, expected);
         }
-
-        [Test]
-        public void Solve_SubsetPhrase_OnlyParentIsReplaced()
-        {
-            const string input = "multi word long phrase. long phrase. multi word long phrase.";
-            const string expected = "MWLP. long phrase. MWLP.";
-            AssertSolve(input, expected);
-        }
-
-        //// no overlap
-        //[Test]
-        //public void Solve_RepeatingPhrase_LongestOccurenceReplaced()
-        //{
-        //    const string input = "apple apple apple apple apple apple apple";
-        //    const string expected = "AAA AAA apple";
-        //    AssertSolve(input, expected);
-        //}
-
-        //[Test]
-        //public void Solve_OverlappingPhrases_DifferentLength_LongerIsReplaced()
-        //{
-        //    const string input = "multi word long phrase. multi word long. long phrase.";
-        //    const string expected = "MWL phrase. MWL. long phrase.";
-        //    AssertSolve(input, expected);
-        //}
-
-        //[Test]
-        //public void Solve_OverlappingPhrases_SameLength_FirstOccurenceIsReplaced()
-        //{
-        //    const string input = "bb cc dd. aa bb cc dd. aa bb cc.";
-        //    const string expected = "BCD. aa BCD. aa bb cc.";
-        //    AssertSolve(input, expected);
-        //}
     }
 }
