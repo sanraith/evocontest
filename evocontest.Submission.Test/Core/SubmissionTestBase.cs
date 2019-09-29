@@ -116,7 +116,6 @@ namespace evocontest.Submission.Test.Core
             AssertSolve(input, expected);
         }
 
-
         [Test]
         public void Solve_SubsetPhrase_OnlyParentIsReplaced()
         {
@@ -125,20 +124,29 @@ namespace evocontest.Submission.Test.Core
             AssertSolve(input, expected);
         }
 
-        [Test]
-        public void Solve_OverlappingPhrases_DifferentLength_LongerIsReplaced()
-        {
-            const string input = "multi word long phrase. multi word long. long phrase.";
-            const string expected = "MWL phrase. MWL. long phrase.";
-            AssertSolve(input, expected);
-        }
+        //// no overlap
+        //[Test]
+        //public void Solve_RepeatingPhrase_LongestOccurenceReplaced()
+        //{
+        //    const string input = "apple apple apple apple apple apple apple";
+        //    const string expected = "AAA AAA apple";
+        //    AssertSolve(input, expected);
+        //}
 
-        [Test]
-        public void Solve_OverlappingPhrases_SameLength_FirstOccurenceIsReplaced()
-        {
-            const string input = "bb cc dd. aa bb cc dd. aa bb cc.";
-            const string expected = "BCD. aa BCD. aa bb cc.";
-            AssertSolve(input, expected);
-        }
+        //[Test]
+        //public void Solve_OverlappingPhrases_DifferentLength_LongerIsReplaced()
+        //{
+        //    const string input = "multi word long phrase. multi word long. long phrase.";
+        //    const string expected = "MWL phrase. MWL. long phrase.";
+        //    AssertSolve(input, expected);
+        //}
+
+        //[Test]
+        //public void Solve_OverlappingPhrases_SameLength_FirstOccurenceIsReplaced()
+        //{
+        //    const string input = "bb cc dd. aa bb cc dd. aa bb cc.";
+        //    const string expected = "BCD. aa BCD. aa bb cc.";
+        //    AssertSolve(input, expected);
+        //}
     }
 }

@@ -31,11 +31,9 @@ namespace evocontest.Runner.Common.Generator
             var sentenceLengths = GetSlices(skeleton.Count, myConfig.SentenceLength);
 
             // GenerateSolution
-            // TODO add dots...
             var solution = GenerateSolution(skeleton, sentenceLengths);
 
             // Render
-            // - Split them into sentences (respect phrase borders)
             var input = GenerateInput(skeleton, sentenceLengths);
 
             return new GeneratorResult
@@ -50,7 +48,7 @@ namespace evocontest.Runner.Common.Generator
             var renderedPhrases = new HashSet<Phrase>();
             var endPoints = new HashSet<int>();
             _ = sentenceLengths.Aggregate(0, (sum, length) => { sum += length; endPoints.Add(sum); return sum; });
-            
+
             var sb = new StringBuilder();
             var isFirst = true;
             foreach (var (phrase, phraseIndex) in phrases.WithIndex())
@@ -141,18 +139,31 @@ namespace evocontest.Runner.Common.Generator
                 return new[] { phrase, new SinglePhrase(junkWord) };
             }).ToList();
 
-            // Generate junk words
             var length = phrasesToUse.Sum(x => x.Words.Count + x.Words.Sum(x => x.Length));
             var lengthToFill = Math.Max(0, myConfig.InputLength - length);
+            var phraseCount = phrasesToUse.Count;
+            var extraJunk = new Queue<(int Index, Phrase Phrase)>();
             while (lengthToFill > 0)
             {
                 var wordLength = GetRandomFromRange(myConfig.WordLength);
                 var junkWord = GenerateNewWord(wordLength);
-                phrasesToUse.Add(new SinglePhrase(junkWord));
+                var pos = myRandom.Next(0, phraseCount);
+                extraJunk.Enqueue((pos, new SinglePhrase(junkWord)));
                 lengthToFill -= wordLength + 1;
             }
+            extraJunk = new Queue<(int Index, Phrase Phrase)>(extraJunk.OrderBy(x => x.Index));
 
-            return phrasesToUse.ToList();
+            var result = new List<Phrase>();
+            foreach (var (phrase, index) in phrasesToUse.WithIndex())
+            {
+                while (extraJunk.Count > 0 && extraJunk.Peek().Index == index)
+                {
+                    result.Add(extraJunk.Dequeue().Phrase);
+                }
+                result.Add(phrase);
+            }
+
+            return result;
         }
 
 

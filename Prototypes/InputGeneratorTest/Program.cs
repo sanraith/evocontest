@@ -19,6 +19,8 @@ namespace InputGeneratorTest
             var generatorConfig = new InputGeneratorConfig
             {
                 Seed = 1337,
+                //InputLength = 10000,
+                SentenceLength = new MinMaxPair(int.MaxValue, int.MaxValue),
                 WordLength = new MinMaxPair(3, 5),
                 PhraseLength = new MinMaxPair(3, 6)
             };
