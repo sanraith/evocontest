@@ -26,6 +26,8 @@ namespace evocontest.WebApp.Areas.Identity.Pages.Account
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
         private readonly Dictionary<string, string> _emailToRoleMap;
+        private static string[] _validEmailDomains;
+        private static string[] _validEmailDomainsExtended;
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
@@ -44,6 +46,8 @@ namespace evocontest.WebApp.Areas.Identity.Pages.Account
                 { configuration.GetValue<string>("AdminEmail").ToLowerInvariant(), Roles.Admin},
                 { configuration.GetValue<string>("WorkerEmail").ToLowerInvariant(), Roles.Worker}
             };
+            _validEmailDomains = configuration.GetValue<string>("ValidEmailDomains").Split(';', StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToArray();
+            _validEmailDomainsExtended = _validEmailDomains.Concat(_emailToRoleMap.Keys).ToArray();
         }
 
         [BindProperty]
@@ -53,7 +57,7 @@ namespace evocontest.WebApp.Areas.Identity.Pages.Account
 
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
-        public class InputModel
+        public class InputModel : IValidatableObject
         {
             [Required]
             [StringLength(100, ErrorMessage = "A {0} hossza {2} - {1} karakter kell legyen.", MinimumLength = 1)]
@@ -80,6 +84,20 @@ namespace evocontest.WebApp.Areas.Identity.Pages.Account
             [Display(Name = "Jelszó megerősítése")]
             [Compare("Password", ErrorMessage = "A jelszó mezők tartalma nem egyezik meg.")]
             public string ConfirmPassword { get; set; }
+
+            public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+            {
+                if (Email == null) { yield break; }
+
+                if (_validEmailDomainsExtended.Any(suffix => Email.EndsWith(suffix, StringComparison.OrdinalIgnoreCase)))
+                {
+                    yield return ValidationResult.Success;
+                }
+                else
+                {
+                    yield return new ValidationResult($"Használd az evosoftos email címed! Elfogadott domainek: {string.Join(", ", _validEmailDomains)}");
+                }
+            }
         }
 
         public async Task OnGetAsync(string returnUrl = null)
