@@ -1,3 +1,6 @@
+# Publish profiles
+Properties/PublishProfiles/
+
 # User submitted assemblies
 _Store/**/*.dll
 
