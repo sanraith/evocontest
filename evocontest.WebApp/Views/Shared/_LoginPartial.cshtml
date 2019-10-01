@@ -8,7 +8,7 @@
     {
         <li class="nav-item">
             <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
-                Bejelentkezve: <span class="font-weight-bold">@User.Identity.Name</span>
+                Bejelentkezve: <span class="font-weight-bold">@((await UserManager.FindByNameAsync(User.Identity.Name)).FullName)</span>
             </a>
         </li>
         <li class="nav-item">

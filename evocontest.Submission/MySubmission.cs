@@ -7,6 +7,8 @@ namespace evocontest.Submission
     {
         public string Solve(string input)
         {
+            // TODO Implement efficient solution.
+
             throw new NotImplementedException();
         }
     }

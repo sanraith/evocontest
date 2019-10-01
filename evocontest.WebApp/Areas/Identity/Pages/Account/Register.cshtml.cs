@@ -56,19 +56,29 @@ namespace evocontest.WebApp.Areas.Identity.Pages.Account
         public class InputModel
         {
             [Required]
+            [StringLength(100, ErrorMessage = "A {0} hossza {2} - {1} karakter kell legyen.", MinimumLength = 1)]
+            [Display(Name = "Vezetéknév")]
+            public string LastName { get; set; }
+
+            [Required]
+            [StringLength(100, ErrorMessage = "A {0} hossza {2} - {1} karakter kell legyen.", MinimumLength = 1)]
+            [Display(Name = "Keresztnév")]
+            public string FirstName { get; set; }
+
+            [Required]
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
 
             [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [StringLength(100, ErrorMessage = "A {0} hossza {2} - {1} karakter kell legyen.", MinimumLength = 6)]
             [DataType(DataType.Password)]
-            [Display(Name = "Password")]
+            [Display(Name = "Jelszó")]
             public string Password { get; set; }
 
             [DataType(DataType.Password)]
-            [Display(Name = "Confirm password")]
-            [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+            [Display(Name = "Jelszó megerősítése")]
+            [Compare("Password", ErrorMessage = "A jelszó mezők tartalma nem egyezik meg.")]
             public string ConfirmPassword { get; set; }
         }
 
@@ -84,7 +94,7 @@ namespace evocontest.WebApp.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email };
+                var user = new ApplicationUser { FirstName = Input.FirstName, LastName = Input.LastName, UserName = Input.Email, Email = Input.Email };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {

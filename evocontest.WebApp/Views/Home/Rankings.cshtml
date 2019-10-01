@@ -32,13 +32,13 @@
                     var solvedPerSecString = (1000 / result.TotalMilliseconds).ToString("#.####", CultureInfo.InvariantCulture);
                     <tr>
                         <td style="font-weight: bold; font-size: 20px; vertical-align: middle; text-align: center">@place.</td>
-                        <td>@measurement.Submission.User.Email</td>
+                        <td>@measurement.Submission.User.FullName</td>
                         <td>
                             (@result.DifficultyLevel)
                             @result.TotalMilliseconds ms
 
                             <span style="display:none">
-                                <input type="text" name="name" value="@measurement.Submission.User.Email" />
+                                <input type="text" name="name" value="@measurement.Submission.User.FullName" />
                                 <input type="text" name="score" value="@solvedPerSecString" />
                             </span>
                         </td>

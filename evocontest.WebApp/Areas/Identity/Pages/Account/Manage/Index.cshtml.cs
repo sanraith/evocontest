@@ -24,6 +24,7 @@ namespace evocontest.WebApp.Areas.Identity.Pages.Account.Manage
             _signInManager = signInManager;
         }
 
+        [Display(Name = "Email")]
         public string Username { get; set; }
 
         [TempData]
@@ -34,47 +35,57 @@ namespace evocontest.WebApp.Areas.Identity.Pages.Account.Manage
 
         public class InputModel
         {
-            [Phone]
-            [Display(Name = "Phone number")]
-            public string PhoneNumber { get; set; }
+            [Required]
+            [StringLength(100, ErrorMessage = "A {0} hossza {2} - {1} karakter kell legyen.", MinimumLength = 1)]
+            [Display(Name = "Vezetéknév")]
+            public string LastName { get; set; }
+
+            [Required]
+            [StringLength(100, ErrorMessage = "A {0} hossza {2} - {1} karakter kell legyen.", MinimumLength = 1)]
+            [Display(Name = "Keresztnév")]
+            public string FirstName { get; set; }
+
+            //[Phone]
+            //[Display(Name = "Phone number")]
+            //public string PhoneNumber { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync()
         {
-            return RedirectToPage("Email");
-
-            //var user = await _userManager.GetUserAsync(User);
-            //if (user == null)
-            //{
-            //    return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            //}
-            //var userName = await _userManager.GetUserNameAsync(user);
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
+            
+            Username = await _userManager.GetUserNameAsync(user);
             //var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
 
-            //Username = userName;
+            Input = new InputModel
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName
+            };
 
-            //Input = new InputModel
-            //{
-            //    PhoneNumber = phoneNumber
-            //};
-
-            //return Page();
+            return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
-            return RedirectToPage();
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
 
-            //if (!ModelState.IsValid)
-            //{
-            //    return Page();
-            //}
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
 
-            //var user = await _userManager.GetUserAsync(User);
-            //if (user == null)
-            //{
-            //    return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            //}
+            user.FirstName = Input.FirstName;
+            user.LastName = Input.LastName;
+            await _userManager.UpdateAsync(user);
 
             //var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
             //if (Input.PhoneNumber != phoneNumber)
@@ -87,9 +98,9 @@ namespace evocontest.WebApp.Areas.Identity.Pages.Account.Manage
             //    }
             //}
 
-            //await _signInManager.RefreshSignInAsync(user);
-            //StatusMessage = "Your profile has been updated";
-            //return RedirectToPage();
+            await _signInManager.RefreshSignInAsync(user);
+            StatusMessage = "A profilod frissítve lett.";
+            return RedirectToPage();
         }
     }
 }

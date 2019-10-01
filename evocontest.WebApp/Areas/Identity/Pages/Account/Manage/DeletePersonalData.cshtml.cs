@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace evocontest.WebApp.Areas.Identity.Pages.Account.Manage
 {
+    #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
     public class DeletePersonalDataModel : PageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -51,34 +52,35 @@ namespace evocontest.WebApp.Areas.Identity.Pages.Account.Manage
 
         public async Task<IActionResult> OnPostAsync()
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
+            //var user = await _userManager.GetUserAsync(User);
+            //if (user == null)
+            //{
+            //    return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            //}
 
-            RequirePassword = await _userManager.HasPasswordAsync(user);
-            if (RequirePassword)
-            {
-                if (!await _userManager.CheckPasswordAsync(user, Input.Password))
-                {
-                    ModelState.AddModelError(string.Empty, "Incorrect password.");
-                    return Page();
-                }
-            }
+            //RequirePassword = await _userManager.HasPasswordAsync(user);
+            //if (RequirePassword)
+            //{
+            //    if (!await _userManager.CheckPasswordAsync(user, Input.Password))
+            //    {
+            //        ModelState.AddModelError(string.Empty, "Incorrect password.");
+            //        return Page();
+            //    }
+            //}
 
-            var result = await _userManager.DeleteAsync(user);
-            var userId = await _userManager.GetUserIdAsync(user);
-            if (!result.Succeeded)
-            {
-                throw new InvalidOperationException($"Unexpected error occurred deleting user with ID '{userId}'.");
-            }
+            //var result = await _userManager.DeleteAsync(user);
+            //var userId = await _userManager.GetUserIdAsync(user);
+            //if (!result.Succeeded)
+            //{
+            //    throw new InvalidOperationException($"Unexpected error occurred deleting user with ID '{userId}'.");
+            //}
 
-            await _signInManager.SignOutAsync();
+            //await _signInManager.SignOutAsync();
 
-            _logger.LogInformation("User with ID '{UserId}' deleted themselves.", userId);
+            //_logger.LogInformation("User with ID '{UserId}' deleted themselves.", userId);
 
             return Redirect("~/");
         }
     }
+    #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 }

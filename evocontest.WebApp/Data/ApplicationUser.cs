@@ -14,11 +14,19 @@ namespace evocontest.WebApp.Data
 {
     public class ApplicationUser : IdentityUser
     {
+        [StringLength(100)]
+        public string FirstName { get; set; }
+
+        [StringLength(100)]
+        public string LastName { get; set; }
+
         [Required]
         [StringLength(255)]
         public string UploadFolderName { get; set; }
 
         public virtual List<Submission> Submissions { get; set; }
+
+        public string FullName => $"{LastName} {FirstName}";
 
         public sealed class Configuration : IEntityTypeConfiguration<ApplicationUser>
         {
