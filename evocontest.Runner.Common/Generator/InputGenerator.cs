@@ -6,9 +6,9 @@ using System.Text;
 
 namespace evocontest.Runner.Common.Generator
 {
-    public sealed class FinalInputGenerator : InputGeneratorBase
+    public sealed class InputGenerator : InputGeneratorBase
     {
-        public FinalInputGenerator(InputGeneratorConfig config) : base(config)
+        public InputGenerator(InputGeneratorConfig config) : base(config)
         {
             Init();
         }
@@ -36,10 +36,13 @@ namespace evocontest.Runner.Common.Generator
             // Render
             var input = GenerateInput(skeleton, sentenceLengths);
 
+            Console.WriteLine($"AcronymPhrases: {myPhrases.Count}, DecoyPhrases: {myDecoyPhrases.Count}, AllPhrases: {skeleton.Count}, Words: {myWordSet.Count}");
+
             return new GeneratorResult
             {
                 Input = input,
-                Solution = solution
+                Solution = solution,
+                Config = myConfig
             };
         }
 
@@ -117,7 +120,6 @@ namespace evocontest.Runner.Common.Generator
 
             return sb.ToString();
         }
-
 
         private List<Phrase> GenerateSkeleton()
         {

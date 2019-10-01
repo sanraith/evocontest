@@ -7,7 +7,7 @@ using System.Text;
 
 namespace MySubmission
 {
-    class MyNewSolution2 : ISolution
+    class MyNewSolution2// : ISolution
     {
         public string Solve(string input)
         {

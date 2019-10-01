@@ -1,14 +1,16 @@
 ﻿using evocontest.Runner.Common.Extensions;
 using evocontest.Runner.Common.Generator;
+using System;
+using System.Diagnostics;
 using System.IO;
 
 namespace evocontest.Submission.Runner.Core
 {
-    public class TestDataManager
+    public sealed class TestDataManager
     {
         public string TestDataDirectory { get; set; } = "testdata";
 
-        public TestDataManager(int seed, InputGeneratorManager inputGeneratorManger)
+        public TestDataManager(int seed, IInputGeneratorManager inputGeneratorManger)
         {
             mySeed = seed;
             myInputGeneratorManger = inputGeneratorManger;
@@ -33,9 +35,10 @@ namespace evocontest.Submission.Runner.Core
 
         private void GenerateAllInputData(int difficulty, int count)
         {
-            System.Console.WriteLine($"Generating testdata...");
+            Console.Write($"Generating test data... ");
             var difficultyDirectory = new DirectoryInfo(Path.Combine(TestDataDirectory, mySeed.ToString(), difficulty.ToString()));
 
+            var sw = Stopwatch.StartNew();
             var results = myInputGeneratorManger.Generate(difficulty, count);
             foreach (var (result, i) in results.WithIndex())
             {
@@ -46,10 +49,17 @@ namespace evocontest.Submission.Runner.Core
 
                 File.WriteAllText(newInputFileInfo.FullName, result.Input);
                 File.WriteAllText(newSolutionFoleInfo.FullName, result.Solution);
+                if (i == 0)
+                {
+                    var length = result.Input.Length;
+                    var chunkText = length < 1024 ? $"{length} byte" : $"{ length / 1024} KByte";
+                    Console.Write($"{count} * {chunkText} chunks... ");
+                }
             }
+            Console.WriteLine($"in {sw.ElapsedMilliseconds} ms.");
         }
 
         private readonly int mySeed;
-        private readonly InputGeneratorManager myInputGeneratorManger;
+        private readonly IInputGeneratorManager myInputGeneratorManger;
     }
 }
