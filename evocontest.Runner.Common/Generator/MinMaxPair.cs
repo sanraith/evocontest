@@ -1,5 +1,8 @@
-﻿namespace evocontest.Runner.Common.Generator
+﻿using System.Diagnostics;
+
+namespace evocontest.Runner.Common.Generator
 {
+    [DebuggerDisplay("({Min}, {Max})")]
     public sealed class MinMaxPair
     {
         public int Min { get; }

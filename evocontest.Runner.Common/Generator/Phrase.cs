@@ -9,11 +9,14 @@ namespace evocontest.Runner.Common.Generator
 
         public string Acronym { get; }
 
+        public int Length { get; }
+
         public Phrase(IEnumerable<string> words)
         {
             Words = words.ToList();
             Acronym = GetWordOrAcronym(Words);
             myHashCode = Words.Aggregate(0, (sum, word) => sum ^ word.GetHashCode());
+            Length = Words.Sum(x => x.Length) + Words.Count - 1;
         }
 
         public override bool Equals(object? obj)
