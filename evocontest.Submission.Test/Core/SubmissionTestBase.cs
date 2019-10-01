@@ -6,18 +6,18 @@ namespace evocontest.Submission.Test.Core
     /// Rules:
     /// - Word: >=2 character long string of lowercase [a-z] letters.
     /// - Acronym: >=2 character long string formed from words and acronyms. Only UPPERCASE [A-Z] letters.
-    ///     - Acronyms can be formed from words by taking the first letter of each.
+    ///     - Acronyms can be formed from words by taking the first letter of each in Uppercase.
     ///         E.g.: apple + pear = AP
     ///     - Acronyms can be joined to form a new acronym.
     ///         E.g.: AB + CD = ABCD
-    ///     - Acronyms and words can be joined to form a new acronym.
+    ///     - Acronyms and words can also be joined to form a new acronym.
     ///         E.g.: apple + BC + date = ABCD
+    ///     - An acronym can only be formed, when it occurs multiple times throughout the text.
     /// - Sentence: >=1 word long string terminated by '.', where words are separated by ' '.
     /// - Text: >=0 sentence long string where sentences are separated by ' '.
     /// 
-    /// 3. make rule, that longer abbreviations are replaced first
-    /// Longer = number of words, or first occurence
-    /// no overlap allowed
+    /// Input data:
+    /// - Different acronyms will not overlap
     /// </summary>
     public abstract class SubmissionTestBase : TestBase
     {
@@ -28,7 +28,7 @@ namespace evocontest.Submission.Test.Core
         }
 
         [Test]
-        public void Solve_NoAbbreviation_SameOutput()
+        public void Solve_NoAcronym_SameOutput()
         {
             const string input = "sample text without abbreviation.";
             const string expected = input;
@@ -75,7 +75,7 @@ namespace evocontest.Submission.Test.Core
             const string expected = "PDS. PDSH. PDSH.";
             AssertSolve(input, expected);
         }
-        
+
         [Test]
         public void Solve_SubsetPhrase_ParentAndChildIsReplaced3()
         {
@@ -85,15 +85,16 @@ namespace evocontest.Submission.Test.Core
         }
 
         [Test]
-        public void Solve_ConflictingWordAndAcronym_ConflictingWordNotReplaced()
+        public void Solve_LowercaseAcronym_NotReplaced()
         {
-            const string input = "aa bb aa bb. AB cc AB cc. ab cc.";
-            const string expected = "AB AB. ABC ABC. ab cc.";
+            const string input = "aa pp pp ll ee. APPLE. appl ee.";
+            const string expected = "APPLE. APPLE. appl ee.";
+
             AssertSolve(input, expected);
         }
 
         [Test]
-        public void Solve_ConflictingAbbreviations_NotReplaced()
+        public void Solve_ConflictingAcronyms_NotReplaced()
         {
             string input = "tim cook. tim cook. total commander. total commander.";
             string expected = "tim cook. tim cook. total commander. total commander.";
@@ -101,21 +102,38 @@ namespace evocontest.Submission.Test.Core
         }
 
         [Test]
-        public void Solve_ConflictingAbbreviations_NotReplaced2()
+        public void Solve_ConflictingAcronyms_NotReplaced2()
         {
-            const string input = "apple banana cold. apple banana cold AB connor. AB connor.";
+            // "ABC" is conflictiong for "AB cold" and "AB connor"
+            // "AB" is not conflicting.
+
+            const string input = "apple banana cold. apple banana cold AB connor. apple banana connor.";
             const string expected = "AB cold. AB cold AB connor. AB connor.";
             AssertSolve(input, expected);
         }
 
         [Test]
-        public void Solve_PartiallyConflictingAbbreviations_AreReplaced()
+        public void Solve_PartiallyConflictingAcronyms_ConflictedPartNotReplaced()
         {
+            // "BC" is conflicting for "bb cc", "bx cx".
+            // "ABC" is not conflicting.
+
+            const string input = "aa BC. aa bb cc. bx cx. bx cx.";
+            const string expected = "ABC. ABC. bx cx. bx cx.";
+            AssertSolve(input, expected);
+        }
+
+        [Test]
+        public void Solve_PartiallyConflictingButDifferentAcronyms_AreReplaced()
+        {
+            // "AA" is conflicting for "apple apple", "aa aa"
+            // "AAP" and "AAC" are not conflicting.
+
             const string input = "apple apple pear apple apple pear. aa aa cc aa aa cc.";
             const string expected = "AAP AAP. AAC AAC.";
             AssertSolve(input, expected);
         }
-
+        
         [Test]
         public void Solve_PhraseWithPrefix_PrefixedWordNotReplaced()
         {
@@ -127,7 +145,8 @@ namespace evocontest.Submission.Test.Core
         [Test]
         public void Solve_PhraseWithSuffix_NoneReplaced()
         {
-            // SP would be conflicting for "simple phrase" and "simple phrases"
+            // "SP" would be a conflicting acronym for both "simple phrase" and "simple phrases"
+
             const string input = "simple phrase. simple phrase. simple phrases.";
             const string expected = "simple phrase. simple phrase. simple phrases.";
             AssertSolve(input, expected);
