@@ -50,7 +50,7 @@ namespace evocontest.Runner.Host.Connection
                     .WithAutomaticReconnect()
                     .ConfigureLogging(options => options.AddConsole().SetMinimumLevel(LogLevel.Error))
                     .Build();
-                return HubProxy.Create<IWorkerHubServer, IWorkerHubClient>(myHubConn, client);
+                return HubProxy.Create(myHubConn, client);
             });
             WorkerHubServer = hubProxy;
 
