@@ -3,7 +3,7 @@ using evocontest.Runner.RaspberryPiUtilities;
 
 namespace evocontest.Runner.Host.Core
 {
-    public class DummyEpaperDisplay : IEpaperDisplay, IResolvable
+    public class DummyEpaperDisplay : IEpaperDisplay
     {
         public bool IsInitialized => true;
 

@@ -42,10 +42,10 @@ namespace evocontest.WebApp.Areas.Identity.Pages.Account.Manage
 
         public class InputModel
         {
-            [Required]
-            [EmailAddress]
-            [Display(Name = "New email")]
-            public string NewEmail { get; set; }
+            //[Required]
+            //[EmailAddress]
+            //[Display(Name = "New email")]
+            //public string NewEmail { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -61,7 +61,7 @@ namespace evocontest.WebApp.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
-                NewEmail = email,
+                //NewEmail = email,
             };
 
             IsEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
