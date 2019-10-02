@@ -22,6 +22,16 @@ namespace evocontest.WebApp.Controllers
             return View();
         }
 
+        public IActionResult Info()
+        {
+            return View();
+        }
+
+        public IActionResult Rules()
+        {
+            return View();
+        }
+
         public async Task<IActionResult> Rankings()
         {
             var matches = await myDb.Matches

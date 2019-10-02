@@ -1,0 +1,112 @@
+﻿
+@{
+    ViewData["Title"] = "Info";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Head
+{
+    <style>
+        h2 {
+            margin-top: 1em;
+        }
+    </style>
+}
+
+<h1>Információk</h1>
+
+<img src="~/pic/Paper Shredding.png" style="float: right; margin-left: 2em" width="400" />
+<h2>Bevezető</h2>
+<p>
+    Bajban vannak a celebek az ország legnagyobb szoftverházában. Hiába bővítgették rendületlenül az SWRS-t, SWAS-t, MRS-t, SITS-t, CDS-t és más hasznos dokumentációikat, azok hatalmas méretük miatt egyre kezelhetetlenebbé váltak. A helyzet odáig fajult, hogy a fejlesztők már nem is hajlandók elolvasni őket! Valamit tenni kell.
+</p>
+<p>
+    Rövidítések! Ha a hosszú ismétlődő kifejezéseket betűszavakra cserélnénk, a doksik újra vállalható hosszúak lennének, és a talán még a fejlesztők is újra magukévá tennék az olvasás élményét...
+</p>
+
+<h2>A feladat</h2>
+<p>
+    Készíts egy algoritmust, ami egy folyószövegben lecseréli az ismétlődő kifejezéseket betűszavakra, majd az így keletkező szöveggel visszatér!
+</p>
+<p>
+    Például:
+    <pre>
+&nbsp;&nbsp;<span class="font-weight-bold">Bemenet:</span> "<span class="text-danger font-weight-bold">component design specification</span>. az egy write only dokumentum. pedig a <span class="text-danger font-weight-bold">component design specification</span> olvasasa hasznos."
+&nbsp;&nbsp;<span class="font-weight-bold">Kimenet:</span> "<span class="text-danger font-weight-bold">CDS</span>. az egy write only dokumentum. pedig a <span class="text-danger font-weight-bold">CDS</span> olvasasa hasznos."
+</pre>
+</p>
+<p>
+    A bemenő adat mondatokból, szavakból és betűszavakból áll, az angol ABC karaktereit felhasználva. Részletes leírást a <a asp-controller="Home" asp-action="Rules">Szabályok</a> oldalon találsz.
+</p>
+
+<h2>SDK</h2>
+<div style="width: 25em; margin-left:1em; float:right">
+    <h5 style="text-align: center">Letöltés</h5>
+    <a class="btn btn-block btn-outline-primary" href="git-client://clone?repo=https%3A%2F%2Fgithub.com%2Fsanraith%2Fevocontest-sdk">Megnyitás Visual Studio-ban</a>
+    <a class="btn btn-block btn-outline-secondary" href="https://github.com/sanraith/evocontest-sdk">Megnyitás GitHub-on</a>
+    <a class="btn btn-block btn-outline-secondary" href="https://github.com/sanraith/evocontest-sdk/archive/master.zip">Letöltés ZIP-ként</a>
+</div>
+<p>
+    A jelentkezéshez le kell töltened a verseny SDK-ját. Az SDK tartalmazza a megoldás
+    <ul>
+        <li>elkészítéséhez <code>(evocontest.Submission)</code></li>
+        <li>tanulmányozásához <code>(evocontest.Submission.Sample)</code></li>
+        <li>kipróbálásához <code>(evocontest.Submission.Runner)</code></li>
+        <li>és teszteléséhez <code>(evocontest.Submission.Test)</code></li>
+    </ul>
+    szükséges projekteket. A letöltéshez válaszd ki a jobb oldali linkek valamelyikét!
+</p>
+
+<h2>Jelentkezés</h2>
+<p>
+    A versenyre jelentkezni regisztráció/bejelentkezés után a <a asp-controller="User" asp-action="Submit">Feltöltés</a> menüpont alatt tudsz.<br />
+    Itt kell feltöltened a megoldásodat, ami:
+    <ul>
+        <li>Az <code>evocontest.Submission.dll</code> szerelvény <code>Release - Any CPU</code> módban buildelve.</li>
+        <li>Egyetlen <code>evocontest.Common.ISolution</code> interfészt implementáló osztályt tartalmaz.</li>
+        <li>Az <code>evocontest.Common</code> projekt és a .NET Core 3.0 keretrendszeren kívül nincs más függősége.</li>
+    </ul>
+</p>
+<p>
+    Feltöltés után a megoldásod automatikus ellenőrzéseken esik át.
+    Sikeres ellenőrzés után a megoldásod aktív lesz, és részt fog venni a napi megmérettetéseken.
+    A nevezési időszak alatt a megoldásodat teszőleges alkalommal lecserélheted. A döntőben az utolsó feltöltött megoldás vesz részt.
+</p>
+
+<img src="~/pic/raspberry-pi-4-1_1024x1024.webp" style="float:right" width="250" />
+<h2>A verseny menete</h2>
+<p>
+    A nevezési időszak alatt minden nap megküzdenek egymással a benevezett megoldások.
+    A résztvevőket futási idejük alapján naponta <a asp-controller="Home" asp-action="Rankings">Rangsoroljuk</a>.
+    Minden nap az aznap 10:00-ig benevezett DLL-ek játszanak.
+</p>
+<p>
+    A megoldások egy <code>Raspberry Pi 4 (4GB)</code> számítógépen, <code>Raspbian 10 (buster) 32bit</code> oprendszeren, sandboxolt környezetben futnak.
+</p>
+<p>
+    A rangsor csupán informatív célokat szolgál, a végeredményt kizárólag a döntő határozza meg.
+    Érdemes azonban minél több nap rész venni a rangsorban, mivel a megoldásod teljesítménye a futtató környezetben
+    jelentősen eltérhet sajátodhoz képest.
+</p>
+<p>
+    A döntő a miskolci evosoft egy tárgyalójában, élőben fog zajlani, a napi összecsapásokkal megegyező szabályokkal.
+</p>
+
+<h2>Díjazás</h2>
+<p>
+    A felbecsülhetetlen értékű dicsőség mellett a dobogós résztvevők értékes nyereményben is részesülnek:
+    <ul style="list-style-position: inside;">
+        <li>Első helyezett: <span class="font-weight-bold" style="color: darkgoldenrod">Johnnie Walker Gold Label</span></li>
+        <li>Második helyezett: <span class="font-weight-bold">Johnnie Walker Black Label</span></li>
+        <li>Harmadik helyezett: <span class="font-weight-bold" style="color: darkred">Johnnie Walker Red Rye Finish</span></li>
+    </ul>
+</p>
+
+<h2>Időzítés</h2>
+<p>
+    <ul>
+        <li>Kickoff: <span class="font-weight-bold">október 4.</span></li>
+        <li>Nevezési időszak: <span class="font-weight-bold">október 4-21.</span></li>
+        <li>Döntő: <span class="font-weight-bold">október 22.</span></li>
+    </ul>
+</p>

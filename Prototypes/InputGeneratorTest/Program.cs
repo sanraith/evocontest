@@ -13,8 +13,8 @@ namespace InputGeneratorTest
     {
         static void Main(string[] args)
         {
-            //Test4();
-            Test5();
+            Test4();
+            //Test5();
         }
 
         private static void Test5()

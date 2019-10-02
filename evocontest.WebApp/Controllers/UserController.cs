@@ -32,7 +32,12 @@ namespace evocontest.WebApp.Controllers
 
         public IActionResult Index() => RedirectToAction(nameof(Submit));
 
-        public async Task<IActionResult> Submit()
+        public IActionResult Submit()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> CurrentSubmission()
         {
             var user = await myUserManager.GetUserAsync(HttpContext.User);
             var latestSubmission = myDb.Query(user, u => u.Submissions).OrderBy(x => x.UploadDate).LastOrDefault(x => !x.IsDeleted);

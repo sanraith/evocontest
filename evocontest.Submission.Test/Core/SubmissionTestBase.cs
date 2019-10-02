@@ -55,32 +55,8 @@ namespace evocontest.Submission.Test.Core
         [Test]
         public void Solve_ComplexPhrases_AreReplaced()
         {
-            const string input = "aa bb cc dd. aa bb cc dd. aa BCD. ABC dd.";
-            const string expected = "ABCD. ABCD. ABCD. ABCD.";
-            AssertSolve(input, expected);
-        }
-
-        [Test]
-        public void Solve_SubsetPhrase_ParentAndChildIsReplaced()
-        {
-            const string input = "patient data service. patient data service handler. PDS handler.";
-            const string expected = "PDS. PDSH. PDSH.";
-            AssertSolve(input, expected);
-        }
-
-        [Test]
-        public void Solve_SubsetPhrase_ParentAndChildIsReplaced2()
-        {
-            const string input = "patient data service. patient data service handler. patient data service handler.";
-            const string expected = "PDS. PDSH. PDSH.";
-            AssertSolve(input, expected);
-        }
-
-        [Test]
-        public void Solve_SubsetPhrase_ParentAndChildIsReplaced3()
-        {
-            const string input = "patient data service handler. patient data service patient data service. patient data service handler.";
-            const string expected = "PDSH. PDS PDS. PDSH.";
+            const string input = "aa bb cc dd. aa BCD. ABC dd.";
+            const string expected = "ABCD. ABCD. ABCD.";
             AssertSolve(input, expected);
         }
 
@@ -126,10 +102,10 @@ namespace evocontest.Submission.Test.Core
         [Test]
         public void Solve_PartiallyConflictingButDifferentAcronyms_AreReplaced()
         {
-            // "AA" is conflicting for "apple apple", "aa aa"
+            // "AA" is conflicting for "apple applet", "aa aat"
             // "AAP" and "AAC" are not conflicting.
 
-            const string input = "apple apple pear apple apple pear. aa aa cc aa aa cc.";
+            const string input = "apple applet pear apple applet pear. aa aat cc aa aat cc.";
             const string expected = "AAP AAP. AAC AAC.";
             AssertSolve(input, expected);
         }

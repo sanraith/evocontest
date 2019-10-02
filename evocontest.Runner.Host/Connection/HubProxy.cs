@@ -16,7 +16,7 @@ namespace evocontest.Runner.Host.Connection
 
         public Task UpdateStatus(string submissionId, ValidationStateEnum state, string? error)
         {
-            return myHubConnection.SendCoreAsync(nameof(SendMessage), new object[] { submissionId, state, error });
+            return myHubConnection.SendCoreAsync(nameof(UpdateStatus), new object[] { submissionId, state, error });
         }
 
         private HubProxy(HubConnection hubConnection)

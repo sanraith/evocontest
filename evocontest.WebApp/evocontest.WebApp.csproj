@@ -50,6 +50,15 @@
     <ProjectReference Include="..\evocontest.WebApp.Common\evocontest.WebApp.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="wwwroot\pic\Paper Shredding.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\pic\raspberry-pi-4-1_1024x1024.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
   <Target Name="CopySignalR" BeforeTargets="AfterBuild">
     <ItemGroup>
       <SignalRJSClientFiles Include="$(MSBuildThisFileDirectory)node_modules\@aspnet\signalr\dist\browser\*" />

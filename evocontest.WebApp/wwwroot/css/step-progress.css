@@ -20,7 +20,7 @@
         text-align: center;
         display: table-cell;
         position: relative;
-        color: tomato;
+        color: midnightblue;
     }
 
         .multi-steps > li:before { /* node */
@@ -39,7 +39,7 @@
             font-weight: bold;
             border-width: 2px;
             border-style: solid;
-            border-color: tomato;
+            border-color: midnightblue;
             border-radius: 50%;
         }
 
@@ -47,7 +47,7 @@
             content: '';
             height: 2px;
             width: 100%;
-            background-color: tomato;
+            background-color: midnightblue;
             position: absolute;
             top: 16px;
             left: 50%;
@@ -60,7 +60,7 @@
 
         .multi-steps > li.is-active:before { /* node for active */
             background-color: #fff;
-            border-color: tomato;
+            border-color: midnightblue;
         }
 
         .multi-steps > li.is-active ~ li { /* Text after active */

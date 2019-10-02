@@ -15,7 +15,7 @@ $(function () {
         $(".is-done").removeClass("is-done");
         if (isValid === null) {
             $("#progressItem-" + index).addClass("is-active");
-        } else if (isValid) { 
+        } else if (isValid) {
             $("#progressItem-" + index).addClass("is-done");
         } else {
             $("#progressItem-" + index).addClass("is-active"); // TODO error state
@@ -55,7 +55,8 @@ $(function () {
         setProgressDisplay(false);
         if (event.target.status == 200) {
             setProgressItemActive(2);
-            countDown("Sikeres feltöltés.");
+            reloadForm();
+            //countDown("Sikeres feltöltés.");
         } else {
             var result;
             try {
@@ -142,6 +143,11 @@ $(function () {
         });
     }
 
+    function reloadForm() {
+        $("#submitContent").load("CurrentSubmission", () => initUploadForm());
+        //initUploadForm();
+    }
+
     const connection = new signalR.HubConnectionBuilder()
         .withUrl("/userhub")
         .build();
@@ -152,7 +158,8 @@ $(function () {
 
     connection.on("UpdateUploadStatus", (state, isValid, error) => {
         setProgressItemActive(state, isValid);
+        reloadForm();
     });
 
-    initUploadForm();
+    reloadForm();
 });

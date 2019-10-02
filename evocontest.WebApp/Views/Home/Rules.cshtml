@@ -1,0 +1,120 @@
+﻿
+@{
+    ViewData["Title"] = "Rules";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Head
+{
+    <style>
+        h2 {
+            margin-top: 1.5em;
+        }
+
+        h5 {
+            margin-top: 2em;
+        }
+    </style>
+}
+
+<h1>Szabályok</h1>
+<h2>Feladat</h2>
+<p>
+    A feladat a bemenő szövegben lecseréli az ismétlődő kifejezéseket betűszavakra, majd az így keletkező szöveggel visszatérni.
+    <ul>
+        <li>Egy inputra kizárólag egy helyes megoldás létezik.</li>
+        <li>A különböző rövidítendő kifejezések szavai között nincs átfedés.</li>
+        <li>Egy rövidítendő kifejezés szavai egyediek.</li>
+    </ul>
+    Az alábbi szabályokat az <code>evocontest.Submission.Test</code> projektben található unit tesztek is magukba foglalják.
+</p>
+
+<h5>Definíciók</h5>
+<ul>
+    <li><b>Szó:</b> 2..10 karakterből álló string, kizárólag az angol ABC kisbetűit [a-z] használva.</li>
+    <li><b>Betűszó/rövidítés:</b> >=2 karakterből álló string, kizárólag az angol ABC nagybetűit [A-Z] használva.</li>
+    <li><b>Kifejezés:</b> >=2 szóból/betűszóból álló string, a szavakat/betűszavakat szóközzel (' ') elválaszva.</li>
+    <li><b>Mondat:</b> >=1 szóból/betűszóból álló string, a szavakat/betűszavakat szóközzel (' ') elválaszva, a végén pont ('.') karakterrel.</li>
+    <li><b>Szöveg:</b> >=0 mondatból álló string, a mondatokat szóközzel (' ') elválaszva. Hossza 0..134217728 karakter.</li>
+</ul>
+
+<h5>Rövidítések</h5>
+
+<p>
+    Azokat a kifejezéseket, amelyek legalább 2-szer előfordulnak a szövegben, betűszóval kell helyettesíteni. A rövidítések módja:
+    <ul>
+        <li>
+            Több szóból álló kifejezés helyettesíthető a szavak első betűiből készített betűszóval.<br />
+            <code>"apple pear. apple pear."</code> =&gt;<br />
+            <code>"AP. AP."</code>
+        </li>
+        <li>
+            Több betűszóból álló kifejezés leírható egy betűszóként.<br />
+            <code>"AB CD. AB CD."</code> =&gt;<br />
+            <code>"ABCD. ABCD."</code>
+        </li>
+        <li>
+            Szavakból és betűszavakból álló kifejezés leírható egy betűszóként.<br />
+            <code>"apple BC date. apple BC date."</code> =&gt;<br />
+            <code>"ABCD. ABCD."</code>
+        </li>
+    </ul>
+
+</p>
+
+<h5>Ütköző rövidítések kizárva</h5>
+<p>
+    <span class="font-weight-bold">Ha egy szövegben több különböző kifejezésnek is ugyanaz a rövidítése, akkor azokat nem lehet lerövidíteni.</span>
+    <div class="border-left" style="padding-left: 1em; margin-top: -1em">
+        <code>bemenet: "tim cook. tim cook. total commander. total commander."</code><br />
+        <code>kimenet: "tim cook. tim cook. total commander. total commander."</code><br />
+    </div>
+    Itt mindkét ismétlődő kifejezésnek <code>TC</code> lenne a rövidítése, így azokat nem szabad helyettesíteni.
+</p>
+<p>
+    <span class="font-weight-bold">Két kifejezésnek lehet közös ütköző része, ha egyébként megkülönböztethetőek.</span>
+    <div class="border-left" style="padding-left: 1em; margin-top: -1em">
+        <code>bemenet: "<span class="font-weight-bold">apple applet</span> pear <span class="font-weight-bold">apple applet</span> pear. <span class="font-weight-bold">aa aat</span> cc <span class="font-weight-bold">aa aat</span> cc."</code><br />
+        <code>kimenet: "AAP AAP. AAC AAC."</code><br />
+    </div>
+    Itt az <code>apple applet</code> és <code>aa aat</code> rövidítése megegyezik, de az <code>apple applet pear</code> és <code>aa aat cc</code> kifejezéseknek már különböző a rövidítésük.
+</p>
+<p>
+    <span class="font-weight-bold">Ha két kifejezésből az egyik (akár részlegesen) rövidítve van, attól még nem számítanak különbözőnek.</span>
+    <div class="border-left" style="padding-left: 1em; margin-top: -1em">
+        <code>bemenet: "aa bb cc dd. aa BCD. ABC dd."</code><br />
+        <code>kimenet: "ABCD. ABCD. ABCD."</code><br />
+    </div>
+    Itt mind a 3 kifejezés ugyanazokból a szavakból, vagy azok rövidítéséből áll, így nem számítanak ütközőnek.
+</p>
+
+<h5>Nincsenek se előtagok, toldalékok</h5>
+<p>
+    <span class="font-weight-bold">Egy kifejezést csak akkor lehet rövidíteni, ha a teljes szavakat le lehet cserélni.</span>
+    <div class="border-left" style="padding-left: 1em; margin-top: -1em">
+        <code>bemenet: "simple phrase. simple phrase. megasimple phrase."</code><br />
+        <code>kimenet: "SP. SP. megasimple phrase."</code><br />
+    </div>
+    Itt az előtaggal rendelkező <code><i>mega</i>simple</code> már új kifejezéshez tartozik.
+</p>
+<p style="margin-top:2em">
+    <div class="border-left" style="padding-left: 1em; margin-top: -1em">
+        <code>bemenet: "simple phrase. simple phrase. simple phrases."</code><br />
+        <code>kimenet: "simple phrase. simple phrase. simple phrases."</code><br />
+    </div>
+    Itt a toldalékkal rendelkező <code>phrase<b>s</b></code> már új kifejezéshez tartozik.
+</p>
+
+<h2>Futtatás</h2>
+<p>
+    Egy megoldás futtatása során egyre nehezebb bemenetekre kell kimenetet adnia.
+    A futtatás körökre osztott. Egy körben több (~20) különböző, de azonos nehézségű inputra
+    kell eredményt számolnia a megoldásnak. Ha ez nem sikerül a megadott időn (~1000ms) belül,
+    akkor a megoldás kiesik, és az előző nehézségi fokon elért eredménye lesz érvényes.
+</p>
+
+<h2>Egyebek</h2>
+<p>
+    Tilos a csalás. Tilos a bármilyen módon befolyásolni a futtató környezet működését.
+    A szervező fenntartja a jogot, hogy szükség esetén változtatásokat eszközöljön a szabályokban. Bármilyen vitás helyzetben a szervező jogosult döntést hozni.
+</p>

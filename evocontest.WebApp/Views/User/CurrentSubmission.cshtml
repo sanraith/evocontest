@@ -1,0 +1,70 @@
+﻿@using evocontest.WebApp.Controllers;
+@using evocontest.WebApp.Common;
+@model evocontest.WebApp.ViewModels.SubmitViewModel
+@{
+    //ViewData["Title"] = "Feltöltés";
+    Layout = null;
+    var sub = Model.LatestSubmission;
+
+    var bgClass = "";
+    if (sub?.ValidationState == ValidationStateEnum.Completed)
+    {
+        bgClass = "border-success";
+    }
+    else if (!string.IsNullOrWhiteSpace(sub?.Error))
+    {
+        bgClass = "border-warning";
+    }
+}
+
+@if (sub != null)
+{
+    @using (Html.BeginForm(nameof(UserController.DoDelete), "User", new { submissionId = sub.Id }, FormMethod.Post))
+    {
+        <div class="card-header border @bgClass" style="border-width: 3px !important">
+            <p>
+                Feltöltött dll: @sub.OriginalFileName <br />
+                Ellenőrzés:
+                @if (!sub.IsValid.HasValue)
+                {
+                    <span class="spinner-border spinner-border spinner-border-sm" role="status"></span>
+                }
+                @(sub.IsValid.HasValue ? (sub.IsValid.Value ? "kész." : "sikertelen!") : " folyamatban...") <br />
+
+                @if (sub.IsValid == false)
+                {
+                    <span class="font-weight-bold">@(sub.Error)</span><br />
+                }
+            </p>
+            <p>
+                <input type="submit" value="Másik DLL feltöltése" style="width: 15em;"
+                       class="btn btn-outline-dark"
+                       onclick="return confirm('Biztos törölni szeretnéd a benevezett DLL-ed?')" />
+            </p>
+            @if (!sub.IsValid.HasValue)
+            {
+                <p>
+                    <span class="small">
+                        Általában ez a lépés 1 perc alatt kész. Ha nem szeretnél várni, bezárhatod az oldalt.<br />
+                        Ha 1 óra után sem változik a helyzet, akkor próbáld meg újból feltölteni a dll-ed.
+                    </span>
+                </p>
+            }
+        </div>
+    }
+}
+else
+{
+    <div class="card-header">
+        @using (Html.BeginForm(nameof(UserController.DoUpload), "User", FormMethod.Post, new { id = "upload_form", @class = "upload_form", enctype = "multipart/form-data" }))
+        {@:
+            <h5>Válaszd ki a feltöltendő .dll fájlt!</h5>
+            <input type="file" name="file1" style="width: 40em"><br />
+            <input type="submit" class="btn btn-primary" value="Feltöltés" disabled="disabled" style="display:none;" /><br />
+            <progress value="0" max="100" style="width:300px; display:none;"></progress>
+            <h3 class="upload_form_status"></h3>
+            <p class="upload_form_progress_status"></p>
+            <span id="btn-back" style="display:none">@Html.ActionLink("Vissza", nameof(UserController.Submit))</span>
+        }
+    </div>
+}

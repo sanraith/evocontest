@@ -50,19 +50,23 @@
                     <partial name="_LoginPartial" />
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            @*<a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>*@
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Info">A versenyről</a>
                         </li>
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            <li>
-                                <a class="nav-link text-dark font-weight-bold" asp-area="" asp-controller="User" asp-action="Submit">Submit</a>
-                            </li>
-                            <li>
-                                <a class="nav-link text-dark font-weight-bold" asp-area="" asp-controller="User" asp-action="Stats">Stats</a>
-                            </li>
-                        }
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Rankings">Rankings</a>
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Rules">Szabályok</a>
+                        </li>
+                        @*@if (User.Identity.IsAuthenticated)
+                        {*@
+                            <li>
+                                <a class="nav-link text-dark font-weight-bold" asp-area="" asp-controller="User" asp-action="Submit">Feltöltés</a>
+                            </li>
+                            @*<li>
+                                    <a class="nav-link text-dark font-weight-bold" asp-area="" asp-controller="User" asp-action="Stats">Statisztikák</a>
+                                </li>*@
+@*                        }*@
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Rankings">Rangsor</a>
                         </li>
                         @if (User.IsInRole("Admin"))
                         {
@@ -84,6 +88,9 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
+            <div class="float-right">
+                Bármilyen kérdés, észrevétel, hiba esetén írj az <a href="mailto:evocontest@evosoft.com">evocontest@evosoft.com</a> címre!
+            </div>
             &copy; evocontest 2019 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
