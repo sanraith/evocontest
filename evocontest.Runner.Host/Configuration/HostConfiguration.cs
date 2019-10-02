@@ -9,12 +9,14 @@ namespace evocontest.Runner.Host.Configuration
 
         public bool UseEpaperDisplay { get; set; } = false;
 
+        public int SingleSolveTimeoutMillis { get; set; } = 5000;
+
         public Directories Directories { get; set; } = new Directories();
 
         public CustomProcessStartInfo WorkerProcessInfo { get; set; } = new CustomProcessStartInfo();
 
         public LoginInformation Login { get; set; } = new LoginInformation();
-        
+
         public static HostConfiguration Load()
         {
             IConfiguration config = new ConfigurationBuilder()

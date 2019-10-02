@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using evocontest.Runner.Common.Connection;
 using evocontest.Runner.Common.Messages.Request;
 using evocontest.Runner.Common.Messages.Response;
+using evocontest.Runner.Common.Utility;
 using evocontest.Runner.Host.Configuration;
 using evocontest.Runner.Host.Connection;
 using evocontest.Runner.Host.Core;
@@ -51,14 +52,14 @@ namespace evocontest.Runner.Host.Workflow
                 status = ValidationStateEnum.Static;
 
                 await myServer.UpdateStatus(submissionId, status, null);
-                success = await TimedTask(loadTimeout, () => myLoadSubmissionStep.ExecuteAsync(myPipeServer, targetFile));
+                success = await TaskHelper.TimedTask(loadTimeout, () => myLoadSubmissionStep.ExecuteAsync(myPipeServer, targetFile));
 
                 // Run unit tests
                 if (success)
                 {
                     status = ValidationStateEnum.UnitTest;
                     await myServer.UpdateStatus(submissionId, status, null);
-                    var unitTestResult = await TimedTask(unitTestTimeout, RunUnitTestsInWorker);
+                    var unitTestResult = await TaskHelper.TimedTask(unitTestTimeout, RunUnitTestsInWorker);
                     success = unitTestResult.IsAllPassed;
                     errorMessage = $"Helytelen eredmény a következő unit testekre: {string.Join(", ", unitTestResult.FailedTests)}";
                 }
@@ -79,40 +80,6 @@ namespace evocontest.Runner.Host.Workflow
                 var response = myPipeServer.ReceiveMessage();
                 return (UnitTestResultMessage)response;
             });
-        }
-
-        private static Task TimedTask(TimeSpan timeout, Func<Task> taskFunc)
-        {
-            return TimedTask(timeout, () => taskFunc().ContinueWith(_ => true));
-        }
-
-        private static async Task<TResult> TimedTask<TResult>(TimeSpan timeout, Func<Task<TResult>> workTaskGenerator)
-        {
-            Exception? disqualifyException = null;
-            Task<TResult> workTask;
-            Task timerTask;
-
-            try
-            {
-                timerTask = Task.Delay(timeout);
-                workTask = workTaskGenerator();
-                var completedTask = await Task.WhenAny(timerTask, workTask);
-                var success = workTask.Equals(completedTask);
-                if (success)
-                {
-                    return workTask.Result;
-                }
-            }
-            catch (Exception ex)
-            {
-                disqualifyException = ex;
-            }
-            finally
-            {
-                // TODO cancel task?
-            }
-
-            throw disqualifyException ?? new TimeoutException();
         }
 
         private PipeServer myPipeServer;

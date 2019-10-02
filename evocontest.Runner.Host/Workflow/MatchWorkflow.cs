@@ -1,6 +1,8 @@
 ﻿using evocontest.Runner.Common.Extensions;
 using evocontest.Runner.Common.Generator;
 using evocontest.Runner.Common.Messages.Response;
+using evocontest.Runner.Common.Utility;
+using evocontest.Runner.Host.Configuration;
 using evocontest.Runner.Host.Connection;
 using evocontest.Runner.Host.Core;
 using evocontest.Runner.Host.Extensions;
@@ -18,7 +20,7 @@ namespace evocontest.Runner.Host.Workflow
     public class MatchWorkflow : IResolvable
     {
         public MatchWorkflow(WebAppConnector webApp, DownloadSubmissionStep downloadStep, SetupEnvironmentStep setupEnvironmentStep,
-            StartWorkerProcessStep startWorkerProcessStep, LoadSubmissionStep loadSubmissionStep, MeasureSolveStep measureSolveStep)
+            StartWorkerProcessStep startWorkerProcessStep, LoadSubmissionStep loadSubmissionStep, MeasureSolveStep measureSolveStep, HostConfiguration config)
         {
             myWebApp = webApp;
             myDownloadStep = downloadStep;
@@ -26,6 +28,7 @@ namespace evocontest.Runner.Host.Workflow
             myStartWorkerProcessStep = startWorkerProcessStep;
             myLoadSubmissionStep = loadSubmissionStep;
             myMeasureSolveStep = measureSolveStep;
+            myConfig = config;
         }
 
         public async Task ExecuteAsync()
@@ -93,17 +96,24 @@ namespace evocontest.Runner.Host.Workflow
                 var timeSum = new TimeSpan();
 
                 // TODO Warmup
-                _ = await myMeasureSolveStep.ExecuteAsync(pipeServer, GeneratorResult.Empty);
+                _ = await TaskHelper.TimedTask(myConfig.SingleSolveTimeoutMillis, () => myMeasureSolveStep.ExecuteAsync(pipeServer, GeneratorResult.Empty));
 
                 // TODO double check time
                 // TODO check result
                 foreach (var input in inputs)
                 {
-                    var result = await myMeasureSolveStep.ExecuteAsync(pipeServer, input);
+                    var result = await TaskHelper.TimedTask(myConfig.SingleSolveTimeoutMillis, () => myMeasureSolveStep.ExecuteAsync(pipeServer, input));
                     switch (result)
                     {
-                        case MeasureSolveResultMessage solveMsg: timeSum += solveMsg.Time; break;
-                        case OperationFailedMessage failMsg: Console.WriteLine(failMsg.ErrorMessage); timeSum += TimeSpan.FromDays(1); break;
+                        case MeasureSolveResultMessage solveMsg:
+                            // TODO handle invalid case 
+                            var isSolutionValid = solveMsg.Output == input.Solution;
+                            timeSum += solveMsg.Time;
+                            break;
+                        case OperationFailedMessage failMsg:
+                            Console.WriteLine(failMsg.ErrorMessage);
+                            timeSum += TimeSpan.FromDays(1);
+                            break;
                         default: throw new InvalidOperationException(result.ToString());
                     }
                 }
@@ -111,32 +121,6 @@ namespace evocontest.Runner.Host.Workflow
 
                 return round;
             }
-        }
-
-        private List<MeasurementContainer> GenerateDummyResults(List<DownloadedSubmission> downloadedSubmissions)
-        {
-            var random = new Random();
-            var measurements = new List<MeasurementContainer>();
-            foreach (var submission in downloadedSubmissions)
-            {
-                var measurement = new MeasurementContainer
-                {
-                    SubmissionId = submission.Data.Id,
-                    Rounds = new List<MeasurementRoundContainer>()
-                };
-                var max = random.Next(1, 4);
-                for (int i = 0; i < max; i++)
-                {
-                    var round = new MeasurementRoundContainer
-                    {
-                        DifficultyLevel = i,
-                        TotalMilliseconds = random.Next(10, 501)
-                    };
-                    measurement.Rounds.Add(round);
-                }
-                measurements.Add(measurement);
-            }
-            return measurements;
         }
 
         private sealed class DownloadedSubmission
@@ -158,5 +142,6 @@ namespace evocontest.Runner.Host.Workflow
         private readonly StartWorkerProcessStep myStartWorkerProcessStep;
         private readonly LoadSubmissionStep myLoadSubmissionStep;
         private readonly MeasureSolveStep myMeasureSolveStep;
+        private readonly HostConfiguration myConfig;
     }
 }
