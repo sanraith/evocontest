@@ -38,7 +38,7 @@ namespace InputGeneratorTest
 
                     PhraseLength = new MinMaxPair(2, Math.Max(10, length / 500)),
                     PhraseCount = new MinMaxPair(Math.Max(1, length / 2000), Math.Max(1, length / 100)),
-                    PhraseCollapseChance = .1,
+                    PhraseCollapseChance = .2,
                     PhraseRepeatCount = new MinMaxPair(2, Math.Max(2, length / 1000)),
 
                     DecoyPhraseCount = new MinMaxPair(Math.Max(1, length / 2000), Math.Max(1, length / 200)),
@@ -55,7 +55,7 @@ namespace InputGeneratorTest
 
                     PhraseLength = new MinMaxPair(2, Math.Max(10, length2 / 500)),
                     PhraseCount = new MinMaxPair(Math.Max(1, length2 / 400), Math.Max(1, length2 / 200)),
-                    PhraseCollapseChance = .1,
+                    PhraseCollapseChance = .2,
                     PhraseRepeatCount = new MinMaxPair(2, Math.Max(2, length2 / 1000)),
 
                     DecoyPhraseCount = new MinMaxPair(Math.Max(1, length2 / 1000), Math.Max(1, length2 / 500)),
@@ -86,7 +86,7 @@ namespace InputGeneratorTest
 
                     PhraseLength = new MinMaxPair(2, Math.Max(5, (int)Math.Sqrt(length3 / 200))),
                     PhraseCount = new MinMaxPair(Math.Max(1, length3 / 900), Math.Max(1, length3/600)),
-                    PhraseCollapseChance = .1,
+                    PhraseCollapseChance = .2,
                     PhraseRepeatCount = new MinMaxPair(2, Math.Max(2,(int)Math.Sqrt( length3 / 5000))),
 
                     DecoyPhraseCount =new MinMaxPair(Math.Max(1, length3 / 1600), Math.Max(1, length3/1300)),// new MinMaxPair(0),// new MinMaxPair(Math.Max(1, length3 / 1000), Math.Max(1, length3 / 500)),
@@ -103,7 +103,7 @@ namespace InputGeneratorTest
 
                     PhraseLength = new MinMaxPair(2, Math.Max(5, (int)Math.Sqrt(length4 / 200))),
                     PhraseCount = new MinMaxPair(Math.Max(1, length4 / 7500), Math.Max(1, length4/6000)),
-                    PhraseCollapseChance = .1,
+                    PhraseCollapseChance = .2,
                     PhraseRepeatCount = new MinMaxPair(2, Math.Max(2,(int)Math.Sqrt( length4 / 8000))),
 
                     DecoyPhraseCount =new MinMaxPair(Math.Max(1, length4 / 8000), Math.Max(1, length4/7500)),// new MinMaxPair(0),// new MinMaxPair(Math.Max(1, length4 / 1000), Math.Max(1, length4 / 500)),

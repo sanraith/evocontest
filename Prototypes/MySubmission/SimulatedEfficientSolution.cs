@@ -1,6 +1,8 @@
 ﻿using evocontest.Common;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MySubmission
 {
@@ -8,20 +10,28 @@ namespace MySubmission
     {
         public string Solve(string input)
         {
-            var wrongButFastSolution = string.Create(input.Length - input.Replace(" ", "").Length, input, (span, state) =>
+            if (string.IsNullOrEmpty(input)) { return input; }
+            var rangePartitioner = Partitioner.Create(0, input.Length);
+            var bag = new ConcurrentBag<string>();
+            Parallel.ForEach(rangePartitioner, (range, loopstate) =>
             {
-                var pos = 0;
-                var length = state.Length;
-                for (int i = 0; i < length; i++)
+                var view = input[range.Item1..range.Item2];
+                var part = string.Create(view.Length - view.Replace(" ", "").Length, view, (span, state) =>
                 {
-                    if (state[i] == ' ')
+                    var pos = 0;
+                    var length = state.Length;
+                    for (int i = 0; i < length; i++)
                     {
-                        span[pos++] = state[i + 1];
+                        if (state[i] == ' ')
+                        {
+                            span[pos++] = state[i];
+                        }
                     }
-                }
+                });
+                bag.Add(part);
             });
 
-            return wrongButFastSolution;
+            return string.Concat(bag);
         }
     }
 }
