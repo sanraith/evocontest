@@ -15,6 +15,7 @@ using Microsoft.Extensions.Hosting;
 using evocontest.WebApp.Core;
 using evocontest.WebApp.Hubs;
 using evocontest.WebApp.Common;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace evocontest.WebApp
 {
@@ -51,8 +52,7 @@ namespace evocontest.WebApp
                 options.Password.RequireUppercase = true;
                 options.Password.RequiredLength = 6;
                 options.Password.RequiredUniqueChars = 1;
-
-                options.SignIn.RequireConfirmedEmail = false; // TODO
+                options.SignIn.RequireConfirmedEmail = true;
             });
 
             services.AddControllersWithViews();
@@ -105,6 +105,7 @@ namespace evocontest.WebApp
         {
             services.AddTransient(typeof(IFileManager), typeof(FileManager));
             services.AddSingleton(typeof(IConfigurationValidator), typeof(ConfigurationValidator));
+            services.AddTransient(typeof(IEmailSender), typeof(EmailSender));
         }
     }
 }

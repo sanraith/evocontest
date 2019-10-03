@@ -126,7 +126,7 @@
     <comment>Confirm your email</comment>
   </data>
   <data name="LoginInvalidAttempt" xml:space="preserve">
-    <value>Hibás bejelentkezési adatok.</value>
+    <value>Sikertelen bejelentkezés. Megerősítetted az email címedet?</value>
     <comment>Invalid login attempt.</comment>
   </data>
 </root>
