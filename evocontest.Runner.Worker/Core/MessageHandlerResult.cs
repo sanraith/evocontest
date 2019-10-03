@@ -1,4 +1,4 @@
-﻿using evocontest.Runner.Common.Messages;
+﻿using evocontest.Runner.Host.Common.Messages;
 
 namespace evocontest.Runner.Worker.Core
 {

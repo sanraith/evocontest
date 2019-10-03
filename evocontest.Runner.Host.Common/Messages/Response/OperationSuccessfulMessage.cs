@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace evocontest.Runner.Common.Messages.Response
+namespace evocontest.Runner.Host.Common.Messages.Response
 {
     /// <summary>
     /// Informs the receiver that the handling of the target message was successful.

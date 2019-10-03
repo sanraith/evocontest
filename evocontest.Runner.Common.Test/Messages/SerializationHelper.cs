@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-using evocontest.Runner.Common.Messages;
+using evocontest.Runner.Host.Common.Messages;
 
 namespace evocontest.Runner.Common.Test.Messages
 {

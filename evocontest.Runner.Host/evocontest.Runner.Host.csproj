@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\evocontest.Runner.Common\evocontest.Runner.Common.csproj" />
+    <ProjectReference Include="..\evocontest.Runner.Host.Common\evocontest.Runner.Host.Common.csproj" />
     <ProjectReference Include="..\evocontest.Runner.RaspberryPiUtilities\evocontest.Runner.RaspberryPiUtilities.csproj" />
     <ProjectReference Include="..\evocontest.Runner.SubmissionEnvironment\evocontest.Runner.SubmissionEnvironment.csproj" />
     <ProjectReference Include="..\evocontest.Runner.Worker\evocontest.Runner.Worker.csproj" />

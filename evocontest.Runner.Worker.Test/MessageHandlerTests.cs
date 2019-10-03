@@ -1,4 +1,4 @@
-using evocontest.Runner.Common.Messages.Request;
+using evocontest.Runner.Host.Common.Messages.Request;
 using evocontest.Runner.Worker.Core;
 using NUnit.Framework;
 

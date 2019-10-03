@@ -1,7 +1,7 @@
 ﻿using System.IO.Pipes;
 using System.Threading.Tasks;
 
-namespace evocontest.Runner.Common.Connection
+namespace evocontest.Runner.Host.Common.Connection
 {
     public sealed class PipeServer : AbstractPipeConnection<NamedPipeServerStream>
     {

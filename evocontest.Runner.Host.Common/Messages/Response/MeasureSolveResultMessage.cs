@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace evocontest.Runner.Common.Messages.Response
+namespace evocontest.Runner.Host.Common.Messages.Response
 {
     [Serializable]
     public sealed class MeasureSolveResultMessage : AbstractMessage

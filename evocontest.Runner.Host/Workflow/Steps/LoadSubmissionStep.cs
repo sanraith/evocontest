@@ -1,7 +1,7 @@
-﻿using evocontest.Runner.Common.Connection;
-using evocontest.Runner.Common.Messages;
-using evocontest.Runner.Common.Messages.Request;
-using evocontest.Runner.Common.Messages.Response;
+﻿using evocontest.Runner.Host.Common.Connection;
+using evocontest.Runner.Host.Common.Messages;
+using evocontest.Runner.Host.Common.Messages.Request;
+using evocontest.Runner.Host.Common.Messages.Response;
 using evocontest.Runner.Host.Configuration;
 using evocontest.Runner.Host.Core;
 using System;

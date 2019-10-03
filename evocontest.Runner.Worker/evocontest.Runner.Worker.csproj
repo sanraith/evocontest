@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\evocontest.Common\evocontest.Common.csproj" />
     <ProjectReference Include="..\evocontest.Runner.Common\evocontest.Runner.Common.csproj" />
+    <ProjectReference Include="..\evocontest.Runner.Host.Common\evocontest.Runner.Host.Common.csproj" />
     <ProjectReference Include="..\evocontest.Submission.Test\evocontest.Submission.Test.csproj" />
     <ProjectReference Include="..\evocontest.Submission\evocontest.Submission.csproj" />
   </ItemGroup>

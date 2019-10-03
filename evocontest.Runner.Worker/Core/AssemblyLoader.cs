@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using evocontest.Runner.Common.Utility;
+using evocontest.Runner.Host.Common.Utility;
 
 namespace evocontest.Runner.Worker.Core
 {

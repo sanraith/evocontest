@@ -1,9 +1,9 @@
-﻿using evocontest.Runner.Common.Messages;
+﻿using evocontest.Runner.Host.Common.Messages;
 using System;
 using System.IO.Pipes;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace evocontest.Runner.Common.Connection
+namespace evocontest.Runner.Host.Common.Connection
 {
     public abstract class AbstractPipeConnection<TStream> : IDisposable where TStream : PipeStream
     {

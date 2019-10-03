@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace evocontest.Runner.Common.Messages
+namespace evocontest.Runner.Host.Common.Messages
 {
     public interface IMessage
     {

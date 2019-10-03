@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace evocontest.Runner.Common.Utility
+namespace evocontest.Runner.Host.Common.Utility
 {
     public static class TaskHelper
     {
@@ -24,7 +24,7 @@ namespace evocontest.Runner.Common.Utility
 
         public static async Task<TResult> TimedTask<TResult>(TimeSpan timeout, Func<Task<TResult>> workTaskGenerator)
         {
-            Exception? disqualifyException = null;
+            Exception disqualifyException = null;
             Task<TResult> workTask;
             Task timerTask;
 

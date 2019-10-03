@@ -1,12 +1,12 @@
-﻿using evocontest.Runner.Common.Connection;
-using evocontest.Runner.Common.Messages.Request;
-using evocontest.Runner.Common.Utility;
+﻿using evocontest.Runner.Host.Common.Connection;
+using evocontest.Runner.Host.Common.Messages.Request;
+using evocontest.Runner.Host.Common.Utility;
 using evocontest.Runner.Host.Configuration;
 using evocontest.Runner.Host.Core;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using RunnerConstants = evocontest.Runner.Common.Constants;
+using RunnerConstants = evocontest.Runner.Host.Common.Constants;
 
 namespace evocontest.Runner.Host.Workflow.Steps
 {

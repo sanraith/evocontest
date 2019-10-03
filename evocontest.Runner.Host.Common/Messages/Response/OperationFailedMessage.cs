@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace evocontest.Runner.Common.Messages.Response
+namespace evocontest.Runner.Host.Common.Messages.Response
 {
     /// <summary>
     /// Informs the receiver that the handling of the target message failed.
@@ -10,9 +10,9 @@ namespace evocontest.Runner.Common.Messages.Response
     {
         public Guid TargetMessageId { get; set; }
 
-        public string? ErrorMessage { get; set; }
+        public string ErrorMessage { get; set; }
 
-        public Exception? Exception { get; set; }
+        public Exception Exception { get; set; }
 
         private OperationFailedMessage()
         {

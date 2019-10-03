@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
-using evocontest.Runner.Common.Connection;
-using evocontest.Runner.Common.Messages.Request;
-using evocontest.Runner.Common.Messages.Response;
-using evocontest.Runner.Common.Utility;
+using evocontest.Runner.Host.Common.Connection;
+using evocontest.Runner.Host.Common.Messages.Request;
+using evocontest.Runner.Host.Common.Messages.Response;
+using evocontest.Runner.Host.Common.Utility;
 using evocontest.Runner.Host.Configuration;
 using evocontest.Runner.Host.Connection;
 using evocontest.Runner.Host.Core;

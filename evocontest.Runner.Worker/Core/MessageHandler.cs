@@ -1,8 +1,8 @@
 ﻿using evocontest.Common;
-using evocontest.Runner.Common.Messages;
-using evocontest.Runner.Common.Messages.Request;
-using evocontest.Runner.Common.Messages.Response;
-using evocontest.Runner.Common.Utility;
+using evocontest.Runner.Host.Common.Messages;
+using evocontest.Runner.Host.Common.Messages.Request;
+using evocontest.Runner.Host.Common.Messages.Response;
+using evocontest.Runner.Host.Common.Utility;
 using System;
 using System.Diagnostics;
 using System.Linq;

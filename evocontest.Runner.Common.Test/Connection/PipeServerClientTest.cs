@@ -4,8 +4,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using evocontest.Runner.Common.Connection;
-using evocontest.Runner.Common.Messages;
 using evocontest.Runner.Common.Test.Messages;
+using evocontest.Runner.Host.Common.Connection;
+using evocontest.Runner.Host.Common.Messages;
 using NUnit.Framework;
 
 namespace evocontest.Runner.Common.Test.Connection

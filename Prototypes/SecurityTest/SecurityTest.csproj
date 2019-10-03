@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\evocontest.Runner.Common\evocontest.Runner.Common.csproj" />
+    <ProjectReference Include="..\..\evocontest.Runner.Host.Common\evocontest.Runner.Host.Common.csproj" />
   </ItemGroup>
 
 </Project>

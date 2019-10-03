@@ -1,9 +1,9 @@
 ﻿using System;
 
-namespace evocontest.Runner.Common.Messages.Request
+namespace evocontest.Runner.Host.Common.Messages.Request
 {
     /// <summary>
-    /// Instructs the receiver to load the target assemblly.
+    /// Instructs the receiver to load the target assembly.
     /// </summary>
     [Serializable]
     public sealed class LoadContextMessage : AbstractMessage

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace evocontest.Runner.Common.Utility
+namespace evocontest.Runner.Host.Common.Utility
 {
     public static class DisposableValue
     {
@@ -27,7 +27,7 @@ namespace evocontest.Runner.Common.Utility
     {
         public TValue Value { get; }
 
-        internal DisposableValue(TValue value, Action<TValue>? onDispose, params IDisposable[] disposables)
+        internal DisposableValue(TValue value, Action<TValue> onDispose, params IDisposable[] disposables)
         {
             Value = value;
             myOnDispose = onDispose;
@@ -43,7 +43,7 @@ namespace evocontest.Runner.Common.Utility
             }
         }
 
-        private readonly Action<TValue>? myOnDispose;
+        private readonly Action<TValue> myOnDispose;
         private readonly IDisposable[] myDisposables;
     }
 }

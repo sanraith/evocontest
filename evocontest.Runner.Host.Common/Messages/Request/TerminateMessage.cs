@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace evocontest.Runner.Common.Messages.Request
+namespace evocontest.Runner.Host.Common.Messages.Request
 {
     /// <summary>
     /// Instructs the receiver to terminate itself.

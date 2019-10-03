@@ -1,5 +1,5 @@
-﻿using evocontest.Runner.Common;
-using evocontest.Runner.Common.Connection;
+﻿using evocontest.Runner.Common.Connection;
+using evocontest.Runner.Host.Common;
 using evocontest.Runner.Worker.Core;
 using System.Threading.Tasks;
 

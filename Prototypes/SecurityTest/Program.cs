@@ -5,7 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using evocontest.Runner.Common.Messages.Request;
+using evocontest.Runner.Host.Common.Connection;
+using evocontest.Runner.Host.Common.Messages.Request;
 
 namespace SecurityTest
 {

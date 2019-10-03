@@ -11,9 +11,9 @@ using evocontest.WebApp.Common;
 using evocontest.Runner.Host.Extensions;
 using System.IO;
 using evocontest.Runner.Host.Configuration;
-using evocontest.Runner.Common.Utility;
 using evocontest.WebApp.Common.Data;
 using evocontest.WebApp.Common.Hub;
+using evocontest.Runner.Host.Common.Utility;
 
 namespace evocontest.Runner.Host.Connection
 {

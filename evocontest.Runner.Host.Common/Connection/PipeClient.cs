@@ -1,4 +1,5 @@
-﻿using System;
+﻿using evocontest.Runner.Host.Common.Connection;
+using System;
 using System.IO.Pipes;
 using System.Threading.Tasks;
 

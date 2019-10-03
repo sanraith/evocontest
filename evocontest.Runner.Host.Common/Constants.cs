@@ -1,4 +1,4 @@
-﻿namespace evocontest.Runner.Common
+﻿namespace evocontest.Runner.Host.Common
 {
     public static class Constants
     {
