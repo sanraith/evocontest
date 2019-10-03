@@ -72,8 +72,8 @@ namespace evocontest.Submission.Test.Core
         [Test]
         public void Solve_ConflictingAcronyms_NotReplaced()
         {
-            string input = "tim cook. tim cook. total commander. total commander.";
-            string expected = "tim cook. tim cook. total commander. total commander.";
+            string input = "tim cook. tim cook. total commander.";
+            string expected = "tim cook. tim cook. total commander.";
             AssertSolve(input, expected);
         }
 

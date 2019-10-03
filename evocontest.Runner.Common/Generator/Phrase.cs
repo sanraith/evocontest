@@ -35,7 +35,7 @@ namespace evocontest.Runner.Common.Generator
 
         public static string GetWordOrAcronym(IReadOnlyList<string> words)
         {
-            return words.Count > 1 ? string.Concat(words.Select(x => x[0])).ToUpper() : words[0];
+            return words.Count == 1 && words[0].All(char.IsUpper) ? words[0] : string.Concat(words.Select(x => x[0])).ToUpper();
         }
 
         private readonly int myHashCode;
@@ -50,6 +50,12 @@ namespace evocontest.Runner.Common.Generator
     public sealed class DecoyPhrase : Phrase
     {
         public DecoyPhrase(IEnumerable<string> words) : base(words)
+        { }
+    }
+
+    public sealed class JunkPhrase : Phrase
+    {
+        public JunkPhrase(IEnumerable<string> words) : base(words)
         { }
     }
 

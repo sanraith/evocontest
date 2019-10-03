@@ -13,8 +13,8 @@ namespace InputGeneratorTest
     {
         static void Main(string[] args)
         {
-            Test4();
-            //Test5();
+            //Test4();
+            Test5();
         }
 
         private static void Test5()
@@ -120,8 +120,16 @@ namespace InputGeneratorTest
                 {
                     config.Seed = myRandom.Next();
                     var generator = new InputGenerator(config);
-                    var result = generator.Generate();
-                    Console.WriteLine($"{index}, {result.Input.Length}");
+                    var generated = generator.Generate();
+                    var solver = new SampleSubmission();
+                    var solverResult = solver.Solve(generated.Input);
+
+                    if (solverResult != generated.Solution)
+                    {
+                        throw new Exception();
+                    }
+
+                    Console.WriteLine($"{index}, {generated.Input.Length}");
                 }
             }
 

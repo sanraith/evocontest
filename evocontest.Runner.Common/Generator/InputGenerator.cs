@@ -17,25 +17,18 @@ namespace evocontest.Runner.Common.Generator
         {
             Init();
 
-            // Generate phrases
             myPhrases = GenerateNormalPhrases();
-            // - Add partially conflicted acronyms
 
-            // Generate decoy phrases
             myDecoyPhrases = GenerateDecoyPhrases();
-            // - 2. normal acronym is part of it
-            // - 3. same word as an acronym
 
-            // Build skeleton
             var skeleton = GenerateSkeleton();
             var sentenceLengths = GetSlices(skeleton.Count, myConfig.SentenceLength);
 
-            // GenerateSolution
             var solution = GenerateSolution(skeleton, sentenceLengths);
 
-            // Render
             var input = GenerateInput(skeleton, sentenceLengths);
 
+            //TODO remove
             Console.WriteLine($"AcronymPhrases: {myPhrases.Count}, DecoyPhrases: {myDecoyPhrases.Count}, SinglePhrases: {skeleton.OfType<SinglePhrase>().Count()}, Junk: {myExtraJunkCount}, AllPhrases: {skeleton.Count}, Words: {myWordSet.Count}");
 
             return new GeneratorResult
@@ -61,6 +54,7 @@ namespace evocontest.Runner.Common.Generator
                 {
                     case SinglePhrase sp:
                     case DecoyPhrase dp:
+                    case JunkPhrase jp:
                         sb.AppendJoin(' ', phrase.Words);
                         break;
                     case NormalPhrase np:
@@ -135,43 +129,51 @@ namespace evocontest.Runner.Common.Generator
                 }
             }
             phrasesToUse.AddRange(myDecoyPhrases);
-
-            phrasesToUse = phrasesToUse.ShuffleInPlace(myRandom).SelectMany(phrase =>
-            {
-                var wordLength = GetRandomFromRange(myConfig.WordLength);
-                var junkWord = GenerateNewWord(wordLength);
-                return new[] { phrase, new SinglePhrase(junkWord) };
-            }).ToList();
+            phrasesToUse.ShuffleInPlace(myRandom);
 
             var length = phrasesToUse.Sum(x => x.Words.Count + x.Words.Sum(x => x.Length));
             var lengthToFill = Math.Max(0, myConfig.InputLength - length);
-            var phraseCount = phrasesToUse.Count;
-            var extraJunk = new Queue<(int Index, Phrase Phrase)>();
-            while (lengthToFill > 0)
-            {
-                var wordLength = GetRandomFromRange(myConfig.WordLength);
-                var junkWord = GenerateNewWord(wordLength);
-                var pos = myRandom.Next(0, phraseCount);
-                extraJunk.Enqueue((pos, new SinglePhrase(junkWord)));
-                lengthToFill -= wordLength + 1;
-            }
-            extraJunk = new Queue<(int Index, Phrase Phrase)>(extraJunk.OrderBy(x => x.Index));
-            myExtraJunkCount = extraJunk.Count;
+            var junkPhraseCount = phrasesToUse.Count - 1;
+            var avgJunkWordLength = (myConfig.WordLength.Min + myConfig.WordLength.Max) / 2.0;
+            var junkWordCount = Math.Max(junkPhraseCount, (int)Math.Ceiling(lengthToFill / (avgJunkWordLength + 1)));
+            myExtraJunkCount = junkWordCount;
+
+            var minimumSlices = Enumerable.Repeat(1, junkPhraseCount);
+            var additionSlices = GetSlices(junkWordCount - junkPhraseCount, new MinMaxPair(0, myConfig.PhraseLength.Max));
+            var sliceDiff = junkPhraseCount - additionSlices.Count;
+            var slices = additionSlices
+                .Concat(Enumerable.Repeat(0, sliceDiff > 0 ? sliceDiff : 0))
+                .Zip(minimumSlices, (a, b) => a + b)
+                .ToList()
+                .ShuffleInPlace(myRandom);
 
             var result = new List<Phrase>();
-            foreach (var (phrase, index) in phrasesToUse.WithIndex())
+            for (int wordIndex = 0; wordIndex < phrasesToUse.Count - 1; wordIndex++)
             {
-                while (extraJunk.Count > 0 && extraJunk.Peek().Index == index)
+                var sliceLength = slices[wordIndex];
+                Phrase junkPhrase;
+                bool isAllowed = false;
+                do
                 {
-                    result.Add(extraJunk.Dequeue().Phrase);
-                }
-                result.Add(phrase);
+                    var words = GeneratePhraseWords(sliceLength);
+                    junkPhrase = new JunkPhrase(words);
+                    if (myValidAcronymSet.Contains(junkPhrase.Acronym))
+                    {
+                        continue;
+                    }
+
+                    var testedAcronym = string.Concat(phrasesToUse[wordIndex].Acronym[1..],
+                        junkPhrase.Acronym, phrasesToUse[wordIndex + 1].Acronym[..^1]);
+                    isAllowed = myValidAcronymSet.All(x => !testedAcronym.Contains(x));
+                } while (!isAllowed);
+
+                result.Add(phrasesToUse[wordIndex]);
+                result.Add(junkPhrase);
             }
+            result.Add(phrasesToUse[^1]);
 
             return result;
         }
-
-        private int myExtraJunkCount;
 
         private List<Phrase> GenerateDecoyPhrases()
         {
@@ -186,7 +188,7 @@ namespace evocontest.Runner.Common.Generator
                 do
                 {
                     phrase = new DecoyPhrase(GeneratePhraseWords());
-                } while (myValidAcronymSet.Contains(phrase.Acronym));
+                } while (myValidAcronymSet.Any(x => phrase.Acronym.Contains(x) || x.Contains(phrase.Acronym)));
                 myConflictingAcronymSet.Add(phrase.Acronym);
                 decoyPhrases.Add(phrase);
                 myCurrentLength += phrase.Length;
@@ -214,7 +216,7 @@ namespace evocontest.Runner.Common.Generator
                 do
                 {
                     phrase = new NormalPhrase(GeneratePhraseWords());
-                } while (!myValidAcronymSet.Add(phrase.Acronym));
+                } while (myValidAcronymSet.Any(x => phrase.Acronym.Contains(x) || x.Contains(phrase.Acronym)) || !myValidAcronymSet.Add(phrase.Acronym));
                 phrases.Add(phrase);
                 myCurrentLength += phrase.Length;
             }
@@ -222,10 +224,10 @@ namespace evocontest.Runner.Common.Generator
             return phrases;
         }
 
-        private List<string> GeneratePhraseWords()
+        private List<string> GeneratePhraseWords(int? wordCount = null)
         {
             var phraseWords = new List<string>();
-            var wordCount = GetRandomFromRange(myConfig.PhraseLength);
+            wordCount ??= GetRandomFromRange(myConfig.PhraseLength);
             for (int wordIndex = 0; wordIndex < wordCount; wordIndex++)
             {
                 var wordLength = GetRandomFromRange(myConfig.WordLength);
@@ -284,7 +286,7 @@ namespace evocontest.Runner.Common.Generator
             myConflictingAcronymSet = new HashSet<string>();
         }
 
-
+        private int myExtraJunkCount;
         private int myCurrentLength = 0;
         private List<Phrase> myPhrases;
         private HashSet<string> myWordSet;
