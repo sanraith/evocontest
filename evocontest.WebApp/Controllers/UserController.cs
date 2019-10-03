@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Server.IIS;
 using Microsoft.AspNetCore.SignalR;
 
 namespace evocontest.WebApp.Controllers
@@ -65,12 +66,20 @@ namespace evocontest.WebApp.Controllers
 
             string submissionId = null;
             var success = false;
-            var file = Request.Form.Files.SingleOrDefault();
-            var checkResult = myFileManager.CheckUserSubmission(file);
-            if (checkResult == FileManager.SubmissionFileCheckResult.Ok)
+            FileManager.SubmissionFileCheckResult checkResult;
+            try
             {
-                submissionId = await SaveUserSubmission(user, file);
-                success = submissionId != null;
+                var file = Request.Form.Files.SingleOrDefault();
+                checkResult = myFileManager.CheckUserSubmission(file);
+                if (checkResult == FileManager.SubmissionFileCheckResult.Ok)
+                {
+                    submissionId = await SaveUserSubmission(user, file);
+                    success = submissionId != null;
+                }
+            }
+            catch (BadHttpRequestException)
+            {
+                checkResult = FileManager.SubmissionFileCheckResult.InvalidSize;
             }
 
             if (success)

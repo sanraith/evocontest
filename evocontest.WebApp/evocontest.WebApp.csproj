@@ -57,6 +57,9 @@
     <Content Update="wwwroot\pic\raspberry-pi-4-1_1024x1024.webp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Update="wwwroot\pic\vscore.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <Target Name="CopySignalR" BeforeTargets="AfterBuild">

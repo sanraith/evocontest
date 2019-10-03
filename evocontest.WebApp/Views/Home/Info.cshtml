@@ -1,6 +1,6 @@
 ﻿
 @{
-    ViewData["Title"] = "Info";
+    ViewData["Title"] = "Információk";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -8,20 +8,21 @@
 {
     <style>
         h2 {
-            margin-top: 1em;
+            margin-top: 2em;
         }
     </style>
 }
 
 <h1>Információk</h1>
 
-<img src="~/pic/Paper Shredding.png" style="float: right; margin-left: 2em" width="400" />
+<img src="~/pic/Paper Shredding.png" style="float: right; margin-left: 2em; margin-top: 2em" width="400" />
 <h2>Bevezető</h2>
 <p>
     Bajban vannak a celebek az ország legnagyobb szoftverházában. Hiába bővítgették rendületlenül az SWRS-t, SWAS-t, MRS-t, SITS-t, CDS-t és más hasznos dokumentációikat, azok hatalmas méretük miatt egyre kezelhetetlenebbé váltak. A helyzet odáig fajult, hogy a fejlesztők már nem is hajlandók elolvasni őket! Valamit tenni kell.
 </p>
 <p>
-    Rövidítések! Ha a hosszú ismétlődő kifejezéseket betűszavakra cserélnénk, a doksik újra vállalható hosszúak lennének, és a talán még a fejlesztők is újra magukévá tennék az olvasás élményét...
+    Rövidítések! Ha a hosszú ismétlődő kifejezéseket <i>betűszavakra</i> cserélnénk, a doksik újra vállalható hosszúak lennének,
+    és talán még a fejlesztők is újra megbarátkoznának velük...
 </p>
 
 <h2>A feladat</h2>
@@ -36,7 +37,8 @@
 </pre>
 </p>
 <p>
-    A bemenő adat mondatokból, szavakból és betűszavakból áll, az angol ABC karaktereit felhasználva. Részletes leírást a <a asp-controller="Home" asp-action="Rules">Szabályok</a> oldalon találsz.
+    A feladat a bementhez tartozó legrövidebb szöveg előállítása. Egy bemenő szöveghez csak egy helyes megoldás tartozik.<br />
+    Részletes leírást a <a asp-controller="Home" asp-action="Rules">Szabályok</a> oldalon találsz.
 </p>
 
 <h2>SDK</h2>
@@ -54,8 +56,17 @@
         <li>kipróbálásához <code>(evocontest.Submission.Runner)</code></li>
         <li>és teszteléséhez <code>(evocontest.Submission.Test)</code></li>
     </ul>
-    szükséges projekteket. A letöltéshez válaszd ki a jobb oldali linkek valamelyikét!
+    szükséges projekteket. A letöltéshez válaszd ki a jobboldali linkek valamelyikét!
 </p>
+<div style="margin-top: 2em">
+    <img src="~/pic/vscore.png" style="float: right; margin-left: 1em;" />
+    <p>
+        Az SDK használatához ajánlott feltelepíteni a legújabb
+        <a href="https://visualstudio.microsoft.com/vs/"><span class="text-nowrap">Visual Studio 2019</span></a>
+        <span class="small">(v16.3+)</span> környezetet is, ami párhuzamosan más Visual Studio verziók mellé is telepíthető.
+        Telepítéskor ne felejtsd el kiválasztani a ".NET Core cross-platform development" csomagot.
+    </p>
+</div>
 
 <h2>Jelentkezés</h2>
 <p>
@@ -73,8 +84,8 @@
     A nevezési időszak alatt a megoldásodat teszőleges alkalommal lecserélheted. A döntőben az utolsó feltöltött megoldás vesz részt.
 </p>
 
-<img src="~/pic/raspberry-pi-4-1_1024x1024.webp" style="float:right" width="250" />
 <h2>A verseny menete</h2>
+<img src="~/pic/raspberry-pi-4-1_1024x1024.webp" style="float:right" width="250" />
 <p>
     A nevezési időszak alatt minden nap megküzdenek egymással a benevezett megoldások.
     A résztvevőket futási idejük alapján naponta <a asp-controller="Home" asp-action="Rankings">Rangsoroljuk</a>.

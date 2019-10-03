@@ -59,6 +59,7 @@ else
         @using (Html.BeginForm(nameof(UserController.DoUpload), "User", FormMethod.Post, new { id = "upload_form", @class = "upload_form", enctype = "multipart/form-data" }))
         {@:
             <h5>Válaszd ki a feltöltendő .dll fájlt!</h5>
+            <p>Maximális méret: 5 MB.</p>
             <input type="file" name="file1" style="width: 40em"><br />
             <input type="submit" class="btn btn-primary" value="Feltöltés" disabled="disabled" style="display:none;" /><br />
             <progress value="0" max="100" style="width:300px; display:none;"></progress>

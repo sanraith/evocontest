@@ -159,6 +159,9 @@ $(function () {
     connection.on("UpdateUploadStatus", (state, isValid, error) => {
         setProgressItemActive(state, isValid);
         reloadForm();
+        if (isValid !== null) {
+            connection.stop();
+        }
     });
 
     reloadForm();
