@@ -1,6 +1,10 @@
-﻿@{
+﻿@using evocontest.WebApp.Data
+
+@{
     ViewData["Title"] = "Feltöltés";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var user = (ApplicationUser)ViewBag.User;
 }
 @section Head
 {
@@ -23,3 +27,13 @@
 </div>
 
 <div id="submitContent"></div>
+
+@*<div class="alert-danger">
+    <h2>Erősítsd meg az email címedet!</h2>
+    A nevezéshez meg kell erősítened az email címedet. A megerősítéshez kattints az emailben kapott megerősítő kódra.
+    Ha nem érkezett volna meg, akkor 
+
+    <form class="form-inline" asp-area="Identity" asp-page="/Account/SendVerificationEmail">
+        <button type="submit" class="nav-link btn btn-link text-dark">itt kérhetsz újat</button>
+    </form>
+</div>*@

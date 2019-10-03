@@ -33,8 +33,10 @@ namespace evocontest.WebApp.Controllers
 
         public IActionResult Index() => RedirectToAction(nameof(Submit));
 
-        public IActionResult Submit()
+        public async Task<IActionResult> Submit()
         {
+            ViewBag.User = await myUserManager.GetUserAsync(User);
+
             return View();
         }
 
