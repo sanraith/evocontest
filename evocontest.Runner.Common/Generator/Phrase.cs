@@ -61,10 +61,4 @@ namespace evocontest.Runner.Common.Generator
         public JunkPhrase(IEnumerable<string> words) : base(words)
         { }
     }
-
-    public sealed class SinglePhrase : Phrase
-    {
-        public SinglePhrase(string word) : base(new[] { word })
-        { }
-    }
 }

@@ -37,7 +37,7 @@ namespace evocontest.Runner.Worker.Core
                 if (myLoadedSolutionType != null) { ClearLoadedAssembly(); }
 
                 var loadedAssembly = AssemblyLoader.Load(loadMsg.TargetAssemblyPath);
-                var solutionType = loadedAssembly.Value.GetTypes().Single(x => typeof(ISolution).IsAssignableFrom(x));
+                var solutionType = loadedAssembly.Value.GetTypes().First(x => typeof(ISolution).IsAssignableFrom(x));
                 myLoadedSolutionType = DisposableValue.Create(solutionType, loadedAssembly);
 
                 response = new OperationSuccessfulMessage(loadMsg.Id);

@@ -1,12 +1,13 @@
-﻿@{
+﻿@using evocontest.WebApp.Controllers;
+@{
     ViewData["Title"] = "Főoldal";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Főoldal</h1>
+<div class="text-center" style="margin-top: 2em">
+    @*    <h1 class="display-4">Főoldal</h1>*@
+    <img src="~/pic/title.png" style="margin-left: auto; margin-right: auto" width="700" />
 </div>
-<div class="text-left">
-    <p>
-        Ez a 2019-es evosoft Miskolci programozó versenyének oldala.<br />
-    </p>
-</div>
+<p style="font-size: larger; margin-top: 3em">
+    Ez a 2019-es evosoft Miskolci programozó versenyének oldala.<br />
+    @Html.ActionLink("Kattints ide a verseny leírás elolvasásához!", nameof(HomeController.Info), "Home")
+</p>

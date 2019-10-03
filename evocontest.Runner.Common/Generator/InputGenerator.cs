@@ -29,7 +29,7 @@ namespace evocontest.Runner.Common.Generator
             var input = GenerateInput(skeleton, sentenceLengths);
 
             //TODO remove
-            Console.WriteLine($"AcronymPhrases: {myPhrases.Count}, DecoyPhrases: {myDecoyPhrases.Count}, SinglePhrases: {skeleton.OfType<SinglePhrase>().Count()}, Junk: {myExtraJunkCount}, AllPhrases: {skeleton.Count}, Words: {myWordSet.Count}");
+            Console.WriteLine($"AcronymPhrases: {myPhrases.Count}, DecoyPhrases: {myDecoyPhrases.Count}, Junk: {myExtraJunkCount}, AllPhrases: {skeleton.Count}, Words: {myWordSet.Count}");
 
             return new GeneratorResult
             {
@@ -52,7 +52,6 @@ namespace evocontest.Runner.Common.Generator
                 if (isFirst) { isFirst = false; } else { sb.Append(' '); }
                 switch (phrase)
                 {
-                    case SinglePhrase sp:
                     case DecoyPhrase dp:
                     case JunkPhrase jp:
                         sb.AppendJoin(' ', phrase.Words);

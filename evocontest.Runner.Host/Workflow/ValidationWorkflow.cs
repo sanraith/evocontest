@@ -43,31 +43,44 @@ namespace evocontest.Runner.Host.Workflow
             string errorMessage;
             var status = ValidationStateEnum.File;
 
-            // TODO handle timeout exception...
-            using (var disposablePipe = await myStartWorkerProcessStep.ExecuteAsync())
+            try
             {
-                myPipeServer = disposablePipe.Value;
-                // Load assembly
-                errorMessage = "Nem sikerült betölteni a szerelvényt.";
-                status = ValidationStateEnum.Static;
-
-                await myServer.UpdateStatus(submissionId, status, null);
-                success = await TaskHelper.TimedTask(loadTimeout, () => myLoadSubmissionStep.ExecuteAsync(myPipeServer, targetFile));
-
-                // Run unit tests
-                if (success)
+                using (var disposablePipe = await myStartWorkerProcessStep.ExecuteAsync())
                 {
-                    status = ValidationStateEnum.UnitTest;
+                    myPipeServer = disposablePipe.Value;
+                    // Load assembly
+                    errorMessage = "Nem sikerült betölteni a szerelvényt.";
+                    status = ValidationStateEnum.Static;
+
                     await myServer.UpdateStatus(submissionId, status, null);
-                    var unitTestResult = await TaskHelper.TimedTask(unitTestTimeout, RunUnitTestsInWorker);
-                    success = unitTestResult.IsAllPassed;
-                    errorMessage = $"Helytelen eredmény a következő unit testekre: {string.Join(", ", unitTestResult.FailedTests)}";
+                    success = await TaskHelper.TimedTask(loadTimeout, () => myLoadSubmissionStep.ExecuteAsync(myPipeServer, targetFile));
+
+                    // Run unit tests
+                    if (success)
+                    {
+                        status = ValidationStateEnum.UnitTest;
+                        await myServer.UpdateStatus(submissionId, status, null);
+                        var unitTestResult = await TaskHelper.TimedTask(unitTestTimeout, RunUnitTestsInWorker);
+                        success = unitTestResult.IsAllPassed;
+                        errorMessage = $"Helytelen eredmény a következő unit testekre: {string.Join(", ", unitTestResult.FailedTests)}";
+                    }
                 }
+            } 
+            catch (TimeoutException)
+            {
+                success = false;
+                errorMessage = "A szerelvényt nem lehetett ellenőrizni a megadott időn belül.";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                success = false;
+                errorMessage = "Ismeretlen hiba történt az ellenőrzés során.";
             }
 
             // Validation completed
             status = success ? ValidationStateEnum.Completed : status;
-            Console.WriteLine("Validation done.");
+            Console.WriteLine($"Validation done. {status}, Success: {success}, Error: {errorMessage}");
             await myServer.UpdateStatus(submissionId, status, success ? null : errorMessage)
                 .WithProgressLog("Sending validation result to server");
         }
