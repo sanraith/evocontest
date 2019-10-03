@@ -6,6 +6,9 @@ namespace evocontest.Runner.Common.Extensions
 {
     public static class EnumerableExtensions
     {
+        /// <summary>
+        /// Creates (item, index) pairs for each element of the sequence.
+        /// </summary>
         public static IEnumerable<(TSource Item, int Index)> WithIndex<TSource>(this IEnumerable<TSource> sequence)
         {
             return sequence.Select((item, index) => (Item: item, Index: index));

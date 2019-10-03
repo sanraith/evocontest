@@ -3,6 +3,9 @@ using System.Linq;
 
 namespace evocontest.Runner.Common.Generator
 {
+    /// <summary>
+    /// Represents a phrase.
+    /// </summary>
     public abstract class Phrase
     {
         public IReadOnlyList<string> Words { get; }

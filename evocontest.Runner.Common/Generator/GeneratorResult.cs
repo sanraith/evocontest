@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace evocontest.Runner.Common.Generator
+﻿namespace evocontest.Runner.Common.Generator
 {
     public sealed class GeneratorResult
     {
