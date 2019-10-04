@@ -26,14 +26,56 @@
     </ul>
 </div>
 
-<div id="submitContent"><span class="spinner-border spinner-border-sm" role="status"></span></div>
+<div id="submitContent">Pillanat... <span class="spinner-border spinner-border-sm" role="status"></span></div>
 
 @*<div class="alert-danger">
-    <h2>Erősítsd meg az email címedet!</h2>
-    A nevezéshez meg kell erősítened az email címedet. A megerősítéshez kattints az emailben kapott megerősítő kódra.
-    Ha nem érkezett volna meg, akkor 
+        <h2>Erősítsd meg az email címedet!</h2>
+        A nevezéshez meg kell erősítened az email címedet. A megerősítéshez kattints az emailben kapott megerősítő kódra.
+        Ha nem érkezett volna meg, akkor
 
-    <form class="form-inline" asp-area="Identity" asp-page="/Account/SendVerificationEmail">
-        <button type="submit" class="nav-link btn btn-link text-dark">itt kérhetsz újat</button>
-    </form>
+        <form class="form-inline" asp-area="Identity" asp-page="/Account/SendVerificationEmail">
+            <button type="submit" class="nav-link btn btn-link text-dark">itt kérhetsz újat</button>
+        </form>
+    </div>*@
+
+<h2 style="margin-top: 3em">SDK</h2>
+<div style="width: 25em; margin-left:1em; float:right">
+    <h5 style="text-align: center">Letöltés</h5>
+    <a class="btn btn-block btn-outline-primary" href="git-client://clone?repo=https%3A%2F%2Fgithub.com%2Fsanraith%2Fevocontest-sdk">Megnyitás Visual Studio-ban</a>
+    <a class="btn btn-block btn-outline-secondary" href="https://github.com/sanraith/evocontest-sdk">Megnyitás GitHub-on</a>
+    <a class="btn btn-block btn-outline-secondary" href="https://github.com/sanraith/evocontest-sdk/archive/master.zip">Letöltés ZIP-ként</a>
+</div>
+<p>
+    A jelentkezéshez le kell töltened a verseny SDK-ját. Az SDK tartalmazza a megoldás
+    <ul>
+        <li>elkészítéséhez <code>(evocontest.Submission)</code></li>
+        <li>tanulmányozásához <code>(evocontest.Submission.Sample)</code></li>
+        <li>kipróbálásához <code>(evocontest.Submission.Runner)</code></li>
+        <li>és teszteléséhez <code>(evocontest.Submission.Test)</code></li>
+    </ul>
+    szükséges projekteket. A letöltéshez válaszd ki a jobboldali linkek valamelyikét!
+</p>
+@*<div style="margin-top: 2em">
+    <img src="~/pic/vscore.png" style="float: right; margin-left: 1em;" />
+    <p>
+        Az SDK használatához ajánlott feltelepíteni a legújabb
+        <a href="https://visualstudio.microsoft.com/vs/"><span class="text-nowrap">Visual Studio 2019</span></a>
+        <span class="small">(v16.3+)</span> környezetet is, ami párhuzamosan más Visual Studio verziók mellé is telepíthető.
+        Telepítéskor ne felejtsd el kiválasztani a ".NET Core cross-platform development" csomagot.
+    </p>
 </div>*@
+
+<h2>Jelentkezés</h2>
+<p>
+    Itt kell feltöltened a megoldásodat, ami:
+    <ul>
+        <li>Az <code>evocontest.Submission.dll</code> szerelvény <code>Release - Any CPU</code> módban buildelve.</li>
+        <li>Egyetlen <code>evocontest.Common.ISolution</code> interfészt implementáló osztályt tartalmaz.</li>
+        <li>Az <code>evocontest.Common</code> projekt és a .NET Core 3.0 keretrendszeren kívül nincs más függősége.</li>
+    </ul>
+</p>
+<p>
+    Feltöltés után a megoldásod automatikus ellenőrzéseken esik át.
+    Sikeres ellenőrzés után a megoldásod aktív lesz, és részt fog venni a napi megmérettetéseken.
+    A nevezési időszak alatt a megoldásodat teszőleges alkalommal lecserélheted. A döntőben az utolsó feltöltött megoldás vesz részt.
+</p>
