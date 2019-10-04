@@ -37,9 +37,9 @@
     </environment>
     @RenderSection("Head", required: false)
 </head>
-<body>
+<body style="background-image: linear-gradient(#FFFFFF, rgb(214, 232, 236)); background-position-y: top; background-position-x: right;">
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3" @*style="background-image: linear-gradient(#FFFFFF, rgb(214, 232, 235));"*@>
             <div class="container">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
                     <img src="~/pic/title.png" style="height: 2em; margin-bottom: -.5em; margin-top: -.8em" />
@@ -63,7 +63,7 @@
                         @*@if (User.Identity.IsAuthenticated)
                         {*@
                             <li>
-                                <a class="nav-link text-dark font-weight-bold" asp-area="" asp-controller="User" asp-action="Submit">Feltöltés</a>
+                                <a class="nav-link text-dark font-weight-bold" asp-area="" asp-controller="User" asp-action="Submit">Nevezés</a>
                             </li>
                             @*<li>
                                     <a class="nav-link text-dark font-weight-bold" asp-area="" asp-controller="User" asp-action="Stats">Statisztikák</a>

@@ -52,10 +52,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="wwwroot\pic\evosoft_logo_coloured_transparent.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Update="wwwroot\pic\Paper Shredding.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\pic\raspberry-pi-4-1_1024x1024.webp">
+    <Content Update="wwwroot\pic\thinking.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Update="wwwroot\pic\title.png">

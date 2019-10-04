@@ -3,11 +3,30 @@
     ViewData["Title"] = "Főoldal";
 }
 
-<div class="text-center" style="margin-top: 2em">
-    @*    <h1 class="display-4">Főoldal</h1>*@
-    <img src="~/pic/title.png" style="margin-left: auto; margin-right: auto" width="700" />
+<div class="text-center" style=" padding-top: 1em; padding-bottom: 3em">
+    <div style="float:right; font-size: 1em; width: 20em; margin-top:5px; text-align: right; margin-bottom: 10px">
+        <span id="countdown">&nbsp;</span>
+    </div>
+    <img src="~/pic/title.png" style="margin-left: auto; margin-right: auto" width="75%" />
+    <h3 style="font-family: 'Lucida Console', Monaco, monospace">
+        evosoft programozó verseny
+    </h3>
 </div>
-<p style="font-size: larger; margin-top: 3em">
-    Ez a 2019-es evosoft Miskolci programozó versenyének oldala.<br />
-    @Html.ActionLink("Kattints ide a verseny leírás elolvasásához!", nameof(HomeController.Info), "Home")
-</p>
+<div class="clearfix" style="margin-top: 4em">
+    <img height="400px" src="~/pic/thinking.png" class="float-right" style="margin-left: -40px" />
+    <h2>A verseny</h2>
+    <p>
+        Csatlakozz a 2019-es miskolci evosoft .NET programozó versenyéhez!
+    </p>
+    <p class="text-justify">
+        A verseny résztvevőinek két hét alatt kell minél hatékonyabb megoldást adniuk egy programozási feladatra.
+        A feltöltött programok nap mint nap automatikusan össze fognak csapni egymással,
+        a csaták ereménye alapján pedig folyamatosan figyelemmel kísérhetjük az erőviszonyokat. A verseny végén a leggyorsabb algoritmus nyer.
+    </p><p>
+        @Html.ActionLink("Kattints ide a verseny leírás elolvasásához!", nameof(HomeController.Info), "Home")
+    </p>
+</div>
+
+<div class="text-center" style="margin-top: 3em">
+    <img src="~/pic/evosoft_logo_coloured_transparent.png" style="margin-left: auto; margin-right: auto" width="300" />
+</div>

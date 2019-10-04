@@ -1,6 +1,6 @@
 ﻿
 @{
-    ViewData["Title"] = "Információk";
+    ViewData["Title"] = "A versenyről";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -13,7 +13,7 @@
     </style>
 }
 
-<h1>Információk</h1>
+<h1>A versenyről</h1>
 
 <img src="~/pic/Paper Shredding.png" style="float: right; margin-left: 2em; margin-top: 2em" width="400" />
 <h2>Bevezető</h2>
@@ -70,7 +70,7 @@
 
 <h2>Jelentkezés</h2>
 <p>
-    A versenyre jelentkezni regisztráció/bejelentkezés után a <a asp-controller="User" asp-action="Submit">Feltöltés</a> menüpont alatt tudsz.<br />
+    A versenyre jelentkezni regisztráció/bejelentkezés után a <a asp-controller="User" asp-action="Submit">Nevezés</a> menüpont alatt tudsz.<br />
     Itt kell feltöltened a megoldásodat, ami:
     <ul>
         <li>Az <code>evocontest.Submission.dll</code> szerelvény <code>Release - Any CPU</code> módban buildelve.</li>
@@ -85,7 +85,7 @@
 </p>
 
 <h2>A verseny menete</h2>
-<img src="~/pic/raspberry-pi-4-1_1024x1024.webp" style="float:right" width="250" />
+<img src="~/pic/raspberry.png" style="float:right" width="400" />
 <p>
     A nevezési időszak alatt minden nap megküzdenek egymással a benevezett megoldások.
     A résztvevőket futási idejük alapján naponta <a asp-controller="Home" asp-action="Rankings">Rangsoroljuk</a>.
@@ -118,6 +118,7 @@
     <ul>
         <li>Kickoff: <span class="font-weight-bold">október 4.</span></li>
         <li>Nevezési időszak: <span class="font-weight-bold">október 4-21.</span></li>
+        <li>Napi rangsor: <span class="font-weight-bold">október 7-21.</span></li>
         <li>Döntő: <span class="font-weight-bold">október 22.</span></li>
     </ul>
 </p>

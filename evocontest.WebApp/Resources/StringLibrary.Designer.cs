@@ -79,7 +79,7 @@ namespace evocontest.WebApp.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sikertelen bejelentkezés. Megerősítetted az email címedet?.
+        ///   Looks up a localized string similar to Sikertelen bejelentkezés..
         /// </summary>
         public static string LoginInvalidAttempt {
             get {
