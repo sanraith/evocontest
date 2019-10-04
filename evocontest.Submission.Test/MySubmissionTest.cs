@@ -4,7 +4,7 @@ using NUnit.Framework;
 namespace evocontest.Submission.Test
 {
     /// <summary>
-    /// Tests the submission of the participant. 
+    /// Tests your submission. 
     /// Test cases are defined in the base class.
     /// </summary>
     [TestFixture]

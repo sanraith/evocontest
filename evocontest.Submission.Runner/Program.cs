@@ -9,7 +9,7 @@ namespace evocontest.Submission.Runner
         /// <summary>
         /// Change this if you want to test a different implementation.
         /// </summary>
-        public static Type SubmissionType { get; } = typeof(SampleSubmission);
+        public static Type SubmissionType { get; } = typeof(MySubmission);
 
         /// <summary>
         /// Change this if you want to use a different set of random test data.

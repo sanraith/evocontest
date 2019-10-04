@@ -3,11 +3,15 @@ using System;
 
 namespace evocontest.Submission
 {
+    /// <summary>
+    /// Template class for your own submission for the contest.
+    /// </summary>
     public class MySubmission : ISolution
     {
         public string Solve(string input)
         {
-            // TODO Implement efficient solution.
+            
+            // Implement your own solution here.
 
             throw new NotImplementedException();
         }

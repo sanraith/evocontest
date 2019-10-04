@@ -28,8 +28,7 @@ namespace evocontest.Runner.Common.Generator
 
             var input = GenerateInput(skeleton, sentenceLengths);
 
-            //TODO remove
-            Console.WriteLine($"AcronymPhrases: {myPhrases.Count}, DecoyPhrases: {myDecoyPhrases.Count}, Junk: {myExtraJunkCount}, AllPhrases: {skeleton.Count}, Words: {myWordSet.Count}");
+            //Console.WriteLine($"AcronymPhrases: {myPhrases.Count}, DecoyPhrases: {myDecoyPhrases.Count}, Junk: {myExtraJunkCount}, AllPhrases: {skeleton.Count}, Words: {myWordSet.Count}");
 
             return new GeneratorResult
             {
@@ -71,7 +70,7 @@ namespace evocontest.Runner.Common.Generator
                             foreach (var slice in slices)
                             {
                                 var words = wordArray[pos..(pos + slice)];
-                                parts.Add(Phrase.GetWordOrAcronym(words));
+                                parts.Add(Phrase.GetSingleWordOrAcronym(words));
                                 pos += slice;
                             }
                             sb.AppendJoin(' ', parts);

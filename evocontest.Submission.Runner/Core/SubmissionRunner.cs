@@ -25,40 +25,53 @@ namespace evocontest.Submission.Runner.Core
         public void Run()
         {
             const int roundLength = 20;
-            const int difficultyCount = 20;
+            const int difficultyCount = 16;
             const int maxRuntimeMillis = 1000;
 
             var manager = new TestDataManager(Seed, new InputGeneratorManager(Seed));
 
-            var difficulty = 0;
-            Stopwatch sw = new Stopwatch();
-            do
+            try
             {
-                // Init round
-                manager.GetTestData(difficulty, roundLength - 1);
-
-                // Warmup 
-                ((ISolution)Activator.CreateInstance(mySubmissionType)).Solve(string.Empty);
-
-                sw.Reset();
-                for (int index = 0; index < roundLength; index++)
+                var difficulty = -1;
+                Stopwatch sw = new Stopwatch();
+                long bestTime;
+                int bestDifficulty;
+                do
                 {
-                    var testData = manager.GetTestData(difficulty, index);
+                    bestTime = sw.ElapsedMilliseconds;
+                    bestDifficulty = difficulty++;
 
-                    sw.Start();
-                    var submission = (ISolution)Activator.CreateInstance(mySubmissionType);
-                    var result = submission.Solve(testData.Input);
-                    sw.Stop();
+                    // Init round
+                    manager.GetTestData(difficulty, roundLength - 1);
 
-                    if (ShouldValidateResult && result != testData.Solution)
+                    // Warmup 
+                    ((ISolution)Activator.CreateInstance(mySubmissionType)).Solve(string.Empty);
+
+                    sw.Reset();
+                    for (int index = 0; index < roundLength; index++)
                     {
-                        throw new Exception("Invalid solution!");
-                    }
-                }
-                Console.WriteLine($"Difficulty: {difficulty}, Time: {sw.ElapsedMilliseconds} ms");
+                        var testData = manager.GetTestData(difficulty, index);
 
-                difficulty++;
-            } while (difficulty < difficultyCount && sw.ElapsedMilliseconds < maxRuntimeMillis);
+                        sw.Start();
+                        var submission = (ISolution)Activator.CreateInstance(mySubmissionType);
+                        var result = submission.Solve(testData.Input);
+                        sw.Stop();
+
+                        if (ShouldValidateResult && result != testData.Solution)
+                        {
+                            throw new Exception($"Invalid solution for input data! Difficulty: {difficulty}, Index: {index}, Seed: {Seed}");
+                        }
+                    }
+                    Console.WriteLine($"Difficulty: {difficulty}, Time: {sw.ElapsedMilliseconds} ms");
+                } while (difficulty < difficultyCount && sw.ElapsedMilliseconds < maxRuntimeMillis);
+
+                Console.WriteLine();
+                Console.WriteLine($"Best time is {bestTime} ms at difficulty {bestDifficulty}.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: " + ex.Message);
+            }
         }
 
         private readonly Type mySubmissionType;
