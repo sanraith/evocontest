@@ -20,11 +20,22 @@
 <h1>Szabályok</h1>
 <h2>Feladat</h2>
 <p>
-    A feladat a bemenő szövegben lecserélni az ismétlődő kifejezéseket betűszavakra, majd az így keletkező szöveggel visszatérni.
+    A feladat a bemenő szövegben lecserélni az ismétlődő kifejezéseket betűszavakra, majd az így keletkező szöveggel visszatérni.<br/>
+    A következő feltételek garantálva vannak a bemenő szövegre:
     <ul>
         <li>Egy inputra kizárólag egy helyes megoldás létezik.</li>
-        <li>A különböző rövidítendő kifejezések szavai között nincs átfedés.</li>
-        <li>Egy rövidítendő kifejezés szavai egyediek.</li>
+        <li>
+            Egy rövidítendő kifejezés minden szava egyedi.<br />
+            <span class="small">Nem fordulhat elő például:</span> <code style="text-decoration: line-through">aa aa bb. aa aa bb.</code> <code> (aa kétszer szerepel az AAB-ben)</code>
+        </li>
+        <li>
+            A különböző rövidítendő kifejezések szavai között nincs átfedés.<br />
+            <span class="small">Nem fordulhat elő például:</span> <code style="text-decoration: line-through">aa bb aa bb. ax bb ax bb.</code> <code>(bb mindkét kifejezésben szerepel)</code>
+        </li>
+        <li>
+            A különböző rövidítendő kifejezések rövidítései között sincs áfedés.<br />
+            <span class="small">Nem fordulhat elő például:</span> <code style="text-decoration: line-through">aa bb cc aa bb cc. ax bx ax bx.</code> <code>(ax bx)=&gt;<b>AB</b> része az (aa bb cc)=&gt;<b>AB</b>C-nek</code>
+        </li>
     </ul>
     Az alábbi szabályokat az <code>evocontest.Submission.Test</code> projektben található unit tesztek is magukba foglalják.
 </p>
@@ -58,6 +69,14 @@
             <code>"apple BC date. apple BC date."</code> =&gt;<br />
             <code>"ABCD. ABCD."</code>
         </li>
+        <li>
+            Egy kifejezés akkor is ismétlődőnek számít, ha egyik előfordulása már (részben) rövidítve van.<br />
+            <code>"aa bb cc. ABC."</code> =&gt;<br />
+            <code>"ABC. ABC."</code><br />
+            vagy:<br />
+            <code>"aa bb cc. AB cc."</code> =&gt;<br />
+            <code>"ABC. ABC."</code><br />
+        </li>
     </ul>
 
 </p>
@@ -85,7 +104,14 @@
         <code>bemenet: "aa bb cc dd. aa BCD. ABC dd."</code><br />
         <code>kimenet: "ABCD. ABCD. ABCD."</code><br />
     </div>
-    Itt mind a 3 kifejezés ugyanazokból a szavakból, vagy azok rövidítéséből áll, így nem számítanak ütközőnek.
+    Itt mind a 3 kifejezés ugyanazokból a szavakból, vagy azok rövidítéséből áll, így nem számítanak ütközőnek. Ellenben:
+</p>
+<p>
+    <div class="border-left" style="padding-left: 1em; margin-top: -1em">
+        <code>bemenet: "ABCD. aa bb cc dd. aa BCD. ABC dd. ax bx cx dx."</code><br />
+        <code>kimenet: "ABCD. aa bb cc dd. aa BCD. ABC dd. ax bx cx dx."</code><br />
+    </div>
+    Itt már az <code>aa bb cc dd</code> és <code>ax bx cx dx</code> különböző kifejezések, emiatt egyik előfordulásukat sem lehet rövidíteni.
 </p>
 
 <h5>Nincsenek se előtagok, toldalékok</h5>

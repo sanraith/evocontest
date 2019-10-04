@@ -127,5 +127,13 @@ namespace evocontest.Submission.Test.Core
             const string expected = "simple phrase. simple phrase. simple phrases.";
             AssertSolve(input, expected);
         }
+
+        [Test]
+        public void Solve_ConflictingAcronyms_NotReplaced3()
+        {
+            var input = "ABCD. aa bb cc dd. aa BCD. ABC dd. ax bx cx dx.";
+            var expected = "ABCD. aa bb cc dd. aa BCD. ABC dd. ax bx cx dx.";
+            AssertSolve(input,expected);
+        }
     }
 }
