@@ -78,6 +78,15 @@ namespace evocontest.Runner.Host
             {
                 builder.RegisterType<DummyEpaperDisplay>().As<IEpaperDisplay>();
             }
+            if (config.UseFanControl)
+            {
+                builder.RegisterInstance(new FanHandler(config.FanGpio)).As<IFanControl>().SingleInstance();
+            }
+            else
+            {
+                builder.RegisterType<DummyFanControl>().As<IFanControl>();
+            }
+
 
             var container = builder.Build();
             return container;

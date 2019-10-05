@@ -7,6 +7,7 @@ using evocontest.Runner.Host.Connection;
 using evocontest.Runner.Host.Core;
 using evocontest.Runner.Host.Extensions;
 using evocontest.Runner.Host.Workflow.Steps;
+using evocontest.Runner.RaspberryPiUtilities;
 using evocontest.WebApp.Common;
 using evocontest.WebApp.Common.Data;
 using System;
@@ -20,7 +21,8 @@ namespace evocontest.Runner.Host.Workflow
     public class MatchWorkflow : IResolvable
     {
         public MatchWorkflow(WebAppConnector webApp, DownloadSubmissionStep downloadStep, SetupEnvironmentStep setupEnvironmentStep,
-            StartWorkerProcessStep startWorkerProcessStep, LoadSubmissionStep loadSubmissionStep, MeasureSolveStep measureSolveStep, HostConfiguration config)
+            StartWorkerProcessStep startWorkerProcessStep, LoadSubmissionStep loadSubmissionStep, MeasureSolveStep measureSolveStep,
+            HostConfiguration config, IFanControl fanControl)
         {
             myWebApp = webApp;
             myDownloadStep = downloadStep;
@@ -29,6 +31,7 @@ namespace evocontest.Runner.Host.Workflow
             myLoadSubmissionStep = loadSubmissionStep;
             myMeasureSolveStep = measureSolveStep;
             myConfig = config;
+            myFanControl = fanControl;
         }
 
         public async Task ExecuteAsync()
@@ -36,10 +39,13 @@ namespace evocontest.Runner.Host.Workflow
             Console.WriteLine();
             Console.WriteLine("Running match...");
 
-            var submissionResult = await myWebApp.GetValidSubmissionsAsync();
-            var downloadedSubmissions = await DownloadSubmissions(submissionResult);
-            var matchResults = await RunMatch(downloadedSubmissions);
-            await myWebApp.UploadMatchResults(matchResults).WithProgressLog("Uploading match results");
+            using (myFanControl.TurnOnTemporarily())
+            {
+                var submissionResult = await myWebApp.GetValidSubmissionsAsync();
+                var downloadedSubmissions = await DownloadSubmissions(submissionResult);
+                var matchResults = await RunMatch(downloadedSubmissions);
+                await myWebApp.UploadMatchResults(matchResults).WithProgressLog("Uploading match results");
+            }
         }
 
         private async Task<List<DownloadedSubmission>> DownloadSubmissions(GetValidSubmissionsResult submissionsResult)
@@ -59,7 +65,7 @@ namespace evocontest.Runner.Host.Workflow
         {
             const int roundLength = 20;
             var random = new Random();
-            var difficulty = 8;
+            var difficulty = -1;
             var activeSubmissions = downloadedSubmissions.ToList();
             var measurements = activeSubmissions.Select(x => new MeasurementContainer() { SubmissionId = x.Data.Id }).ToList();
             var inputManager = new InputGeneratorManager();
@@ -67,15 +73,16 @@ namespace evocontest.Runner.Host.Workflow
             while (activeSubmissions.Any() && ++difficulty < 20)
             {
                 Console.WriteLine($"--- Difficulty: {difficulty} ---");
+                Console.WriteLine($"[{DateTime.Now}] Generating inputs...");
                 var inputs = inputManager.Generate(difficulty, roundLength); // TODO write into file instead...
                 foreach (var submission in activeSubmissions.Shuffle(random).ToList())
                 {
-                    Console.WriteLine($"Solving: {submission.Data.Id}");
+                    Console.WriteLine($"[{DateTime.Now}] Solving: {submission.Data.Id}");
                     var measurement = measurements.First(x => x.SubmissionId == submission.Data.Id);
 
                     var round = await ExecuteRound(submission, inputs, difficulty);
                     measurement.Rounds.Add(round);
-                    if (round.TotalMilliseconds >= 2000)
+                    if (round.TotalMilliseconds > 1000)
                     {
                         activeSubmissions.Remove(submission);
                     }
@@ -143,5 +150,6 @@ namespace evocontest.Runner.Host.Workflow
         private readonly LoadSubmissionStep myLoadSubmissionStep;
         private readonly MeasureSolveStep myMeasureSolveStep;
         private readonly HostConfiguration myConfig;
+        private readonly IFanControl myFanControl;
     }
 }
