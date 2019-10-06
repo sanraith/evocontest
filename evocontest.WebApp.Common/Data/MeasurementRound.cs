@@ -10,6 +10,8 @@ namespace evocontest.WebApp.Common.Data
 
         public MeasurementError? Error { get; set; }
 
+        public double[] SplitMilliseconds { get; set; }
+
         public InputGeneratorConfig[]? GeneratorConfigs { get; set; }
     }
 }

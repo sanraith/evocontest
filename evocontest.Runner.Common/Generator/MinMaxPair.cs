@@ -8,9 +8,9 @@ namespace evocontest.Runner.Common.Generator
     [DebuggerDisplay("({Min}, {Max})")]
     public sealed class MinMaxPair
     {
-        public int Min { get; }
+        public int Min { get; set; }
 
-        public int Max { get; }
+        public int Max { get; set; }
 
         public MinMaxPair(int min, int max)
         {
@@ -23,5 +23,7 @@ namespace evocontest.Runner.Common.Generator
             Min = minAndMax;
             Max = minAndMax;
         }
+
+        private MinMaxPair() { }
     }
 }

@@ -33,20 +33,34 @@ namespace evocontest.Runner.Host.Workflow
             myMeasureSolveStep = measureSolveStep;
             myConfig = config;
             myFanControl = fanControl;
+            myMaxRoundMillis = myConfig.MaxRoundSolutionTimeMillis;
         }
 
         public async Task ExecuteAsync()
         {
             Console.WriteLine();
-            Console.WriteLine("Running match...");
 
             using (myFanControl.TurnOnTemporarily())
             {
+                await CoolDown();
+
+                Console.WriteLine("Running match...");
                 var submissionResult = await myWebApp.GetValidSubmissionsAsync();
                 var downloadedSubmissions = await DownloadSubmissions(submissionResult);
                 var matchResults = await RunMatch(downloadedSubmissions);
                 await myWebApp.UploadMatchResults(matchResults).WithProgressLog("Uploading match results");
             }
+        }
+
+        private async Task CoolDown()
+        {
+            var countDownSeconds = myConfig.CoolDownSeconds;
+            for (int i = countDownSeconds; i > 0; i--)
+            {
+                Console.Write($"Cooldown... {i}  \r");
+                await Task.Delay(TimeSpan.FromSeconds(1));
+            }
+            Console.WriteLine("Cooldown complete.");
         }
 
         private async Task<List<DownloadedSubmission>> DownloadSubmissions(GetValidSubmissionsResult submissionsResult)
@@ -71,19 +85,23 @@ namespace evocontest.Runner.Host.Workflow
             var measurements = activeSubmissions.Select(x => new MeasurementContainer() { SubmissionId = x.Data.Id }).ToList();
             var inputManager = new InputGeneratorManager();
 
+            var warmupChallenge = inputManager.Generate(0, 1).First();
+
             while (activeSubmissions.Any() && ++difficulty < 16)
             {
                 Console.WriteLine($"--- Difficulty: {difficulty} ---");
                 Console.WriteLine($"[{DateTime.Now}] Generating inputs...");
-                var inputs = inputManager.Generate(difficulty, roundLength); // TODO write into file instead...
+                var inputs = inputManager.Generate(difficulty, roundLength).ToList(); // TODO write into file instead...
+                //var inputs = Enumerable.Repeat(inputManager.Generate(difficulty, 1).First(), 20).ToList();
+
                 foreach (var submission in activeSubmissions.Shuffle(random).ToList())
                 {
                     Console.WriteLine($"[{DateTime.Now}] Solving: {submission.Data.Id}");
                     var measurement = measurements.First(x => x.SubmissionId == submission.Data.Id);
 
-                    var round = await ExecuteRound(submission, inputs, difficulty);
+                    var round = await ExecuteRound(submission, inputs, difficulty, warmupChallenge);
                     measurement.Rounds.Add(round);
-                    if (round.TotalMilliseconds > 1000 || round.Error != null)
+                    if (round.TotalMilliseconds > myMaxRoundMillis || round.Error != null)
                     {
                         activeSubmissions.Remove(submission);
                     }
@@ -93,7 +111,7 @@ namespace evocontest.Runner.Host.Workflow
             return new MatchContainer { Measurements = measurements };
         }
 
-        private async Task<MeasurementRoundContainer> ExecuteRound(DownloadedSubmission submission, IEnumerable<GeneratorResult> inputs, int difficultyLevel)
+        private async Task<MeasurementRoundContainer> ExecuteRound(DownloadedSubmission submission, IEnumerable<GeneratorResult> inputs, int difficultyLevel, GeneratorResult warmupChallenge)
         {
             var targetFile = mySetupEnvironmentStep.Execute(submission.FileInfo);
             using (var disposablePipe = await myStartWorkerProcessStep.ExecuteAsync())
@@ -109,12 +127,21 @@ namespace evocontest.Runner.Host.Workflow
 
                 var timeSum = new TimeSpan();
 
-                // TODO Warmup
-                _ = await TaskHelper.TimedTask(myConfig.SingleSolveTimeoutMillis, () => myMeasureSolveStep.ExecuteAsync(pipeServer, GeneratorResult.Empty));
+                // Warmup
+                try
+                {
+                    _ = await TaskHelper.TimedTask(myConfig.WarmupTimeoutMillis, () => myMeasureSolveStep.ExecuteAsync(pipeServer, warmupChallenge));
+                }
+                catch (TimeoutException)
+                {
+                    round.Error = new MeasurementError { ErrorType = MeasurementErrorType.Timeout };
+                    return round;
+                }
 
                 // TODO double check time
                 MeasurementError? error = null;
                 var configs = new List<InputGeneratorConfig>();
+                var splitMilliseconds = new List<double>();
                 foreach (var (input, index) in inputs.WithIndex())
                 {
                     configs.Add(input.Config);
@@ -127,6 +154,7 @@ namespace evocontest.Runner.Host.Workflow
                             case MeasureSolveResultMessage solveMsg:
                                 var isSolutionValid = solveMsg.Output == input.Solution;
                                 timeSum += solveMsg.Time;
+                                splitMilliseconds.Add(solveMsg.Time.TotalMilliseconds);
                                 if (!isSolutionValid)
                                 {
                                     error = new MeasurementError { ErrorType = MeasurementErrorType.InvalidSolution, ErrorMessage = $"Solution differs from expected at: {input.Solution.Zip(solveMsg.Output ?? "", (c1, c2) => c1 == c2).TakeWhile(b => b).Count()}" };
@@ -142,7 +170,7 @@ namespace evocontest.Runner.Host.Workflow
                     }
                     catch (TimeoutException)
                     {
-                        Console.WriteLine($"Solution timed out.");
+                        Console.WriteLine($"Single solution timeout exceeded.");
                         error = new MeasurementError { ErrorType = MeasurementErrorType.Timeout };
                     }
                     catch (Exception ex)
@@ -155,13 +183,21 @@ namespace evocontest.Runner.Host.Workflow
                         timeSum += TimeSpan.FromHours(1);
                         break;
                     }
-                    if (timeSum > TimeSpan.FromSeconds(10))
+                    if (timeSum > TimeSpan.FromMilliseconds(myMaxRoundMillis * 5))
                     {
+                        Console.WriteLine("Max solution time exceeded.");
                         break;
                     }
                 }
 
-                return new MeasurementRoundContainer { DifficultyLevel = difficultyLevel, TotalMilliseconds = timeSum.TotalMilliseconds, GeneratorConfigs = configs.ToArray(), Error = error };
+                return new MeasurementRoundContainer
+                {
+                    DifficultyLevel = difficultyLevel,
+                    TotalMilliseconds = timeSum.TotalMilliseconds,
+                    SplitMilliseconds = splitMilliseconds.ToArray(),
+                    GeneratorConfigs = configs.ToArray(),
+                    Error = error
+                };
             }
         }
 
@@ -178,6 +214,7 @@ namespace evocontest.Runner.Host.Workflow
             }
         }
 
+        private readonly int myMaxRoundMillis;
         private readonly WebAppConnector myWebApp;
         private readonly DownloadSubmissionStep myDownloadStep;
         private readonly SetupEnvironmentStep mySetupEnvironmentStep;

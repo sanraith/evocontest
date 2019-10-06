@@ -10,10 +10,18 @@ namespace evocontest.Runner.Host.Configuration
         public bool UseEpaperDisplay { get; set; } = false;
 
         public bool UseFanControl { get; set; } = false;
+
+        public bool IsDebug { get; set; } = false;
         
         public int FanGpio { get; set; } = 26;
 
+        public int CoolDownSeconds { get; set; } = 30;
+
         public int SingleSolveTimeoutMillis { get; set; } = 5000;
+
+        public int MaxRoundSolutionTimeMillis { get; set; } = 1000;
+
+        public int WarmupTimeoutMillis { get; set; } = 1000;
 
         public Directories Directories { get; set; } = new Directories();
 

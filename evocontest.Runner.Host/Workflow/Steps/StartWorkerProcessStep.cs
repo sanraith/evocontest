@@ -28,6 +28,12 @@ namespace evocontest.Runner.Host.Workflow.Steps
             myWorkerProcess = StartWorkerProcess();
             myPipeServer = await StartPipeServerAsync();
 
+            if (myConfig.IsDebug)
+            {
+                Console.WriteLine("Waiting for debugger to attach to child process. Press enter to continue.");
+                Console.ReadLine();
+            }
+
             return DisposableValue.Create(myPipeServer, pipeServer =>
             {
                 StopWorkerProcess();

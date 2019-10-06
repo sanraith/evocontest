@@ -21,7 +21,8 @@ namespace evocontest.Runner.Host
     {
         static async Task Main(string[] args)
         {
-            if (args.FirstOrDefault() == "--debug")
+            var isDebug = args.FirstOrDefault() == "--debug";
+            if (isDebug)
             {
                 Console.WriteLine("Waiting for debugger. Press enter when ready...");
                 Console.ReadLine();
@@ -30,6 +31,9 @@ namespace evocontest.Runner.Host
             using var container = LoggerExtensions.ProgressLog("Initializing", CreateContainer);
             using (var scope = container.BeginLifetimeScope())
             {
+                var config = container.Resolve<HostConfiguration>();
+                config.IsDebug = config.IsDebug ? true : isDebug;
+
                 var screen = container.Resolve<IEpaperDisplay>();
                 using (var image = new Image<Rgba32>(ImageSharpConfig.Default, screen.Width, screen.Height, Rgba32.White))
                 {
