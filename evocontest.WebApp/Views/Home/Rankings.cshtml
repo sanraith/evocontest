@@ -12,7 +12,7 @@
         .Where(x => x.MeasurementResult.Result != null)
         .OrderByDescending(x => x.MeasurementResult.Result.DifficultyLevel)
         .ThenBy(x => x.MeasurementResult.Result.TotalMilliseconds);
-    var invalidMeasurements = lastMatch.Measurements.Where(x => x.MeasurementResult.Result == null).ToList();
+    var invalidMeasurements = lastMatch?.Measurements.Where(x => x.MeasurementResult.Result == null).ToList() ?? new List<Measurement>();
 
     var participants = matches.SelectMany(x => x.Measurements).Select(x => x.Submission.User).Distinct().ToList();
     var resultsPerParticipant = new Dictionary<ApplicationUser, List<MeasurementRoundContainer>>();
@@ -28,7 +28,7 @@
 
     static string GetSolvedPerSec(int difficulty, double timeMillis)
     {
-        return (difficulty + 1 - (timeMillis / 1000)).ToString("#.###", CultureInfo.InvariantCulture); ;
+        return (difficulty + 1 - (timeMillis / 5000)).ToString("#.###", CultureInfo.InvariantCulture); ;
     }
 
 }
@@ -38,20 +38,21 @@
 }
 
 <h1>Rangsor</h1>
+<p>
+    Frissítve: @lastMatch.MatchDate
+</p>
 
-<div style="margin-top: 3em">
+<h2 style="margin-top: 1em">Napi eredmények</h2>
+<div>
     @if (lastMatch != null)
     {
-        <p>
-            Frissítve: @lastMatch.MatchDate
-        </p>
         <div style="display:flex">
             <div style="flex:45%; margin-right: 2em">
                 <table id="rankingsTable" class="table table-hover table-striped">
                     <tr>
                         <th style="text-align: center">#</th>
                         <th>Versenyző</th>
-                        <th style="text-align: center; max-width: 80px">Eredmény</th>
+                        <th style="text-align: center; max-width: 80px">Eredmény*</th>
                     </tr>
                     @foreach (var (measurement, place) in orderedMeasurements.Select((x, i) => (x, i + 1)))
                     {
@@ -94,9 +95,15 @@
                 </div>
             </div>
         </div>
-        <div style="margin-top: 3em">
+        <div class="font-italic" style="margin-top: 1em">
+            *A korábban bejelentett 1000 ms helyett egy kör maximális futási ideje 5000 ms, hogy kompenzáljuk a Raspberryn elért eredményeket az otthoniakhoz képest.
+        </div>
+
+        <h2 style="margin-top: 2em">Eredmények a verseny folyamán</h2>
+        <div>
             <canvas id="standingsChart" />
         </div>
+        <div style="margin-bottom: 2em">&nbsp;</div>
     }
     else
     {
@@ -124,7 +131,14 @@
                 }]
             },
             options: {
-                scales: { yAxes: [{ ticks: { beginAtZero: true } }] }
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            stepSize: 1
+                        }
+                    }]
+                },
             }
         });
     }
@@ -151,7 +165,14 @@
                 datasets: uDatasets
             },
             options: {
-                scales: { yAxes: [{ ticks: { beginAtZero: true } }] },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            stepSize: 1
+                        }
+                    }]
+                },
                 title: {
                     display: true,
                     text: 'Elért nehézségi szint a verseny folyamán'

@@ -19,7 +19,7 @@ namespace evocontest.Runner.Host.Configuration
 
         public int SingleSolveTimeoutMillis { get; set; } = 5000;
 
-        public int MaxRoundSolutionTimeMillis { get; set; } = 1000;
+        public int MaxRoundSolutionTimeMillis { get; set; } = 5000;
 
         public int WarmupTimeoutMillis { get; set; } = 1000;
 

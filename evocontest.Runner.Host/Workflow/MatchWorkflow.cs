@@ -191,7 +191,7 @@ namespace evocontest.Runner.Host.Workflow
                         timeSum += TimeSpan.FromHours(1);
                         break;
                     }
-                    if (timeSum > TimeSpan.FromMilliseconds(myMaxRoundMillis * 5))
+                    if (timeSum > TimeSpan.FromMilliseconds(myMaxRoundMillis))
                     {
                         Console.WriteLine("Max solution time exceeded.");
                         break;
