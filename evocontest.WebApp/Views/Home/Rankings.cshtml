@@ -38,78 +38,78 @@
 }
 
 <h1>Rangsor</h1>
+@if (lastMatch != null)
+    {
 <p>
     Frissítve: @lastMatch.MatchDate
 </p>
 
 <h2 style="margin-top: 1em">Napi eredmények</h2>
 <div>
-    @if (lastMatch != null)
-    {
-        <div style="display:flex">
-            <div style="flex:45%; margin-right: 2em">
-                <table id="rankingsTable" class="table table-hover table-striped">
-                    <tr>
-                        <th style="text-align: center">#</th>
-                        <th>Versenyző</th>
-                        <th style="text-align: center; max-width: 80px">Eredmény*</th>
-                    </tr>
-                    @foreach (var (measurement, place) in orderedMeasurements.Select((x, i) => (x, i + 1)))
+    <div style="display:flex">
+        <div style="flex:45%; margin-right: 2em">
+            <table id="rankingsTable" class="table table-hover table-striped">
+                <tr>
+                    <th style="text-align: center">#</th>
+                    <th>Versenyző</th>
+                    <th style="text-align: center; max-width: 80px">Eredmény*</th>
+                </tr>
+                @foreach (var (measurement, place) in orderedMeasurements.Select((x, i) => (x, i + 1)))
                     {
                         string solveOverTime = string.Join(";", resultsPerParticipant[measurement.Submission.User].Select(x => x == null ? "0" : GetSolvedPerSec(x.DifficultyLevel, x.TotalMilliseconds)));
 
                         var result = measurement.MeasurementResult.Result;
                         var solvedPerSecString = GetSolvedPerSec(result.DifficultyLevel, result.TotalMilliseconds);
-                        <tr>
-                            <td style="font-weight: bold; font-size: 20px; vertical-align: middle; text-align: center">@place.</td>
-                            <td>@measurement.Submission.User.FullName</td>
-                            <td>
-                                lvl @result.DifficultyLevel -
-                                @($"{result.TotalMilliseconds:0.00} ms")
+                <tr>
+                    <td style="font-weight: bold; font-size: 20px; vertical-align: middle; text-align: center">@place.</td>
+                    <td>@measurement.Submission.User.FullName</td>
+                    <td>
+                        lvl @result.DifficultyLevel -
+                        @($"{result.TotalMilliseconds:0.00} ms")
 
-                                <span style="display: none">
-                                    <input type="text" name="name" value="@measurement.Submission.User.FullName" />
-                                    <input type="text" name="score" value="@solvedPerSecString" />
-                                    <input type="text" name="scoreOverTime" value="@solveOverTime" />
-                                    <input type="text" name="difficulty" value="@result.DifficultyLevel" />
-                                    <input type="text" name="time" value="@($"{result.TotalMilliseconds:0.00}")" />
-                                </span>
-                            </td>
-                        </tr>
+                        <span style="display: none">
+                            <input type="text" name="name" value="@measurement.Submission.User.FullName" />
+                            <input type="text" name="score" value="@solvedPerSecString" />
+                            <input type="text" name="scoreOverTime" value="@solveOverTime" />
+                            <input type="text" name="difficulty" value="@result.DifficultyLevel" />
+                            <input type="text" name="time" value="@($"{result.TotalMilliseconds:0.00}")" />
+                        </span>
+                    </td>
+                </tr>
                     }
-                    @foreach (var measurement in invalidMeasurements)
+                @foreach (var measurement in invalidMeasurements)
                     {
-                        <tr>
-                            <td style="font-weight: bold; font-size: 20px; vertical-align: middle; text-align: center">-</td>
-                            <td>@measurement.Submission.User.FullName</td>
-                            <td>
-                                <span class="font-italic">Hibás eredmény</span>
-                            </td>
-                        </tr>
+                <tr>
+                    <td style="font-weight: bold; font-size: 20px; vertical-align: middle; text-align: center">-</td>
+                    <td>@measurement.Submission.User.FullName</td>
+                    <td>
+                        <span class="font-italic">Hibás eredmény</span>
+                    </td>
+                </tr>
                     }
-                </table>
-            </div>
-            <div style="flex:55%">
-                <div>
-                    <canvas id="rankingsChart" />
-                </div>
+            </table>
+        </div>
+        <div style="flex:55%">
+            <div>
+                <canvas id="rankingsChart" />
             </div>
         </div>
-        <div class="font-italic" style="margin-top: 1em">
-            *A korábban bejelentett 1000 ms helyett egy kör maximális futási ideje 5000 ms, hogy kompenzáljuk a Raspberryn elért eredményeket az otthoniakhoz képest.
-        </div>
+    </div>
+    <div class="font-italic" style="margin-top: 1em">
+        *A korábban bejelentett 1000 ms helyett egy kör maximális futási ideje 5000 ms, hogy kompenzáljuk a Raspberryn elért eredményeket az otthoniakhoz képest.
+    </div>
 
-        <h2 style="margin-top: 2em">Eredmények a verseny folyamán</h2>
-        <div>
-            <canvas id="standingsChart" />
-        </div>
-        <div style="margin-bottom: 2em">&nbsp;</div>
+    <h2 style="margin-top: 2em">Eredmények a verseny folyamán</h2>
+    <div>
+        <canvas id="standingsChart" />
+    </div>
+    <div style="margin-bottom: 2em">&nbsp;</div>
+</div>
     }
     else
     {
-        <h5>Október 7-től itt találhatod majd a napi megmérettetések eredményeit.</h5>
+<h5>Október 7-től itt találhatod majd a napi megmérettetések eredményeit.</h5>
     }
-</div>
 
 <script>
     var chartColors = "#e6194B, #3cb44b, #ffe119, #4363d8, #f58231, #911eb4, #42d4f4, #f032e6, #bfef45, #fabebe, #469990, #e6beff, #9A6324, #fffac8, #800000, #aaffc3, #808000, #ffd8b1, #000075, #a9a9a9, #000000, #e6194B, #3cb44b, #ffe119, #4363d8, #f58231, #911eb4, #42d4f4, #f032e6, #bfef45, #fabebe, #469990, #e6beff, #9A6324, #fffac8, #800000, #aaffc3, #808000, #ffd8b1, #000075, #a9a9a9, #000000".split(", ");
@@ -175,7 +175,7 @@
                 },
                 title: {
                     display: true,
-                    text: 'Elért nehézségi szint a verseny folyamán'
+                    text: 'Elért nehézségi szint'
                 }
             }
         });
