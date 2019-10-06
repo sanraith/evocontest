@@ -1,13 +1,36 @@
 ﻿@using System.Globalization;
+@using evocontest.WebApp.Data;
+@using evocontest.WebApp.Common.Data;
 @model IEnumerable<evocontest.WebApp.Data.Match>
 
 @{
     ViewData["Title"] = "Rankings";
 
+    var matches = Model.OrderBy(x => x.MatchDate).ToList();
     var lastMatch = Model.OrderByDescending(x => x.MatchDate).FirstOrDefault();
     var orderedMeasurements = lastMatch?.Measurements
+        .Where(x => x.MeasurementResult.Result != null)
         .OrderByDescending(x => x.MeasurementResult.Result.DifficultyLevel)
         .ThenBy(x => x.MeasurementResult.Result.TotalMilliseconds);
+    var invalidMeasurements = lastMatch.Measurements.Where(x => x.MeasurementResult.Result == null).ToList();
+
+    var participants = matches.SelectMany(x => x.Measurements).Select(x => x.Submission.User).Distinct().ToList();
+    var resultsPerParticipant = new Dictionary<ApplicationUser, List<MeasurementRoundContainer>>();
+    foreach (var participant in participants)
+    {
+        var results = matches.Select(x =>
+        {
+            var measurement = x.Measurements.FirstOrDefault(x => x.Submission.User == participant);
+            return measurement?.MeasurementResult.Result;
+        }).ToList();
+        resultsPerParticipant.Add(participant, results);
+    }
+
+    static string GetSolvedPerSec(int difficulty, double timeMillis)
+    {
+        return (difficulty + 1 - (timeMillis / 1000)).ToString("#.###", CultureInfo.InvariantCulture); ;
+    }
+
 }
 @section Head
 {
@@ -16,99 +39,154 @@
 
 <h1>Rangsor</h1>
 
-@if (lastMatch != null)
-{
-    <div style="display:flex">
-        <div style="flex:50%">
-            <table id="rankingsTable" class="table table-hover table-striped">
-                <tr>
-                    <th style="text-align: center">#</th>
-                    <th>Készítő</th>
-                    <th style="text-align: center; max-width: 100px">Idő</th>
-                </tr>
-                @foreach (var (measurement, place) in orderedMeasurements.Select((x, i) => (x, i + 1)))
-                {
-                    var result = measurement.MeasurementResult.Result;
-                    var solvedPerSecString = (1000 / result.TotalMilliseconds).ToString("#.####", CultureInfo.InvariantCulture);
+<div style="margin-top: 3em">
+    @if (lastMatch != null)
+    {
+        <p>
+            Frissítve: @lastMatch.MatchDate
+        </p>
+        <div style="display:flex">
+            <div style="flex:45%; margin-right: 2em">
+                <table id="rankingsTable" class="table table-hover table-striped">
                     <tr>
-                        <td style="font-weight: bold; font-size: 20px; vertical-align: middle; text-align: center">@place.</td>
-                        <td>@measurement.Submission.User.FullName</td>
-                        <td>
-                            (@result.DifficultyLevel)
-                            @result.TotalMilliseconds ms
-
-                            <span style="display:none">
-                                <input type="text" name="name" value="@measurement.Submission.User.FullName" />
-                                <input type="text" name="score" value="@solvedPerSecString" />
-                            </span>
-                        </td>
+                        <th style="text-align: center">#</th>
+                        <th>Versenyző</th>
+                        <th style="text-align: center; max-width: 80px">Eredmény</th>
                     </tr>
-                }
-            </table>
-        </div>
+                    @foreach (var (measurement, place) in orderedMeasurements.Select((x, i) => (x, i + 1)))
+                    {
+                        string solveOverTime = string.Join(";", resultsPerParticipant[measurement.Submission.User].Select(x => x == null ? "0" : GetSolvedPerSec(x.DifficultyLevel, x.TotalMilliseconds)));
 
-        <div style="flex:50%">
-            <canvas id="rankingsChart" />
+                        var result = measurement.MeasurementResult.Result;
+                        var solvedPerSecString = GetSolvedPerSec(result.DifficultyLevel, result.TotalMilliseconds);
+                        <tr>
+                            <td style="font-weight: bold; font-size: 20px; vertical-align: middle; text-align: center">@place.</td>
+                            <td>@measurement.Submission.User.FullName</td>
+                            <td>
+                                lvl @result.DifficultyLevel -
+                                @($"{result.TotalMilliseconds:0.00} ms")
+
+                                <span style="display: none">
+                                    <input type="text" name="name" value="@measurement.Submission.User.FullName" />
+                                    <input type="text" name="score" value="@solvedPerSecString" />
+                                    <input type="text" name="scoreOverTime" value="@solveOverTime" />
+                                    <input type="text" name="difficulty" value="@result.DifficultyLevel" />
+                                    <input type="text" name="time" value="@($"{result.TotalMilliseconds:0.00}")" />
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                    @foreach (var measurement in invalidMeasurements)
+                    {
+                        <tr>
+                            <td style="font-weight: bold; font-size: 20px; vertical-align: middle; text-align: center">-</td>
+                            <td>@measurement.Submission.User.FullName</td>
+                            <td>
+                                <span class="font-italic">Hibás eredmény</span>
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+            <div style="flex:55%">
+                <div>
+                    <canvas id="rankingsChart" />
+                </div>
+            </div>
         </div>
-    </div>
-}
-else
-{
-    <h5>Október 7-től itt találhatod majd a napi megmérettetések eredményeit.</h5>
-}
+        <div style="margin-top: 3em">
+            <canvas id="standingsChart" />
+        </div>
+    }
+    else
+    {
+        <h5>Október 7-től itt találhatod majd a napi megmérettetések eredményeit.</h5>
+    }
+</div>
 
 <script>
-    var labels = $("#rankingsTable input[name=name]").map((_, x) => $(x).val()).toArray();
-    var scores = $("#rankingsTable input[name=score]").map((_, x) => parseFloat($(x).val())).toArray();
+    var chartColors = "#e6194B, #3cb44b, #ffe119, #4363d8, #f58231, #911eb4, #42d4f4, #f032e6, #bfef45, #fabebe, #469990, #e6beff, #9A6324, #fffac8, #800000, #aaffc3, #808000, #ffd8b1, #000075, #a9a9a9, #000000, #e6194B, #3cb44b, #ffe119, #4363d8, #f58231, #911eb4, #42d4f4, #f032e6, #bfef45, #fabebe, #469990, #e6beff, #9A6324, #fffac8, #800000, #aaffc3, #808000, #ffd8b1, #000075, #a9a9a9, #000000".split(", ");
 
-    var ctx = document.getElementById('rankingsChart').getContext('2d');
-    var myChart = new Chart(ctx, {
-        type: 'horizontalBar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Solved/sec',
-                data: scores,
-                borderWidth: 1,
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)'
-                ]
-            }]
-        },
-        options: {
-            scales: { yAxes: [{ ticks: { beginAtZero: true } }] }
+    function renderRankingsChart() {
+        var labels = $("#rankingsTable input[name=name]").map((_, x) => $(x).val()).toArray();
+        var scores = $("#rankingsTable input[name=score]").map((_, x) => parseFloat($(x).val())).toArray();
+
+        var ctx = document.getElementById('rankingsChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Elért nehézségi szint',
+                    data: scores,
+                    borderWidth: 1,
+                    backgroundColor: chartColors
+                }]
+            },
+            options: {
+                scales: { yAxes: [{ ticks: { beginAtZero: true } }] }
+            }
+        });
+    }
+
+    function renderStandingsChart() {
+        var labels = $("#rankingsTable input[name=name]").map((_, x) => $(x).val()).toArray();
+        var scores = $("#rankingsTable input[name=scoreOverTime]").map((_, x) => $(x).val()).toArray();
+
+        var uDatasets = [];
+        for (var i = 0; i < labels.length; i++) {
+            uDatasets.push({
+                data: scores[i].split(";").map((x) => parseFloat(x)),
+                label: labels[i],
+                borderColor: chartColors[i],
+                fill: false
+            });
         }
-    });
+
+        var ctx = document.getElementById('standingsChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [@Html.Raw(string.Join(", ", matches.Select(x => "\"" + x.MatchDate.ToString("MM.dd.") + "\"")))],
+                datasets: uDatasets
+            },
+            options: {
+                scales: { yAxes: [{ ticks: { beginAtZero: true } }] },
+                title: {
+                    display: true,
+                    text: 'Elért nehézségi szint a verseny folyamán'
+                }
+            }
+        });
+    }
+
+    renderRankingsChart();
+    renderStandingsChart();
 </script>
 
 @*<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.MatchDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.JsonResult)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+        <thead>
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.MatchDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.JsonResult)
-                </td>
+                <th>
+                    @Html.DisplayNameFor(model => model.MatchDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.JsonResult)
+                </th>
+                <th></th>
             </tr>
-        }
-    </tbody>
-</table>*@
+        </thead>
+        <tbody>
+            @foreach (var item in matches)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.MatchDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.JsonResult)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>*@
