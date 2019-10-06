@@ -43,7 +43,7 @@ namespace evocontest.Runner.Host.Workflow
         private async Task Validate(string submissionId)
         {
             var loadTimeout = TimeSpan.FromSeconds(5);
-            var unitTestTimeout = TimeSpan.FromSeconds(30);
+            var unitTestTimeout = TimeSpan.FromSeconds(20);
 
             var sourceFile = await myDownloadStep.ExecuteAsync(submissionId);
             var targetFile = mySetupEnvironmentStep.Execute(sourceFile);
@@ -75,6 +75,10 @@ namespace evocontest.Runner.Host.Workflow
                         success = unitTestResult.IsAllPassed;
                         errorMessage = $"Helytelen eredmény a következő unit testekre: {string.Join(", ", unitTestResult.FailedTests)}";
                     }
+                    else
+                    {
+                        Console.WriteLine($"Sikertelen ellenőrzés!");
+                    }
                 }
             }
             catch (TimeoutException)
@@ -91,7 +95,7 @@ namespace evocontest.Runner.Host.Workflow
 
             // Validation completed
             status = success ? ValidationStateEnum.Completed : status;
-            Console.WriteLine($"Validation done. {status}, Success: {success}{(success ? "" : ", Error: " + errorMessage)}");
+            Console.WriteLine($"[{DateTime.Now}] Validation done. {status}, Success: {success}{(success ? "" : ", Error: " + errorMessage)}");
             await myServer.UpdateStatus(submissionId, status, success ? null : errorMessage)
                 .WithProgressLog("Sending validation result to server");
         }

@@ -5,4 +5,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\evocontest.Runner.Common\evocontest.Runner.Common.csproj" />
+  </ItemGroup>
+
 </Project>

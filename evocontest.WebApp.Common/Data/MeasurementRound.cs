@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using evocontest.Runner.Common.Generator;
 
 namespace evocontest.WebApp.Common.Data
 {
@@ -10,6 +8,8 @@ namespace evocontest.WebApp.Common.Data
 
         public double TotalMilliseconds { get; set; }
 
-        public string? Error { get; set; }
+        public MeasurementError? Error { get; set; }
+
+        public InputGeneratorConfig[]? GeneratorConfigs { get; set; }
     }
 }

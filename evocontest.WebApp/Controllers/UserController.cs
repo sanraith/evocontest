@@ -116,6 +116,7 @@ namespace evocontest.WebApp.Controllers
             if (submissionForDelete != null)
             {
                 submissionForDelete.IsDeleted = true;
+                submissionForDelete.DeletionDate = DateTime.Now;
                 await myDb.SaveChangesAsync();
             }
 

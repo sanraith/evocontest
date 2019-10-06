@@ -58,10 +58,16 @@ namespace evocontest.Runner.Host.Workflow.Steps
 
         private void StopWorkerProcess()
         {
-            myPipeServer.SendMessage(new TerminateMessage());
-
             Console.Write("Waiting for worker process to exit... ");
-            myWorkerProcess.WaitForExit(5000);
+
+            var terminateTask = TaskHelper.TimedTask(TimeSpan.FromSeconds(5), () => Task.Run(() => myPipeServer.SendMessage(new TerminateMessage())));
+            try
+            {
+                terminateTask.GetAwaiter().GetResult();
+                myWorkerProcess.WaitForExit(5000);
+            }
+            catch (TimeoutException)
+            { }
 
             if (!myWorkerProcess.HasExited)
             {

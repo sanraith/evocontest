@@ -1,5 +1,6 @@
 ﻿using evocontest.Runner.Common.Extensions;
 using evocontest.Runner.Common.Generator;
+using evocontest.Runner.Host.Common.Messages;
 using evocontest.Runner.Host.Common.Messages.Response;
 using evocontest.Runner.Host.Common.Utility;
 using evocontest.Runner.Host.Configuration;
@@ -70,7 +71,7 @@ namespace evocontest.Runner.Host.Workflow
             var measurements = activeSubmissions.Select(x => new MeasurementContainer() { SubmissionId = x.Data.Id }).ToList();
             var inputManager = new InputGeneratorManager();
 
-            while (activeSubmissions.Any() && ++difficulty < 20)
+            while (activeSubmissions.Any() && ++difficulty < 16)
             {
                 Console.WriteLine($"--- Difficulty: {difficulty} ---");
                 Console.WriteLine($"[{DateTime.Now}] Generating inputs...");
@@ -82,7 +83,7 @@ namespace evocontest.Runner.Host.Workflow
 
                     var round = await ExecuteRound(submission, inputs, difficulty);
                     measurement.Rounds.Add(round);
-                    if (round.TotalMilliseconds > 1000)
+                    if (round.TotalMilliseconds > 1000 || round.Error != null)
                     {
                         activeSubmissions.Remove(submission);
                     }
@@ -97,36 +98,70 @@ namespace evocontest.Runner.Host.Workflow
             var targetFile = mySetupEnvironmentStep.Execute(submission.FileInfo);
             using (var disposablePipe = await myStartWorkerProcessStep.ExecuteAsync())
             {
+                var round = new MeasurementRoundContainer { DifficultyLevel = difficultyLevel };
                 var pipeServer = disposablePipe.Value;
                 var success = await myLoadSubmissionStep.ExecuteAsync(pipeServer, targetFile);
-                // TODO check success
+                if (!success)
+                {
+                    round.Error = new MeasurementError { ErrorType = MeasurementErrorType.CouldNotLoadAssembly };
+                    return round;
+                }
+
                 var timeSum = new TimeSpan();
 
                 // TODO Warmup
                 _ = await TaskHelper.TimedTask(myConfig.SingleSolveTimeoutMillis, () => myMeasureSolveStep.ExecuteAsync(pipeServer, GeneratorResult.Empty));
 
                 // TODO double check time
-                // TODO check result
-                foreach (var input in inputs)
+                MeasurementError? error = null;
+                var configs = new List<InputGeneratorConfig>();
+                foreach (var (input, index) in inputs.WithIndex())
                 {
-                    var result = await TaskHelper.TimedTask(myConfig.SingleSolveTimeoutMillis, () => myMeasureSolveStep.ExecuteAsync(pipeServer, input));
-                    switch (result)
+                    configs.Add(input.Config);
+                    IMessage? result = null;
+                    try
                     {
-                        case MeasureSolveResultMessage solveMsg:
-                            // TODO handle invalid case 
-                            var isSolutionValid = solveMsg.Output == input.Solution;
-                            timeSum += solveMsg.Time;
-                            break;
-                        case OperationFailedMessage failMsg:
-                            Console.WriteLine(failMsg.ErrorMessage);
-                            timeSum += TimeSpan.FromDays(1);
-                            break;
-                        default: throw new InvalidOperationException(result.ToString());
+                        result = await TaskHelper.TimedTask(myConfig.SingleSolveTimeoutMillis, () => myMeasureSolveStep.ExecuteAsync(pipeServer, input));
+                        switch (result)
+                        {
+                            case MeasureSolveResultMessage solveMsg:
+                                var isSolutionValid = solveMsg.Output == input.Solution;
+                                timeSum += solveMsg.Time;
+                                if (!isSolutionValid)
+                                {
+                                    error = new MeasurementError { ErrorType = MeasurementErrorType.InvalidSolution, ErrorMessage = $"Solution differs from expected at: {input.Solution.Zip(solveMsg.Output ?? "", (c1, c2) => c1 == c2).TakeWhile(b => b).Count()}" };
+                                }
+                                break;
+                            case OperationFailedMessage failMsg:
+                                error = new MeasurementError { ErrorType = MeasurementErrorType.Unknown, ErrorMessage = failMsg.ErrorMessage };
+                                Console.WriteLine($"Failed operation: {failMsg.ErrorMessage}");
+                                break;
+                            default:
+                                throw new InvalidOperationException("Unknown result from worker process!");
+                        }
+                    }
+                    catch (TimeoutException)
+                    {
+                        Console.WriteLine($"Solution timed out.");
+                        error = new MeasurementError { ErrorType = MeasurementErrorType.Timeout };
+                    }
+                    catch (Exception ex)
+                    {
+                        error = new MeasurementError { ErrorType = MeasurementErrorType.Unknown, ErrorMessage = ex.Message };
+                    }
+
+                    if (error != null)
+                    {
+                        timeSum += TimeSpan.FromHours(1);
+                        break;
+                    }
+                    if (timeSum > TimeSpan.FromSeconds(10))
+                    {
+                        break;
                     }
                 }
-                var round = new MeasurementRoundContainer { DifficultyLevel = difficultyLevel, TotalMilliseconds = timeSum.TotalMilliseconds };
 
-                return round;
+                return new MeasurementRoundContainer { DifficultyLevel = difficultyLevel, TotalMilliseconds = timeSum.TotalMilliseconds, GeneratorConfigs = configs.ToArray(), Error = error };
             }
         }
 

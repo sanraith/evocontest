@@ -7,16 +7,28 @@ namespace evocontest.Runner.Host.Common.Utility
 {
     public static class TaskHelper
     {
+        /// <summary>
+        /// .
+        /// </summary>
+        /// <exception cref="TimeoutException"></exception>
         public static Task TimedTask(int timeoutMillis, Func<Task> taskFunc)
         {
             return TimedTask(TimeSpan.FromMilliseconds(timeoutMillis), taskFunc);
         }
 
+        /// <summary>
+        /// .
+        /// </summary>
+        /// <exception cref="TimeoutException"></exception>
         public static Task TimedTask(TimeSpan timeout, Func<Task> taskFunc)
         {
             return TimedTask(timeout, () => taskFunc().ContinueWith(_ => true));
         }
 
+        /// <summary>
+        /// .
+        /// </summary>
+        /// <exception cref="TimeoutException"></exception>
         public static Task<TResult> TimedTask<TResult>(int timeoutMillis, Func<Task<TResult>> workTaskGenerator)
         {
             return TimedTask(TimeSpan.FromMilliseconds(timeoutMillis), workTaskGenerator);

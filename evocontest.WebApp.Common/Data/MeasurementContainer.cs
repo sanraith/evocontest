@@ -13,6 +13,6 @@ namespace evocontest.WebApp.Common.Data
         public List<MeasurementRoundContainer> Rounds { get; set; } = new List<MeasurementRoundContainer>();
 
         [JsonIgnore]
-        public MeasurementRoundContainer Result => Rounds.OrderByDescending(x => x.DifficultyLevel).FirstOrDefault();
+        public MeasurementRoundContainer Result => Rounds.OrderByDescending(x => x.DifficultyLevel).FirstOrDefault(x => x.Error == null && x.TotalMilliseconds <= 1000);
     }
 }
