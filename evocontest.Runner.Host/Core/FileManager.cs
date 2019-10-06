@@ -38,6 +38,33 @@ namespace evocontest.Runner.Host.Core
             return relativePath;
         }
 
+        public void CleanTempDirectory()
+        {
+            foreach (var directory in myTempDirectory.GetDirectories())
+            {
+                try
+                {
+                    directory.Delete(true);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Could not delete \"{directory.FullName}\". {ex.Message}");
+                }
+            }
+
+            foreach (var file in myTempDirectory.GetFiles())
+            {
+                try
+                {
+                    file.Delete();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Could not delete \"{file.FullName}\". {ex.Message}");
+                }
+            }
+        }
+
         private readonly DirectoryInfo myTempDirectory;
     }
 }

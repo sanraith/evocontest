@@ -23,7 +23,7 @@ namespace evocontest.Runner.Host.Workflow
     {
         public MatchWorkflow(WebAppConnector webApp, DownloadSubmissionStep downloadStep, SetupEnvironmentStep setupEnvironmentStep,
             StartWorkerProcessStep startWorkerProcessStep, LoadSubmissionStep loadSubmissionStep, MeasureSolveStep measureSolveStep,
-            HostConfiguration config, IFanControl fanControl)
+            HostConfiguration config, IFanControl fanControl, FileManager fileManager)
         {
             myWebApp = webApp;
             myDownloadStep = downloadStep;
@@ -33,6 +33,7 @@ namespace evocontest.Runner.Host.Workflow
             myMeasureSolveStep = measureSolveStep;
             myConfig = config;
             myFanControl = fanControl;
+            myFileManager = fileManager;
             myMaxRoundMillis = myConfig.MaxRoundSolutionTimeMillis;
         }
 
@@ -49,6 +50,7 @@ namespace evocontest.Runner.Host.Workflow
                 var downloadedSubmissions = await DownloadSubmissions(submissionResult);
                 var matchResults = await RunMatch(downloadedSubmissions);
                 await myWebApp.UploadMatchResults(matchResults).WithProgressLog("Uploading match results");
+                myFileManager.CleanTempDirectory();
             }
         }
 
@@ -79,27 +81,31 @@ namespace evocontest.Runner.Host.Workflow
         private async Task<MatchContainer> RunMatch(IEnumerable<DownloadedSubmission> downloadedSubmissions)
         {
             const int roundLength = 20;
+            const int difficultyCount = 16;
             var random = new Random();
             var difficulty = -1;
             var activeSubmissions = downloadedSubmissions.ToList();
             var measurements = activeSubmissions.Select(x => new MeasurementContainer() { SubmissionId = x.Data.Id }).ToList();
-            var inputManager = new InputGeneratorManager();
 
-            var warmupChallenge = inputManager.Generate(0, 1).First();
+            var seed = random.Next();
+            InputGeneratorManager inputGeneratorManger = new InputGeneratorManager(seed);
+            var warmupChallenge = inputGeneratorManger.Generate(0, 1).Single();
+            var testDataManager = new TestDataManager(seed, inputGeneratorManger);
 
-            while (activeSubmissions.Any() && ++difficulty < 16)
+            while (activeSubmissions.Any() && ++difficulty < difficultyCount)
             {
                 Console.WriteLine($"--- Difficulty: {difficulty} ---");
                 Console.WriteLine($"[{DateTime.Now}] Generating inputs...");
-                var inputs = inputManager.Generate(difficulty, roundLength).ToList(); // TODO write into file instead...
-                //var inputs = Enumerable.Repeat(inputManager.Generate(difficulty, 1).First(), 20).ToList();
+
+                // Generate test data up to roundLength
+                _ = testDataManager.GetTestData(difficulty, roundLength + 1);
 
                 foreach (var submission in activeSubmissions.Shuffle(random).ToList())
                 {
                     Console.WriteLine($"[{DateTime.Now}] Solving: {submission.Data.Id}");
                     var measurement = measurements.First(x => x.SubmissionId == submission.Data.Id);
 
-                    var round = await ExecuteRound(submission, inputs, difficulty, warmupChallenge);
+                    var round = await ExecuteRound(testDataManager, warmupChallenge, submission, difficulty, roundLength);
                     measurement.Rounds.Add(round);
                     if (round.TotalMilliseconds > myMaxRoundMillis || round.Error != null)
                     {
@@ -108,10 +114,11 @@ namespace evocontest.Runner.Host.Workflow
                 }
             }
 
+            testDataManager.Clean();
             return new MatchContainer { Measurements = measurements };
         }
 
-        private async Task<MeasurementRoundContainer> ExecuteRound(DownloadedSubmission submission, IEnumerable<GeneratorResult> inputs, int difficultyLevel, GeneratorResult warmupChallenge)
+        private async Task<MeasurementRoundContainer> ExecuteRound(TestDataManager testDataManager, GeneratorResult warmupChallenge, DownloadedSubmission submission, int difficultyLevel, int roundLength)
         {
             var targetFile = mySetupEnvironmentStep.Execute(submission.FileInfo);
             using (var disposablePipe = await myStartWorkerProcessStep.ExecuteAsync())
@@ -142,8 +149,9 @@ namespace evocontest.Runner.Host.Workflow
                 MeasurementError? error = null;
                 var configs = new List<InputGeneratorConfig>();
                 var splitMilliseconds = new List<double>();
-                foreach (var (input, index) in inputs.WithIndex())
+                for (int index = 0; index < roundLength; index++)
                 {
+                    var input = testDataManager.GetTestData(difficultyLevel, index);
                     configs.Add(input.Config);
                     IMessage? result = null;
                     try
@@ -157,15 +165,15 @@ namespace evocontest.Runner.Host.Workflow
                                 splitMilliseconds.Add(solveMsg.Time.TotalMilliseconds);
                                 if (!isSolutionValid)
                                 {
-                                    error = new MeasurementError { ErrorType = MeasurementErrorType.InvalidSolution, ErrorMessage = $"Solution differs from expected at: {input.Solution.Zip(solveMsg.Output ?? "", (c1, c2) => c1 == c2).TakeWhile(b => b).Count()}" };
+                                    error = new MeasurementError { ErrorType = MeasurementErrorType.InvalidSolution, ErrorMessage = $"Hibás megoldás: {input.Solution.Zip(solveMsg.Output ?? "", (c1, c2) => c1 == c2).TakeWhile(b => b).Count()}" };
                                 }
                                 break;
                             case OperationFailedMessage failMsg:
                                 error = new MeasurementError { ErrorType = MeasurementErrorType.Unknown, ErrorMessage = failMsg.ErrorMessage };
-                                Console.WriteLine($"Failed operation: {failMsg.ErrorMessage}");
+                                Console.WriteLine($"Ismeretlen hiba: {failMsg.ErrorMessage}");
                                 break;
                             default:
-                                throw new InvalidOperationException("Unknown result from worker process!");
+                                throw new InvalidOperationException("Impossible case happened. :(");
                         }
                     }
                     catch (TimeoutException)
@@ -189,6 +197,8 @@ namespace evocontest.Runner.Host.Workflow
                         break;
                     }
                 }
+
+                Console.WriteLine($"Round completion time: {timeSum.TotalMilliseconds} ms.");
 
                 return new MeasurementRoundContainer
                 {
@@ -223,5 +233,6 @@ namespace evocontest.Runner.Host.Workflow
         private readonly MeasureSolveStep myMeasureSolveStep;
         private readonly HostConfiguration myConfig;
         private readonly IFanControl myFanControl;
+        private readonly FileManager myFileManager;
     }
 }

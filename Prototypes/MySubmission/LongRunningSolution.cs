@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace MySubmission
 {
-    public sealed class LongRunningSolution : ISolution
+    public sealed class LongRunningSolution// : ISolution
     {
         public string Solve(string input)
         {
