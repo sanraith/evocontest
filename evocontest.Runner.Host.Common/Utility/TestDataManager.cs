@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 
 namespace evocontest.Runner.Host.Common.Utility
 {
@@ -39,6 +40,7 @@ namespace evocontest.Runner.Host.Common.Utility
             var targetDirectory = new DirectoryInfo(Path.Combine(TestDataDirectory, mySeed.ToString(), difficulty.ToString(), targetIndex.ToString()));
             var inputFileInfo = new FileInfo(Path.Combine(targetDirectory.FullName, "input.txt"));
             var solutionFileInfo = new FileInfo(Path.Combine(targetDirectory.FullName, "solution.txt"));
+            var configFileInfo = new FileInfo(Path.Combine(targetDirectory.FullName, "config.txt"));
 
             if (!targetDirectory.Exists)
             {
@@ -47,8 +49,9 @@ namespace evocontest.Runner.Host.Common.Utility
 
             var input = File.ReadAllText(inputFileInfo.FullName);
             var solution = File.ReadAllText(solutionFileInfo.FullName);
+            var config = JsonSerializer.Deserialize<InputGeneratorConfig>(File.ReadAllText(configFileInfo.FullName));
 
-            return new GeneratorResult { Input = input, Solution = solution };
+            return new GeneratorResult { Input = input, Solution = solution, Config = config };
         }
 
         private void GenerateAllInputData(int difficulty, int count)
@@ -69,9 +72,11 @@ namespace evocontest.Runner.Host.Common.Utility
                 targetDirectory.Create();
                 var newInputFileInfo = new FileInfo(Path.Combine(targetDirectory.FullName, "input.txt"));
                 var newSolutionFoleInfo = new FileInfo(Path.Combine(targetDirectory.FullName, "solution.txt"));
+                var newConfigFileInfo = new FileInfo(Path.Combine(targetDirectory.FullName, "config.txt"));
 
                 File.WriteAllText(newInputFileInfo.FullName, result.Input);
                 File.WriteAllText(newSolutionFoleInfo.FullName, result.Solution);
+                File.WriteAllText(newConfigFileInfo.FullName, JsonSerializer.Serialize(result.Config));
                 if (i == 0)
                 {
                     var length = result.Input.Length;
