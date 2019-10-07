@@ -25,8 +25,8 @@
         <li id="progressItem-4">Jelentkezés elfogadva</li>
     </ul>
 </div>
-
 <div id="submitContent">Pillanat... <span class="spinner-border spinner-border-sm" role="status"></span></div>
+<div>A következő rangsorolásig hátralévő idő: <span id="countdown"></span></div>
 
 @*<div class="alert-danger">
         <h2>Erősítsd meg az email címedet!</h2>
@@ -55,15 +55,6 @@
     </ul>
     szükséges projekteket. A letöltéshez válaszd ki a jobboldali linkek valamelyikét!
 </p>
-@*<div style="margin-top: 2em">
-    <img src="~/pic/vscore.png" style="float: right; margin-left: 1em;" />
-    <p>
-        Az SDK használatához ajánlott feltelepíteni a legújabb
-        <a href="https://visualstudio.microsoft.com/vs/"><span class="text-nowrap">Visual Studio 2019</span></a>
-        <span class="small">(v16.3+)</span> környezetet is, ami párhuzamosan más Visual Studio verziók mellé is telepíthető.
-        Telepítéskor ne felejtsd el kiválasztani a ".NET Core cross-platform development" csomagot.
-    </p>
-</div>*@
 
 <h2>Jelentkezés</h2>
 <p>
@@ -79,3 +70,43 @@
     Sikeres ellenőrzés után a megoldásod aktív lesz, és részt fog venni a napi megmérettetéseken.
     A nevezési időszak alatt a megoldásodat teszőleges alkalommal lecserélheted. A döntőben az utolsó feltöltött megoldás vesz részt.
 </p>
+<script>
+    @{
+        var now = DateTime.Now;
+        var targetDate = new DateTime(now.Year, now.Month, now.Day, 10, 0, 0);
+        if (DateTime.Now >= targetDate)
+        {
+            targetDate = targetDate.AddDays(1);
+        }
+        var targetDateStr = targetDate.ToString("yyyy-MM-ddTHH:mm:ss");
+    }
+    // Set the date we're counting down to
+    var countDownDate = new Date("@Html.Raw(targetDateStr)").getTime();
+
+    // Update the count down every 1 second
+    var x = setInterval(function () {
+
+        // Get today's date and time
+        var now = new Date().getTime();
+
+        // Find the distance between now and the count down date
+        var distance = countDownDate - now;
+
+        // Time calculations for days, hours, minutes and seconds
+        var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        // Display the result in the element with id="demo"
+        document.getElementById("countdown").innerHTML = ""
+            + hours + ":"
+            + minutes + ":"
+            + seconds + "";
+
+        // If the count down is finished, set next day
+        if (distance < 0) {
+            countDownDate = new Date(countDownDate).setDate(new Date(countDownDate).getDate() + 1);
+        }
+    }, 1000);
+</script>

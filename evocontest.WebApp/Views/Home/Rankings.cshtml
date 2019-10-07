@@ -4,7 +4,7 @@
 @model IEnumerable<evocontest.WebApp.Data.Match>
 
 @{
-    ViewData["Title"] = "Rankings";
+    ViewData["Title"] = "Rangsor";
 
     var matches = Model.OrderBy(x => x.MatchDate).ToList();
     var lastMatch = Model.OrderByDescending(x => x.MatchDate).FirstOrDefault();
