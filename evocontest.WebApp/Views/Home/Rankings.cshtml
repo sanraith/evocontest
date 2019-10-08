@@ -224,15 +224,20 @@ else
     }
 
     function startCountDown(dateStr) {
-        //countdown("countdown", new Date(dateStr), "A rangsor perceken belül frissül...", (hours, minutes, seconds) => parseInt(hours) < 10 ? "Következő rangsor: " + hours + ":" + minutes + ":" + seconds + " múlva." : "");
+        countdown("countdown", new Date(dateStr), "Rangsorolás folyamatban...", (hours, minutes, seconds) => parseInt(hours) >= 0 && parseInt(hours) < 10 ? "Következő rangsor: " + hours + ":" + minutes + ":" + seconds + " múlva." : "");
     }
 
     @if (lastMatch != null)
     {
         var now = lastMatch.MatchDate.AddDays(1);
         var targetDate = new DateTime(now.Year, now.Month, now.Day, 10, 0, 0);
+        //var targetDate = DateTime.Now.AddSeconds(5);
         var targetDateStr = targetDate.ToString("yyyy-MM-ddTHH:mm:ss");
-        @:startCountDown("@Html.Raw(targetDateStr)");
+        if (targetDate < new DateTime(2019, 10, 21))
+        {
+            @:startCountDown("@Html.Raw(targetDateStr)");
+        }
+
         @:renderRankingsChart();
         @:renderRankingsChart2();
         @:renderStandingsChart();

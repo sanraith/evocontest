@@ -35,7 +35,9 @@ namespace evocontest.WebApp.Controllers
 
         public async Task<IActionResult> Submit()
         {
+            var lastMatch = myDb.Matches.OrderByDescending(x => x.MatchDate).FirstOrDefault();
             ViewBag.User = await myUserManager.GetUserAsync(User);
+            ViewBag.LastMatchDate = lastMatch == null ? DateTime.Now.AddMonths(-1) : lastMatch.MatchDate;
 
             return View();
         }

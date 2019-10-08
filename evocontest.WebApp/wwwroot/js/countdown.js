@@ -21,9 +21,9 @@ function countdown(elementId, targetDate, completedText, getTickText) {
         document.getElementById(elementId).innerHTML = getTickText(hours.toString().padStart(2, "0"), minutes.toString().padStart(2, "0"), seconds.toString().padStart(2, "0"));
 
         // If the count down is finished, set next day
-        if (distance < 0) {
+        if (distance <= 0) {
             clearInterval(x);
-            countDownDate = completedText;
+            document.getElementById(elementId).innerHTML = completedText;
         }
     }, 1000);
 
