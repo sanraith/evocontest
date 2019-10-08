@@ -26,9 +26,19 @@
         resultsPerParticipant.Add(participant, results);
     }
 
-    static string GetSolvedPerSec(int difficulty, double timeMillis)
+    static double GetAdjustedDifficulty(int difficulty, double timeMillis)
     {
-        return (difficulty + 1 - (timeMillis / 5000)).ToString("#.###", CultureInfo.InvariantCulture); ;
+        return (difficulty + 1 - (timeMillis / 5000));
+    }
+
+    static string GetAdjustedDifficultyString(int difficulty, double timeMillis)
+    {
+        return GetAdjustedDifficulty(difficulty, timeMillis).ToString("#.###", CultureInfo.InvariantCulture);
+    }
+
+    static string GetSolvedPerSecString(int difficulty, double timeMillis)
+    {
+        return (Math.Pow(2, difficulty) * 256 * 20 / (timeMillis / 1000)).ToString("#", CultureInfo.InvariantCulture);
     }
 
 }
@@ -56,10 +66,11 @@
                     </tr>
                     @foreach (var (measurement, place) in orderedMeasurements.Select((x, i) => (x, i + 1)))
                     {
-                        string solveOverTime = string.Join(";", resultsPerParticipant[measurement.Submission.User].Select(x => x == null ? "0" : GetSolvedPerSec(x.DifficultyLevel, x.TotalMilliseconds)));
+                        string solveOverTime = string.Join(";", resultsPerParticipant[measurement.Submission.User].Select(x => x == null ? "0" : GetAdjustedDifficultyString(x.DifficultyLevel, x.TotalMilliseconds)));
 
                         var result = measurement.MeasurementResult.Result;
-                        var solvedPerSecString = GetSolvedPerSec(result.DifficultyLevel, result.TotalMilliseconds);
+                        var adjustedDifficultyString = GetAdjustedDifficultyString(result.DifficultyLevel, result.TotalMilliseconds);
+                        var exponentSolvedPerSecString = GetSolvedPerSecString(result.DifficultyLevel, result.TotalMilliseconds);
                         <tr>
                             <td style="font-weight: bold; font-size: 20px; vertical-align: middle; text-align: center">@place.</td>
                             <td>@measurement.Submission.User.FullName</td>
@@ -69,7 +80,8 @@
 
                                 <span style="display: none">
                                     <input type="text" name="name" value="@measurement.Submission.User.FullName" />
-                                    <input type="text" name="score" value="@solvedPerSecString" />
+                                    <input type="text" name="score" value="@adjustedDifficultyString" />
+                                    <input type="text" name="exponentScore" value="@exponentSolvedPerSecString" />
                                     <input type="text" name="scoreOverTime" value="@solveOverTime" />
                                     <input type="text" name="difficulty" value="@result.DifficultyLevel" />
                                     <input type="text" name="time" value="@($"{result.TotalMilliseconds:0.00}")" />
@@ -92,6 +104,9 @@
             <div style="flex:55%">
                 <div>
                     <canvas id="rankingsChart" />
+                </div>
+                <div>
+                    <canvas id="rankingsChart2" />
                 </div>
             </div>
         </div>
@@ -137,6 +152,33 @@ else
                             beginAtZero: true,
                             stepSize: 1
                         }
+                    }]
+                },
+            }
+        });
+    }
+
+    function renderRankingsChart2() {
+        var labels = $("#rankingsTable input[name=name]").map((_, x) => $(x).val()).toArray();
+        var scores = $("#rankingsTable input[name=exponentScore]").map((_, x) => parseFloat($(x).val())).toArray();
+
+        var ctx = document.getElementById('rankingsChart2').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Másodpercenként feldolgozott karakterek',
+                    data: scores,
+                    borderWidth: 1,
+                    backgroundColor: chartColors
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        //type: "logarithmic",
+
                     }]
                 },
             }
@@ -192,6 +234,7 @@ else
         var targetDateStr = targetDate.ToString("yyyy-MM-ddTHH:mm:ss");
         @:startCountDown("@Html.Raw(targetDateStr)");
         @:renderRankingsChart();
+        @:renderRankingsChart2();
         @:renderStandingsChart();
     }
 </script>
