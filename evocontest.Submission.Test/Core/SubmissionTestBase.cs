@@ -63,7 +63,7 @@ namespace evocontest.Submission.Test.Core
         [Test]
         public void Solve_LowercaseAcronym_NotReplaced()
         {
-            const string input = "aa pp pp ll ee. APPLE. appl ee.";
+            const string input = "aa pp px ll ee. APPLE. appl ee.";
             const string expected = "APPLE. APPLE. appl ee.";
 
             AssertSolve(input, expected);
