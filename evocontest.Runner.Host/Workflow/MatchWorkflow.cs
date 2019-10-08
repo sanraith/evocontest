@@ -98,7 +98,7 @@ namespace evocontest.Runner.Host.Workflow
                 Console.WriteLine($"[{DateTime.Now}] Generating inputs...");
 
                 // Generate test data up to roundLength
-                _ = testDataManager.GetTestData(difficulty, roundLength + 1);
+                _ = testDataManager.GetTestData(difficulty, roundLength - 1);
 
                 foreach (var submission in activeSubmissions.Shuffle(random).ToList())
                 {

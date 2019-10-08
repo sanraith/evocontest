@@ -60,9 +60,8 @@ namespace evocontest.WebApp.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> UploadMatchResults([Bind(Prefix = "matchResults")] string matchResultsJson)
+        public async Task<IActionResult> UploadMatchResults([FromBody] MatchContainer matchResults)
         {
-            var matchResults = JsonSerializer.Deserialize<MatchContainer>(matchResultsJson);
             var requiredSubmissionIds = matchResults.Measurements.Select(x => x.SubmissionId).ToList();
             var submissions = await myDb.Submissions
                 .Where(x => requiredSubmissionIds.Contains(x.Id))

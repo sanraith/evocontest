@@ -14,6 +14,7 @@ using evocontest.Runner.Host.Configuration;
 using evocontest.WebApp.Common.Data;
 using evocontest.WebApp.Common.Hub;
 using evocontest.Runner.Host.Common.Utility;
+using System.Text;
 
 namespace evocontest.Runner.Host.Connection
 {
@@ -108,19 +109,23 @@ namespace evocontest.Runner.Host.Connection
 
         public async Task UploadMatchResults(MatchContainer matchResult)
         {
-            using var request = new HttpRequestMessage
+            try
             {
-                Method = HttpMethod.Post,
-                RequestUri = myUploadMatchResultsUri,
-                Content = new FormUrlEncodedContent(new Dictionary<string, string>
+                using var request = new HttpRequestMessage
                 {
-                    { "matchResults", JsonSerializer.Serialize(matchResult) },
-                })
-            };
-            using var response = await myHttpClient.SendAsync(request);
-            if (response.StatusCode != HttpStatusCode.OK)
+                    Method = HttpMethod.Post,
+                    RequestUri = myUploadMatchResultsUri,
+                    Content = new StringContent(JsonSerializer.Serialize(matchResult), Encoding.UTF8, "application/json")
+                };
+                using var response = await myHttpClient.SendAsync(request);
+                if (response.StatusCode != HttpStatusCode.OK)
+                {
+                    throw new InvalidOperationException();
+                }
+            }
+            catch (Exception ex)
             {
-                throw new InvalidOperationException();
+                Console.WriteLine($"Error during upload!!! {ex}");
             }
         }
 
