@@ -40,14 +40,13 @@ namespace evocontest.Runner.Host.Workflow
         public async Task ExecuteAsync()
         {
             Console.WriteLine();
+            Console.WriteLine("Running match...");
+            var submissionResult = await myWebApp.GetValidSubmissionsAsync();
+            var downloadedSubmissions = await DownloadSubmissions(submissionResult);
 
             using (myFanControl.TurnOnTemporarily())
             {
                 await CoolDown();
-
-                Console.WriteLine("Running match...");
-                var submissionResult = await myWebApp.GetValidSubmissionsAsync();
-                var downloadedSubmissions = await DownloadSubmissions(submissionResult);
                 var matchResults = await RunMatch(downloadedSubmissions);
                 await myWebApp.UploadMatchResults(matchResults).WithProgressLog("Uploading match results");
                 myFileManager.CleanTempDirectory();

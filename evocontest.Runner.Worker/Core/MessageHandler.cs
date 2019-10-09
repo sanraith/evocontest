@@ -72,7 +72,7 @@ namespace evocontest.Runner.Worker.Core
 
             var sw = Stopwatch.StartNew();
             var instance = (ISolution)Activator.CreateInstance(myLoadedSolutionType.Value)!;
-            var output = instance.Solve(solveMsg.Input); // TODO throw away input string
+            var output = instance.Solve(solveMsg.Input);
             sw.Stop();
 
             return new MessageHandlerResult(new MeasureSolveResultMessage(output, sw.Elapsed));
