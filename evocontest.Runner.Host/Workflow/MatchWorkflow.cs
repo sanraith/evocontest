@@ -46,22 +46,11 @@ namespace evocontest.Runner.Host.Workflow
 
             using (myFanControl.TurnOnTemporarily())
             {
-                await CoolDown();
+                await ConsoleUtilities.CountDown(myConfig.CoolDownSeconds, i => $"Cooldown... {i}", "Cooldown complete.");
                 var matchResults = await RunMatch(downloadedSubmissions);
                 await myWebApp.UploadMatchResults(matchResults).WithProgressLog("Uploading match results");
                 myFileManager.CleanTempDirectory();
             }
-        }
-
-        private async Task CoolDown()
-        {
-            var countDownSeconds = myConfig.CoolDownSeconds;
-            for (int i = countDownSeconds; i > 0; i--)
-            {
-                Console.Write($"Cooldown... {i}  \r");
-                await Task.Delay(TimeSpan.FromSeconds(1));
-            }
-            Console.WriteLine("Cooldown complete.");
         }
 
         private async Task<List<DownloadedSubmission>> DownloadSubmissions(GetValidSubmissionsResult submissionsResult)

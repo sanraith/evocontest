@@ -22,6 +22,8 @@ namespace evocontest.Runner.Host.Connection
     {
         public IWorkerHubServer? WorkerHubServer { get; private set; }
 
+        public event EventHandler<Exception>? SignalRConnectionLost;
+
         public WebAppConnector(HostConfiguration config)
         {
             myCookieContainer = new CookieContainer();
@@ -36,10 +38,19 @@ namespace evocontest.Runner.Host.Connection
             myUploadMatchResultsUri = new Uri(hostUri, Constants.UploadMatchResultsRoute);
         }
 
-        public async Task LoginAsync(string email, string password)
+        public async Task<bool> LoginAsync(string email, string password)
         {
-            string requestVerificationToken = await GetRequestVerificationTokenAsync(myLoginUri).WithProgressLog("Getting request verification token");
-            await PostLoginAsync(email, password, requestVerificationToken).WithProgressLog("Logging in");
+            try
+            {
+                string requestVerificationToken = await GetRequestVerificationTokenAsync(myLoginUri).WithProgressLog("Getting request verification token");
+                await PostLoginAsync(email, password, requestVerificationToken).WithProgressLog("Logging in");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error on login: " + ex);
+                return false;
+            }
         }
 
         public IWorkerHubServer InitSignalR(IWorkerHubClient client)
@@ -51,6 +62,7 @@ namespace evocontest.Runner.Host.Connection
                     .WithAutomaticReconnect()
                     .ConfigureLogging(options => options.AddConsole().SetMinimumLevel(LogLevel.Error))
                     .Build();
+                myHubConn.Closed += HubConnection_OnClosed;
                 return HubProxy.Create(myHubConn, client);
             });
             WorkerHubServer = hubProxy;
@@ -165,6 +177,20 @@ namespace evocontest.Runner.Host.Connection
             {
                 throw new InvalidOperationException();
             }
+        }
+
+        private Task HubConnection_OnClosed(Exception exception)
+        {
+            if (myHubConn != null)
+            {
+                myHubConn.Closed -= HubConnection_OnClosed;
+                if (exception != null)
+                {
+                    SignalRConnectionLost?.Invoke(this, exception);
+                }
+            }
+
+            return Task.FromResult(true);
         }
 
         public async ValueTask DisposeAsync()

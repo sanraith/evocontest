@@ -17,6 +17,7 @@ namespace evocontest.Runner.Host.Workflow
         public async Task StartAsync()
         {
             myHubClient.RunRaceReceived += OnRunRaceReceived;
+            myWebApp.SignalRConnectionLost += OnSignalRConnectionLost;
             myWebApp.InitSignalR(myHubClient);
             await myWebApp.StartSignalRAsync();
         }
@@ -27,7 +28,7 @@ namespace evocontest.Runner.Host.Workflow
             await myWebApp.StopSignalRAsync();
         }
 
-        public Task WaitUntilRunRaceReceivedAsync()
+        public Task<bool> WaitUntilRunRaceReceivedAsync()
         {
             return myRunRaceReceived.Task;
         }
@@ -35,11 +36,17 @@ namespace evocontest.Runner.Host.Workflow
         public void Dispose()
         {
             myHubClient.RunRaceReceived -= OnRunRaceReceived;
+            myWebApp.SignalRConnectionLost -= OnSignalRConnectionLost;
         }
 
         private void OnRunRaceReceived(object? sender, EventArgs? args)
         {
             myRunRaceReceived.TrySetResult(true);
+        }
+
+        private void OnSignalRConnectionLost(object? sender, Exception exception)
+        {
+            myRunRaceReceived.TrySetResult(false);
         }
 
         private readonly HubClient myHubClient;

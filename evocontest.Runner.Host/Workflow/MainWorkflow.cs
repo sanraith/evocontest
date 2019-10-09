@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using evocontest.Runner.Host.Common.Utility;
 using evocontest.Runner.Host.Configuration;
 using evocontest.Runner.Host.Connection;
 using evocontest.Runner.Host.Core;
@@ -22,16 +23,35 @@ namespace evocontest.Runner.Host.Workflow
 
                 System.Console.WriteLine();
                 var webApp = scope.Resolve<WebAppConnector>();
-                await webApp.LoginAsync(myConfig.Login.Email, myConfig.Login.Password);
+                var loginSuccess = await webApp.LoginAsync(myConfig.Login.Email, myConfig.Login.Password);
+                if (!loginSuccess)
+                {
+                    await ReconnectCountDown();
+                    continue;
+                }
 
                 var listener = scope.Resolve<ListeningWorkflow>();
                 await listener.StartAsync();
-                await listener.WaitUntilRunRaceReceivedAsync();
+                var isRunRaceReceived = await listener.WaitUntilRunRaceReceivedAsync();
                 await listener.StopAsync();
 
-                var matcher = scope.Resolve<MatchWorkflow>();
-                await matcher.ExecuteAsync();
+                if (isRunRaceReceived)
+                {
+                    var matcher = scope.Resolve<MatchWorkflow>();
+                    await matcher.ExecuteAsync();
+                }
+                else
+                {
+                    System.Console.WriteLine("SignalR connection lost.");
+                    await ReconnectCountDown();
+                    continue;
+                }
             }
+        }
+
+        private static async Task ReconnectCountDown()
+        {
+            await ConsoleUtilities.CountDown(60, i => $"Reconnecting in... {i}", "Reconnecting...");
         }
 
         private readonly ILifetimeScope myContainer;
