@@ -118,7 +118,9 @@
     <div>
         <canvas id="standingsChart" />
     </div>
-    <div style="margin-bottom: 2em">&nbsp;</div>
+    <div class="font-italic" style="margin-top: 1em; margin-bottom: 2em">
+        A nevezési időszak október 21. 10:00-ig tart, azonban a végső eredmények október 22-én, az élő döntőből kerülnek ki.
+    </div>
 }
 else
 {
@@ -199,11 +201,23 @@ else
             });
         }
 
+        @{
+            var dates = new List<string>();
+            var date = new DateTime(2019, 10, 07);
+            var lastDate = new DateTime(2019, 10, 20);
+            while (date <= lastDate)
+            {
+                dates.Add(date.ToString("MM.dd."));
+                date = date.AddDays(1);
+            }
+            dates.Add("döntő");
+        }
+
         var ctx = document.getElementById('standingsChart').getContext('2d');
         var myChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: [@Html.Raw(string.Join(", ", matches.Select(x => "\"" + x.MatchDate.ToString("MM.dd.") + "\"")))],
+                labels: [@Html.Raw(string.Join(", ", dates.Select(x => "\"" + x + "\"")))],
                 datasets: uDatasets
             },
             options: {
