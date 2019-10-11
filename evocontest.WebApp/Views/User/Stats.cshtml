@@ -12,13 +12,15 @@
         p, h2 {
             margin-top: 2em;
         }
-        .table th, .table td{
-            padding-left:   0.75rem;
-            padding-right:  0.75rem;
-            padding-top:    0.25rem;
+
+        .table th, .table td {
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+            padding-top: 0.25rem;
             padding-bottom: 0.25rem;
         }
     </style>
+    <script src="~/lib/chart.js/Chart.min.js"></script>
     <script>
         function copySeedToClipboard(seed, level) {
             if (seed == '') { return; }
@@ -34,6 +36,41 @@
             document.getElementById("levelExample").innerHTML = level;
 
             alert("A bemenethez tartozó \"Seed\" vágólapra másolva: " + seed);
+        }
+
+        function renderStandingsChart(chartId) {
+            var chartColors = "#e6194B, #3cb44b, #ffe119, #4363d8, #f58231, #911eb4, #42d4f4, #f032e6, #bfef45, #fabebe, #469990, #e6beff, #9A6324, #fffac8, #800000, #aaffc3, #808000, #ffd8b1, #000075, #a9a9a9, #000000, #e6194B, #3cb44b, #ffe119, #4363d8, #f58231, #911eb4, #42d4f4, #f032e6, #bfef45, #fabebe, #469990, #e6beff, #9A6324, #fffac8, #800000, #aaffc3, #808000, #ffd8b1, #000075, #a9a9a9, #000000".split(", ");
+            var labels = $("#speedTable" + chartId + " input[name=roundIndex]").map((_, x) => $(x).val()).toArray();
+            var scores = $("#speedTable" + chartId + " input[name=totalTime]").map((_, x) => $(x).val()).toArray();
+
+            var ctx = document.getElementById("speedChart" + chartId).getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Nehézségi szintek megoldási ideje (ms)',
+                        data: scores,
+                        borderWidth: 1,
+                        backgroundColor: chartColors
+                    }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            //type: "logarithmic",
+                            ticks: {
+                                beginAtZero: true,
+                            }
+                        }]
+                    },
+                    legend: {
+                        labels: {
+                            boxWidth: 0
+                        }
+                    }
+                }
+            });
         }
     </script>
 }
@@ -53,49 +90,63 @@ else
     </p>
     foreach (var (measurement, measurementIndex) in Model.Measurements.OrderByDescending(x => x.Match.MatchDate).WithIndex())
     {
-        var rounds = measurement.MeasurementResult.Rounds.ToList();
+        var rounds = measurement.MeasurementResult.Rounds.TakeLast(8).ToList();
         <h2>Rangsor - @measurement.Match.MatchDate.ToString("MM.dd.")</h2>
-        <table class="table table-hover table-bordered" cellpadding="2" style="width:auto">
-            <tr>
-                <th style="text-align: center;">#</th>
-                @foreach (var round in rounds)
-                {
-                    var timeString = round.Error == null ? $"{round.TotalMilliseconds.ToString("0")} ms" : "hibás eredmény";
-                    <th style="text-align: center">lvl @round.DifficultyLevel<br />(@timeString)</th>
-                }
-            </tr>
-            @{var maxIndex = rounds.Max(x => x.SplitMilliseconds.Length); }
-            @for (int index = 0; index < maxIndex; index++)
-            {
-                <tr>
-                    <td style="text-align: right">@index</td>
-                    @foreach (var round in rounds)
+        <div style="display: flex">
+            <div style="flex: 70%">
+                <table id="speedTable@(measurementIndex)" class="table table-hover table-bordered" cellpadding="2" style="width:auto">
+                    <tr>
+                        <th style="text-align: center;">#</th>
+                        @foreach (var round in rounds)
+                        {
+                            var timeString = round.Error == null ? $"{round.TotalMilliseconds.ToString("0")} ms" : "hibás eredmény";
+                            <th style="text-align: center">
+                                lvl @round.DifficultyLevel<br />(@timeString)
+                                <div style="display: none">
+                                    <input name="roundIndex" type="text" value="@(round.DifficultyLevel)" />
+                                    <input name="totalTime" type="text" value="@(round.Error == null ? round.TotalMilliseconds : 0)" />
+                                </div>
+                            </th>
+                        }
+                    </tr>
+                    @{var maxIndex = rounds.Max(x => x.SplitMilliseconds.Length); }
+                    @for (int index = 0; index < maxIndex; index++)
                     {
-                        var timeString = round.SplitMilliseconds.Length > index ? round.SplitMilliseconds[index].ToString("0.00") + " ms" : "-";
-                        var config = round.GeneratorConfigs.Length > index ? round.GeneratorConfigs[index] : null;
-                        var seed = config?.Seed.ToString();
-                        <td onclick="copySeedToClipboard('@seed', '@round.DifficultyLevel')" style="text-align: right; cursor: @(seed == null ? "default" : "pointer")">
-                            @if (round.Error != null && index == round.SplitMilliseconds.Length - 1)
+                        <tr>
+                            <td style="text-align: right">@index</td>
+                            @foreach (var round in rounds)
                             {
-                                <span class="text-danger">@timeString (hibás eredmény)</span>
+                                var timeString = round.SplitMilliseconds.Length > index ? round.SplitMilliseconds[index].ToString("0.00") + " ms" : "-";
+                                var config = round.GeneratorConfigs.Length > index ? round.GeneratorConfigs[index] : null;
+                                var seed = config?.Seed.ToString();
+                                <td onclick="copySeedToClipboard('@seed', '@round.DifficultyLevel')" style="text-align: right; cursor: @(seed == null ? "default" : "pointer")">
+                                    @if (round.Error != null && index == round.SplitMilliseconds.Length - 1)
+                                    {
+                                        <span class="text-danger">@timeString (hibás eredmény)</span>
+                                    }
+                                    else
+                                    {
+                                        @timeString
+                                    }
+                                </td>
                             }
-                            else
-                            {
-                                @timeString
-                            }
-                        </td>
+                        </tr>
                     }
-                </tr>
-            }
-        </table>
-
+                </table>
+            </div>
+            <div style="flex: 30%; margin-left: 1em">
+                <canvas id="speedChart@(measurementIndex)" height="400" width="300" />
+            </div>
+            <script>
+                renderStandingsChart("@(Html.Raw(measurementIndex))");
+            </script>
+        </div>
         @if (measurementIndex == 0)
         {
-            <text>
-                <p>
-                    Egy cellára kattintva vágólapra másolhatod az adott bemeneti adathoz tartozó "Seed"-et, így a bemeneteket a saját környezetedben is kipróbálhatod:
-                    <!-- HTML generated using hilite.me -->
-                    <div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+            <p>
+                Egy cellára kattintva vágólapra másolhatod az adott bemeneti adathoz tartozó "Seed"-et, így a bemeneteket a saját környezetedben is kipróbálhatod:
+                <!-- HTML generated using hilite.me -->
+                <div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
 <pre style="margin: 0; line-height: 125%"><span style="color: #888888">// using evocontest.Runner.Common.Generator;</span>
 
 <span style="color: #333399; font-weight: bold">var</span> seed = <span style="color: #6600EE; font-weight: bold"><span id="seedExample">930969440</span></span>;
@@ -106,10 +157,8 @@ else
 <span style="color: #333399; font-weight: bold">var</span> result = <span style="color: #008800; font-weight: bold">new</span> MySubmission().Solve(testData.Input);
 <span style="color: #333399; font-weight: bold">var</span> isValid = result == testData.Solution;
 </pre>
-                    </div>
-                </p>
-            </text>
+                </div>
+            </p>
         }
     }
-
 }
