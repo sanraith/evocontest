@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Server.IIS;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 
 namespace evocontest.WebApp.Controllers
 {
@@ -33,6 +34,18 @@ namespace evocontest.WebApp.Controllers
 
         public IActionResult Index() => RedirectToAction(nameof(Submit));
 
+        public async Task<IActionResult> Stats()
+        {
+            var user = await myUserManager.GetUserAsync(User);
+            var measurements = await myDb.Measurements
+                .Include(x => x.Match).Include(x => x.Submission).ThenInclude(x => x.User)
+                .Where(x => x.Submission.User.Id == user.Id)
+                .OrderBy(x => x.Match.MatchDate)
+                .ToListAsync();
+
+            return View(new StatsViewModel(measurements));
+        }
+
         public async Task<IActionResult> Submit()
         {
             var lastMatch = myDb.Matches.OrderByDescending(x => x.MatchDate).FirstOrDefault();
@@ -49,11 +62,6 @@ namespace evocontest.WebApp.Controllers
 
             var viewModel = new SubmitViewModel { LatestSubmission = latestSubmission };
             return View(viewModel);
-        }
-
-        public IActionResult Stats()
-        {
-            return View();
         }
 
         [HttpPost]

@@ -1,13 +1,16 @@
 ﻿using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using evocontest.WebApp.Common.Hub;
 using evocontest.WebApp.Core;
 using evocontest.WebApp.Data;
 using evocontest.WebApp.Data.Helper;
 using evocontest.WebApp.Hubs;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -19,12 +22,13 @@ namespace evocontest.WebApp.Controllers
     public class AdminController : Controller
     {
         public AdminController(ContestDb db, IFileManager fileManager, UserManager<ApplicationUser> userManager,
-            IHubContext<WorkerHub, IWorkerHubClient> workerHub)
+            IHubContext<WorkerHub, IWorkerHubClient> workerHub, SignInManager<ApplicationUser> signInManager)
         {
             myDb = db;
             myFileManager = fileManager;
             myUserManager = userManager;
             myWorkerHub = workerHub;
+            mySignInManager = signInManager;
         }
 
         public IActionResult Index() => RedirectToAction(nameof(Admin));
@@ -39,7 +43,25 @@ namespace evocontest.WebApp.Controllers
             }
 
             ViewBag.Message = "SignalR clients: " + string.Join(", ", signalRUsers.Select(x => $"{x.Key.Email} ({x.Value})"));
+            ViewBag.Users = myDb.Users.ToList().Select(x => (Id: x.Id, Name: $"{x.LastName} {x.FirstName}")).ToList();
             return View();
+        }
+
+        public async Task<IActionResult> ImpersonateUser(string targetUserId)
+        {
+            var currentUserId = (await myUserManager.GetUserAsync(User)).Id;
+            var impersonatedUser = await myUserManager.FindByIdAsync(targetUserId);
+            var userPrincipal = await mySignInManager.CreateUserPrincipalAsync(impersonatedUser);
+
+            userPrincipal.Identities.First().AddClaim(new Claim("OriginalUserId", currentUserId));
+            userPrincipal.Identities.First().AddClaim(new Claim("IsImpersonating", "true"));
+
+            // sign out the current user
+            await mySignInManager.SignOutAsync();
+
+            await HttpContext.SignInAsync(IdentityConstants.ApplicationScheme, userPrincipal); // <-- This has changed from the previous version.
+
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpPost]
@@ -85,5 +107,6 @@ namespace evocontest.WebApp.Controllers
         private readonly IFileManager myFileManager;
         private readonly UserManager<ApplicationUser> myUserManager;
         private readonly IHubContext<WorkerHub, IWorkerHubClient> myWorkerHub;
+        private readonly SignInManager<ApplicationUser> mySignInManager;
     }
 }

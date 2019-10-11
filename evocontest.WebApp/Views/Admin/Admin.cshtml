@@ -50,10 +50,24 @@
     <input type="submit" value="Delete all matches" onclick="return confirm('Biztos?')" />
 }
 
-@using (Html.BeginForm(nameof(AdminController.DoRunRace), "Admin", FormMethod.Post))
-{
-    <input type="submit" value="Run match" onclick="return confirm('Biztos?')" />
-}
+<div style="margin-top:3em">
+    @using (Html.BeginForm(nameof(AdminController.DoRunRace), "Admin", FormMethod.Post))
+    {
+        <input type="submit" value="Run match" onclick="return confirm('Biztos?')" />
+    }
+</div>
+
+<div style="margin-top:3em">
+    <h5>Impersonate</h5>
+    <ul>
+        @foreach (var (id, name) in (IEnumerable<(string, string)>)ViewBag.Users)
+        {
+            <li>
+                @Html.ActionLink(name, nameof(AdminController.ImpersonateUser), "Admin", new { targetUserId = id })
+            </li>
+        }
+    </ul>
+</div>
 
 <h5>SignalR messages</h5>
 <ul id="messagesList" style="font-size: x-small"></ul>

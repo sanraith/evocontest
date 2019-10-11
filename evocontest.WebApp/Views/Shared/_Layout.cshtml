@@ -43,8 +43,8 @@
             <div class="container">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
                     <img src="~/pic/title.png" style="height: 2em; margin-bottom: -.5em; margin-top: -.8em" />
-                @*evocontest 2019*@
-                
+                    @*evocontest 2019*@
+
                 </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
@@ -60,15 +60,15 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="Home" asp-action="Rules">Szabályok</a>
                         </li>
-                        @*@if (User.Identity.IsAuthenticated)
-                        {*@
+                        <li>
+                            <a class="nav-link text-dark font-weight-bold" asp-area="" asp-controller="User" asp-action="Submit">Nevezés</a>
+                        </li>
+                        @if (User.Identity.IsAuthenticated)
+                        {
                             <li>
-                                <a class="nav-link text-dark font-weight-bold" asp-area="" asp-controller="User" asp-action="Submit">Nevezés</a>
+                                <a class="nav-link text-dark font-weight-bold" asp-area="" asp-controller="User" asp-action="Stats">Statisztikák</a>
                             </li>
-                            @*<li>
-                                    <a class="nav-link text-dark font-weight-bold" asp-area="" asp-controller="User" asp-action="Stats">Statisztikák</a>
-                                </li>*@
-@*                        }*@
+                        }
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Rankings">Rangsor</a>
                         </li>

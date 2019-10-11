@@ -1,8 +1,115 @@
-﻿
+﻿@using evocontest.Runner.Common.Extensions;
+@using evocontest.WebApp.Common.Data;
+
+@model evocontest.WebApp.ViewModels.StatsViewModel
 @{
-    ViewData["Title"] = "Stats";
+    ViewData["Title"] = "Statisztikák";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+@section Head
+{
+    <style>
+        p, h2 {
+            margin-top: 2em;
+        }
+        .table th, .table td{
+            padding-left:   0.75rem;
+            padding-right:  0.75rem;
+            padding-top:    0.25rem;
+            padding-bottom: 0.25rem;
+        }
+    </style>
+    <script>
+        function copySeedToClipboard(seed, level) {
+            if (seed == '') { return; }
+            var dummy = document.createElement("input");
+            document.body.appendChild(dummy);
+            dummy.setAttribute("id", "dummy_id");
+            document.getElementById("dummy_id").value = seed;
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
 
-<h1>Stats</h1>
+            document.getElementById("seedExample").innerHTML = seed;
+            document.getElementById("levelExample").innerHTML = level;
 
+            alert("A bemenethez tartozó \"Seed\" vágólapra másolva: " + seed);
+        }
+    </script>
+}
+
+<h1>Statisztikák</h1>
+
+@if (!Model.Measurements.Any())
+{
+    <p>
+        Itt fognak megjelenni a megoldásodhoz kapcsolódó részletes statisztikák, miután legalább egy napi rangsorolásban részt vettél.
+    </p>
+}
+else
+{
+    <p>
+        Itt találod a napi rangsorolásokon elért részletes eredményeidet.<br />
+    </p>
+    foreach (var (measurement, measurementIndex) in Model.Measurements.OrderByDescending(x => x.Match.MatchDate).WithIndex())
+    {
+        var rounds = measurement.MeasurementResult.Rounds.ToList();
+        <h2>Rangsor - @measurement.Match.MatchDate.ToString("MM.dd.")</h2>
+        <table class="table table-hover table-bordered" cellpadding="2" style="width:auto">
+            <tr>
+                <th style="text-align: center;">#</th>
+                @foreach (var round in rounds)
+                {
+                    var timeString = round.Error == null ? $"{round.TotalMilliseconds.ToString("0")} ms" : "hibás eredmény";
+                    <th style="text-align: center">lvl @round.DifficultyLevel<br />(@timeString)</th>
+                }
+            </tr>
+            @{var maxIndex = rounds.Max(x => x.SplitMilliseconds.Length); }
+            @for (int index = 0; index < maxIndex; index++)
+            {
+                <tr>
+                    <td style="text-align: right">@index</td>
+                    @foreach (var round in rounds)
+                    {
+                        var timeString = round.SplitMilliseconds.Length > index ? round.SplitMilliseconds[index].ToString("0.00") + " ms" : "-";
+                        var config = round.GeneratorConfigs.Length > index ? round.GeneratorConfigs[index] : null;
+                        var seed = config?.Seed.ToString();
+                        <td onclick="copySeedToClipboard('@seed', '@round.DifficultyLevel')" style="text-align: right; cursor: @(seed == null ? "default" : "pointer")">
+                            @if (round.Error != null && index == round.SplitMilliseconds.Length - 1)
+                            {
+                                <span class="text-danger">@timeString (hibás eredmény)</span>
+                            }
+                            else
+                            {
+                                @timeString
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </table>
+
+        @if (measurementIndex == 0)
+        {
+            <text>
+                <p>
+                    Egy cellára kattintva vágólapra másolhatod az adott bemeneti adathoz tartozó "Seed"-et, így a bemeneteket a saját környezetedben is kipróbálhatod:
+                    <!-- HTML generated using hilite.me -->
+                    <div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+<pre style="margin: 0; line-height: 125%"><span style="color: #888888">// using evocontest.Runner.Common.Generator;</span>
+
+<span style="color: #333399; font-weight: bold">var</span> seed = <span style="color: #6600EE; font-weight: bold"><span id="seedExample">930969440</span></span>;
+<span style="color: #333399; font-weight: bold">var</span> difficultyLevel = <span style="color: #6600EE; font-weight: bold"><span id="levelExample">7</span></span>;
+<span style="color: #333399; font-weight: bold">var</span> generatorConfig = <span style="color: #008800; font-weight: bold">new</span> DifficultyLevels().GetConfig(seed, difficultyLevel);
+<span style="color: #333399; font-weight: bold">var</span> testData = <span style="color: #008800; font-weight: bold">new</span> InputGenerator(generatorConfig).Generate();
+
+<span style="color: #333399; font-weight: bold">var</span> result = <span style="color: #008800; font-weight: bold">new</span> MySubmission().Solve(testData.Input);
+<span style="color: #333399; font-weight: bold">var</span> isValid = result == testData.Solution;
+</pre>
+                    </div>
+                </p>
+            </text>
+        }
+    }
+
+}

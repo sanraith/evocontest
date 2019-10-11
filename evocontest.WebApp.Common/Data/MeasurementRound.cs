@@ -1,4 +1,5 @@
 ﻿using evocontest.Runner.Common.Generator;
+using System;
 
 namespace evocontest.WebApp.Common.Data
 {
@@ -10,7 +11,7 @@ namespace evocontest.WebApp.Common.Data
 
         public MeasurementError? Error { get; set; }
 
-        public double[] SplitMilliseconds { get; set; }
+        public double[] SplitMilliseconds { get; set; } = Array.Empty<double>();
 
         public InputGeneratorConfig[]? GeneratorConfigs { get; set; }
     }
