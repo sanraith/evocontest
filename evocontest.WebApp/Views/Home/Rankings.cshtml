@@ -38,7 +38,7 @@
 
     static string GetSolvedPerSecString(int difficulty, double timeMillis)
     {
-        return (Math.Pow(2, difficulty) * 256 * 20 / (timeMillis / 1000)).ToString("#", CultureInfo.InvariantCulture);
+        return (Math.Pow(2, GetAdjustedDifficulty(difficulty, timeMillis)) * 256 * 20 / 5).ToString("#", CultureInfo.InvariantCulture);
     }
 
 }
@@ -67,6 +67,7 @@
                     @foreach (var (measurement, place) in orderedMeasurements.Select((x, i) => (x, i + 1)))
                     {
                         string solveOverTime = string.Join(";", resultsPerParticipant[measurement.Submission.User].Select(x => x == null ? "0" : GetAdjustedDifficultyString(x.DifficultyLevel, x.TotalMilliseconds)));
+                        string exponentSolveOverTime = string.Join(";", resultsPerParticipant[measurement.Submission.User].Select(x => x == null ? "0" : GetSolvedPerSecString(x.DifficultyLevel, x.TotalMilliseconds)));
 
                         var result = measurement.MeasurementResult.Result;
                         var adjustedDifficultyString = GetAdjustedDifficultyString(result.DifficultyLevel, result.TotalMilliseconds);
@@ -83,6 +84,7 @@
                                     <input type="text" name="score" value="@adjustedDifficultyString" />
                                     <input type="text" name="exponentScore" value="@exponentSolvedPerSecString" />
                                     <input type="text" name="scoreOverTime" value="@solveOverTime" />
+                                    <input type="text" name="exponentScoreOverTime" value="@exponentSolveOverTime" />
                                     <input type="text" name="difficulty" value="@result.DifficultyLevel" />
                                     <input type="text" name="time" value="@($"{result.TotalMilliseconds:0.00}")" />
                                 </span>
@@ -101,22 +103,27 @@
                     }
                 </table>
             </div>
-            <div style="flex:55%">
+            <div style="flex:55%; margin-top: -2em">
                 <div>
                     <canvas id="rankingsChart" />
                 </div>
-                <div>
+                <div style="margin-top: 1em">
                     <canvas id="rankingsChart2" />
                 </div>
             </div>
         </div>
         <div class="font-italic" style="margin-top: 1em">
-            *A korábban bejelentett 1000 ms helyett egy kör maximális futási ideje 5000 ms, hogy kompenzáljuk a Raspberryn elért eredményeket az otthoniakhoz képest.
+            *A korábban bejelentett 1000 ms helyett egy kör maximális futási ideje 5000 ms, hogy kompenzáljuk a Raspberry-n elért eredményeket az otthoniakhoz képest.
         </div>
     </div>
     <h2 style="margin-top: 3em">Eredmények a verseny folyamán</h2>
-    <div>
-        <canvas id="standingsChart" />
+    <div style="display:flex;">
+        <div style="flex:50%">
+            <canvas id="standingsChart"  height="250"/>
+        </div>
+        <div style="flex:50%; margin-left:1em">
+            <canvas id="standingsChart2" height="250"/>
+        </div>
     </div>
     <div class="font-italic" style="margin-top: 1em; margin-bottom: 2em">
         A nevezési időszak október 21. 10:00-ig tart, azonban a végső eredmények október 22-én, az élő döntőből kerülnek ki.
@@ -156,6 +163,11 @@ else
                         }
                     }]
                 },
+                legend: {
+                    labels: {
+                        boxWidth: 0
+                    }
+                }
             }
         });
     }
@@ -179,12 +191,16 @@ else
             options: {
                 scales: {
                     yAxes: [{
-                        //type: "logarithmic",
                         ticks: {
                             beginAtZero: true,
                         }
                     }]
                 },
+                legend: {
+                    labels: {
+                        boxWidth: 0
+                    }
+                }
             }
         });
     }
@@ -234,6 +250,57 @@ else
                 title: {
                     display: true,
                     text: 'Elért nehézségi szint'
+                },
+                legend: {
+                    labels: {
+                        boxWidth: 8,
+                        fontSize: 11,
+                        usePointStyle: true
+                    }
+                }
+            }
+        });
+    }
+
+    function renderStandingsChart2() {
+        var labels = $("#rankingsTable input[name=name]").map((_, x) => $(x).val()).toArray();
+        var scores = $("#rankingsTable input[name=exponentScoreOverTime]").map((_, x) => $(x).val()).toArray();
+
+        var uDatasets = [];
+        for (var i = 0; i < labels.length; i++) {
+            uDatasets.push({
+                data: scores[i].split(";").map((x) => parseFloat(x)),
+                label: labels[i],
+                borderColor: chartColors[i],
+                fill: false
+            });
+        }
+
+        var ctx = document.getElementById('standingsChart2').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [@Html.Raw(string.Join(", ", dates.Select(x => "\"" + x + "\"")))],
+                datasets: uDatasets
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                        }
+                    }]
+                },
+                title: {
+                    display: true,
+                    text: 'Másodpercenként feldolgozott karakterek'
+                },
+                legend: {
+                    labels: {
+                        boxWidth: 8,
+                        fontSize: 11,
+                        usePointStyle: true
+                    }
                 }
             }
         });
@@ -257,32 +324,6 @@ else
         @:renderRankingsChart();
         @:renderRankingsChart2();
         @:renderStandingsChart();
+        @:renderStandingsChart2();
     }
 </script>
-
-@*<table class="table">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.MatchDate)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.JsonResult)
-                </th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in matches)
-            {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.MatchDate)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.JsonResult)
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>*@
