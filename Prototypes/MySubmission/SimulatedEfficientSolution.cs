@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MySubmission
 {
-    public class SimulatedEfficientSolution : ISolution
+    public class SimulatedEfficientSolution// : ISolution
     {
         public string Solve(string input)
         {
