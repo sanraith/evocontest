@@ -38,6 +38,22 @@ namespace evocontest.WebApp.Controllers
                 .Include(x => x.Measurements)
                     .ThenInclude(x => x.Submission)
                         .ThenInclude(x => x.User)
+                .Select(x => new Match
+                {
+                    Id = x.Id,
+                    MatchDate = x.MatchDate,
+                    Measurements = x.Measurements.Select(m => new Measurement
+                    {
+                        Id = m.Id,
+                        JsonResult = m.JsonResult,
+                        Submission = new Submission
+                        {
+                            Id = m.Submission.Id,
+                            User = m.Submission.User
+                        }
+                    }).ToList()
+                })
+                .AsNoTracking()
                 .ToListAsync();
 
             return View(matches);

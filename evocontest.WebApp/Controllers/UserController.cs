@@ -38,9 +38,23 @@ namespace evocontest.WebApp.Controllers
         {
             var user = await myUserManager.GetUserAsync(User);
             var measurements = await myDb.Measurements
-                .Include(x => x.Match).Include(x => x.Submission).ThenInclude(x => x.User)
+                .Include(x => x.Match)
+                .Include(x => x.Submission)
+                    .ThenInclude(x => x.User)
+                .Select(m => new Measurement
+                {
+                    Id = m.Id,
+                    JsonResult = m.JsonResult,
+                    Match = new Match { Id = m.Match.Id, MatchDate = m.Match.MatchDate },
+                    Submission = new Submission
+                    {
+                        Id = m.Submission.Id,
+                        User = m.Submission.User
+                    }
+                })
                 .Where(x => x.Submission.User.Id == user.Id)
                 .OrderBy(x => x.Match.MatchDate)
+                .AsNoTracking()
                 .ToListAsync();
 
             return View(new StatsViewModel(measurements));

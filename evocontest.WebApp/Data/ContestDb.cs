@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,10 +18,11 @@ namespace evocontest.WebApp.Data
 
         public virtual DbSet<Measurement> Measurements { get; set; }
 
-        public ContestDb(DbContextOptions<ContestDb> options)
+        public ContestDb(DbContextOptions<ContestDb> options, IConfiguration configuration)
             : base(options)
-        { }
-
+        {
+            myConfiguration = configuration;
+        }
 
         public IQueryable<TProperty> Query<TEntity, TProperty>(TEntity entity,
             Expression<Func<TEntity, IEnumerable<TProperty>>> expression)
@@ -45,6 +48,15 @@ namespace evocontest.WebApp.Data
             Seed(builder);
         }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            base.OnConfiguring(optionsBuilder);
+#if DEBUG
+            optionsBuilder.UseLoggerFactory(myLoggerFactory)
+                .UseSqlServer(myConfiguration.GetConnectionString("DefaultConnection"));
+#endif
+        }
+
         private static void Configure(ModelBuilder builder)
         {
             builder.ApplyConfiguration(new ApplicationUser.Configuration());
@@ -66,5 +78,13 @@ namespace evocontest.WebApp.Data
                 NormalizedName = Helper.Roles.Worker.ToUpperInvariant()
             });
         }
+        
+        private static readonly ILoggerFactory myLoggerFactory = LoggerFactory.Create(builder =>
+        {
+            builder.AddFilter((category, level) => category == DbLoggerCategory.Database.Command.Name && level == LogLevel.Information)
+                   .AddConsole();
+        });
+
+        private readonly IConfiguration myConfiguration;
     }
 }
