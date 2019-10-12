@@ -54,7 +54,6 @@ namespace evocontest.WebApp.Controllers
                 })
                 .Where(x => x.Submission.User.Id == user.Id)
                 .OrderBy(x => x.Match.MatchDate)
-                .AsNoTracking()
                 .ToListAsync();
 
             return View(new StatsViewModel(measurements));

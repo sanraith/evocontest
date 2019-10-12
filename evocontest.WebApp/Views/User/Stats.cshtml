@@ -93,7 +93,7 @@ else
         var rounds = measurement.MeasurementResult.Rounds.TakeLast(8).ToList();
         <h2>Rangsor - @measurement.Match.MatchDate.ToString("MM.dd.")</h2>
         <div style="display: flex">
-            <div style="flex: 70%">
+            <div style="flex: 75%">
                 <table id="speedTable@(measurementIndex)" class="table table-hover table-bordered" cellpadding="2" style="width:auto">
                     <tr>
                         <th style="text-align: center;">#</th>
@@ -134,8 +134,8 @@ else
                     }
                 </table>
             </div>
-            <div style="flex: 30%; margin-left: 1em">
-                <canvas id="speedChart@(measurementIndex)" height="400" width="300" />
+            <div style="flex: 25%; margin-left: 1em">
+                <canvas id="speedChart@(measurementIndex)" height="300" width="200" />
             </div>
             <script>
                 renderStandingsChart("@(Html.Raw(measurementIndex))");

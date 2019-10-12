@@ -53,7 +53,6 @@ namespace evocontest.WebApp.Controllers
                         }
                     }).ToList()
                 })
-                .AsNoTracking()
                 .ToListAsync();
 
             return View(matches);
