@@ -63,15 +63,7 @@ namespace evocontest.WebApp.Controllers
             var orderedMatches = matches;
             var lastMatch = orderedMatches.LastOrDefault();
 
-            var users = orderedMatches.SelectMany(x => x.Measurements.Select(x => x.Submission.User)).Distinct().ToList();
-            ApplicationUser adminUser = null;
-            foreach (var user in users)
-            {
-                if (await myUserManager.IsInRoleAsync(user, Roles.Admin))
-                {
-                    adminUser = user;
-                }
-            }
+            var adminUser = (await myUserManager.GetUsersInRoleAsync(Roles.Admin)).FirstOrDefault();
 
             var lastMatchOrderedMeasurements = lastMatch?.Measurements
                 .Where(x => x.MeasurementResult.Result != null)
