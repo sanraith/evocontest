@@ -1,18 +1,16 @@
 ﻿@using System.Globalization;
 @using evocontest.WebApp.Data;
+@using evocontest.WebApp.ViewModels;
 @using evocontest.WebApp.Common.Data;
-@model IEnumerable<evocontest.WebApp.Data.Match>
+@model RankingsViewModel
 
 @{
     ViewData["Title"] = "Rangsor";
 
-    var matches = Model.OrderBy(x => x.MatchDate).ToList();
-    var lastMatch = Model.OrderByDescending(x => x.MatchDate).FirstOrDefault();
-    var orderedMeasurements = lastMatch?.Measurements
-        .Where(x => x.MeasurementResult.Result != null)
-        .OrderByDescending(x => x.MeasurementResult.Result.DifficultyLevel)
-        .ThenBy(x => x.MeasurementResult.Result.TotalMilliseconds);
-    var invalidMeasurements = lastMatch?.Measurements.Where(x => x.MeasurementResult.Result == null).ToList() ?? new List<Measurement>();
+    var matches = Model.OrderedMatches;
+    var lastMatch = Model.LastMatch;
+    var orderedMeasurements = Model.LastMatchOrderedMeasurements;
+    var invalidMeasurements = Model.LastMatchInvalidMeasurements;
 
     var participants = matches.SelectMany(x => x.Measurements).Select(x => x.Submission.User).Distinct().ToList();
     var resultsPerParticipant = new Dictionary<ApplicationUser, List<MeasurementRoundContainer>>();
@@ -72,10 +70,32 @@
                         var result = measurement.MeasurementResult.Result;
                         var adjustedDifficultyString = GetAdjustedDifficultyString(result.DifficultyLevel, result.TotalMilliseconds);
                         var exponentSolvedPerSecString = GetSolvedPerSecString(result.DifficultyLevel, result.TotalMilliseconds);
+                        var isAdminUser = measurement.Submission.User == Model.AdminUser;
                         <tr>
-                            <td style="font-weight: bold; font-size: 20px; vertical-align: middle; text-align: center">@place.</td>
-                            <td>@measurement.Submission.User.FullName</td>
-                            <td>
+                            <td style="font-weight: bold; font-size: 20px; vertical-align: middle; text-align: center">
+                                @if (isAdminUser)
+                                {
+                                    @:-
+                                }
+                                else
+                                {
+                                    @($"{place}.")
+                                }
+                            </td>
+                            <td style="vertical-align:middle">
+                                @if (isAdminUser)
+                                {
+                                    <div class="" style="line-height: 1.2">
+                                        <span class="font-italic small">(Versenyen kívül)</span><br />
+                                        @measurement.Submission.User.FullName
+                                    </div>
+                                }
+                                else
+                                {
+                                    @measurement.Submission.User.FullName
+                                }
+                            </td>
+                            <td style="vertical-align:middle">
                                 lvl @result.DifficultyLevel -
                                 @($"{result.TotalMilliseconds:0.00} ms")
 
@@ -87,6 +107,7 @@
                                     <input type="text" name="exponentScoreOverTime" value="@exponentSolveOverTime" />
                                     <input type="text" name="difficulty" value="@result.DifficultyLevel" />
                                     <input type="text" name="time" value="@($"{result.TotalMilliseconds:0.00}")" />
+                                    <input type="text" name="isAdminStyle" value="@(isAdminUser?1:0)" />
                                 </span>
                             </td>
                         </tr>
@@ -119,10 +140,10 @@
     <h2 style="margin-top: 3em">Eredmények a verseny folyamán</h2>
     <div style="display:flex;">
         <div style="flex:50%">
-            <canvas id="standingsChart"  height="250"/>
+            <canvas id="standingsChart" height="250" />
         </div>
         <div style="flex:50%; margin-left:1em">
-            <canvas id="standingsChart2" height="250"/>
+            <canvas id="standingsChart2" height="250" />
         </div>
     </div>
     <div class="font-italic" style="margin-top: 1em; margin-bottom: 2em">
@@ -137,6 +158,10 @@ else
 <script src="~/js/countdown.js"></script>
 <script>
     var chartColors = "#e6194B, #3cb44b, #ffe119, #4363d8, #f58231, #911eb4, #42d4f4, #f032e6, #bfef45, #fabebe, #469990, #e6beff, #9A6324, #fffac8, #800000, #aaffc3, #808000, #ffd8b1, #000075, #a9a9a9, #000000, #e6194B, #3cb44b, #ffe119, #4363d8, #f58231, #911eb4, #42d4f4, #f032e6, #bfef45, #fabebe, #469990, #e6beff, #9A6324, #fffac8, #800000, #aaffc3, #808000, #ffd8b1, #000075, #a9a9a9, #000000".split(", ");
+    var isAdminStyles = $("#rankingsTable input[name=isAdminStyle]").map((_, x) => parseFloat($(x).val())).toArray();
+    chartColors = chartColors.map(function (x, i) {
+        return isAdminStyles[i] == 1 ? "#B0B0B0" : x;
+    });
 
     function renderRankingsChart() {
         var labels = $("#rankingsTable input[name=name]").map((_, x) => $(x).val()).toArray();
@@ -208,6 +233,7 @@ else
     function renderStandingsChart() {
         var labels = $("#rankingsTable input[name=name]").map((_, x) => $(x).val()).toArray();
         var scores = $("#rankingsTable input[name=scoreOverTime]").map((_, x) => $(x).val()).toArray();
+        var isAdminStyles = $("#rankingsTable input[name=isAdminStyle]").map((_, x) => parseFloat($(x).val())).toArray();
 
         var uDatasets = [];
         for (var i = 0; i < labels.length; i++) {
@@ -215,6 +241,7 @@ else
                 data: scores[i].split(";").map((x) => parseFloat(x)),
                 label: labels[i],
                 borderColor: chartColors[i],
+                borderDash: isAdminStyles[i] ? [5, 3] : [],
                 fill: false
             });
         }
@@ -265,6 +292,7 @@ else
     function renderStandingsChart2() {
         var labels = $("#rankingsTable input[name=name]").map((_, x) => $(x).val()).toArray();
         var scores = $("#rankingsTable input[name=exponentScoreOverTime]").map((_, x) => $(x).val()).toArray();
+        var isAdminStyles = $("#rankingsTable input[name=isAdminStyle]").map((_, x) => parseFloat($(x).val())).toArray();
 
         var uDatasets = [];
         for (var i = 0; i < labels.length; i++) {
@@ -272,6 +300,7 @@ else
                 data: scores[i].split(";").map((x) => parseFloat(x)),
                 label: labels[i],
                 borderColor: chartColors[i],
+                borderDash: isAdminStyles[i] ? [5, 3] : [],
                 fill: false
             });
         }

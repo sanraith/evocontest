@@ -43,7 +43,8 @@ namespace evocontest.WebApp.Controllers
             }
 
             ViewBag.Message = "SignalR clients: " + string.Join(", ", signalRUsers.Select(x => $"{x.Key.Email} ({x.Value})"));
-            ViewBag.Users = myDb.Users.ToList().Select(x => (Id: x.Id, Name: $"{x.LastName} {x.FirstName}")).ToList();
+            ViewBag.Users = myDb.Users.ToList().OrderBy(x => x.FullName).Select(x => (Id: x.Id, Name: x.FullName, Email: x.Email)).ToList();
+            ViewBag.Submissions = myDb.Submissions.Include(x => x.User).OrderByDescending(x => x.UploadDate).Where(x => !x.IsDeleted).ToList();
             return View();
         }
 
@@ -101,6 +102,18 @@ namespace evocontest.WebApp.Controllers
             await myWorkerHub.Clients.All.RunRace();
 
             return RedirectToAction(nameof(Admin));
+        }
+
+        public async Task<IActionResult> DownloadSubmission(string submissionId)
+        {
+            var submission = await myDb.Submissions.Where(x => x.Id == submissionId).Include(x => x.User).FirstOrDefaultAsync();
+            if (submission == null) { return NotFound(); }
+
+            var fileInfo = myFileManager.GetFileInfo(submission.User, submission.StoredFileName);
+            if (!fileInfo.Exists) { return NotFound(); }
+
+            var fileStream = fileInfo.CreateReadStream();
+            return File(fileStream, "application/x-msdownload", submission.OriginalFileName);
         }
 
         private readonly ContestDb myDb;

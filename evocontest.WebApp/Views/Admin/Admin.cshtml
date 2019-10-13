@@ -1,4 +1,5 @@
 ﻿@using evocontest.WebApp.Controllers;
+@using evocontest.WebApp.Data;
 @{
     ViewData["Title"] = "Admin";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -60,14 +61,27 @@
 <div style="margin-top:3em">
     <h5>Impersonate</h5>
     <ul>
-        @foreach (var (id, name) in (IEnumerable<(string, string)>)ViewBag.Users)
+        @foreach (var (id, name, email) in (IEnumerable<(string, string, string)>)ViewBag.Users)
         {
             <li>
-                @Html.ActionLink(name, nameof(AdminController.ImpersonateUser), "Admin", new { targetUserId = id })
+                @Html.ActionLink(name, nameof(AdminController.ImpersonateUser), "Admin", new { targetUserId = id }) (@email)
             </li>
         }
     </ul>
 </div>
 
-<h5>SignalR messages</h5>
+<div style="margin-top:3em">
+    <h5>Submissions</h5>
+    <ul>
+        @foreach (var submission in (IEnumerable<Submission>)ViewBag.Submissions)
+        {
+        <li>
+            @Html.ActionLink("[download]", nameof(AdminController.DownloadSubmission), "Admin", new { submissionId = submission.Id })
+            @submission.UploadDate.ToString("yyy.MM.dd. HH:mm:ss") - @submission.User.FullName (@submission.User.Email)
+        </li>
+        }
+    </ul>
+</div>
+
+<h5 style="margin-top:3em">SignalR messages</h5>
 <ul id="messagesList" style="font-size: x-small"></ul>

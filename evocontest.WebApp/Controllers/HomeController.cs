@@ -7,14 +7,18 @@ using Microsoft.AspNetCore.Mvc;
 using evocontest.WebApp.Models;
 using evocontest.WebApp.Data;
 using Microsoft.EntityFrameworkCore;
+using evocontest.WebApp.ViewModels;
+using Microsoft.AspNetCore.Identity;
+using evocontest.WebApp.Data.Helper;
 
 namespace evocontest.WebApp.Controllers
 {
     public class HomeController : Controller
     {
-        public HomeController(ContestDb database)
+        public HomeController(ContestDb database, UserManager<ApplicationUser> userManager)
         {
             myDb = database;
+            myUserManager = userManager;
         }
 
         public IActionResult Index()
@@ -53,9 +57,38 @@ namespace evocontest.WebApp.Controllers
                         }
                     }).ToList()
                 })
+                .OrderBy(x => x.MatchDate)
                 .ToListAsync();
 
-            return View(matches);
+            var orderedMatches = matches;
+            var lastMatch = orderedMatches.LastOrDefault();
+
+            var users = orderedMatches.SelectMany(x => x.Measurements.Select(x => x.Submission.User)).Distinct().ToList();
+            ApplicationUser adminUser = null;
+            foreach (var user in users)
+            {
+                if (await myUserManager.IsInRoleAsync(user, Roles.Admin))
+                {
+                    adminUser = user;
+                }
+            }
+
+            var lastMatchOrderedMeasurements = lastMatch?.Measurements
+                .Where(x => x.MeasurementResult.Result != null)
+                .OrderByDescending(x => x.Submission.User == adminUser ? -1 : x.MeasurementResult.Result.DifficultyLevel)
+                .ThenBy(x => x.MeasurementResult.Result.TotalMilliseconds)
+                .ToList();
+            var lastMatchInvalidMeasurements = lastMatch?.Measurements
+                .Where(x => x.MeasurementResult.Result == null).ToList() ?? new List<Measurement>();
+
+            return View(new RankingsViewModel
+            {
+                AdminUser = adminUser,
+                OrderedMatches = orderedMatches,
+                LastMatch = lastMatch,
+                LastMatchOrderedMeasurements = lastMatchOrderedMeasurements,
+                LastMatchInvalidMeasurements = lastMatchInvalidMeasurements
+            });
         }
 
         public IActionResult Privacy()
@@ -70,5 +103,6 @@ namespace evocontest.WebApp.Controllers
         }
 
         private readonly ContestDb myDb;
+        private readonly UserManager<ApplicationUser> myUserManager;
     }
 }
