@@ -34,10 +34,7 @@ namespace MySubmission
     public sealed class ProcessedInput
     {
         public string Acronym;
-
         public (int Index, int Length, bool IsNormalWordOrEndOfAcronym)[] WordIndexes;
-
-        //public int[] PeriodIndexes;
     }
 
     public sealed class MyEfficientSolution : ISolution
@@ -93,7 +90,7 @@ namespace MySubmission
             for (int i = 0; i < upperText.Length; i++)
             {
                 //TODO more efficient
-                // Step over found occurences
+                // Step over found occurrences
                 if (allOccurences.TryGetValue(i, out var stepSize))
                 {
                     i += stepSize - 1;
@@ -158,10 +155,12 @@ namespace MySubmission
             var occurences = replacement.Occurences;
             var occurenceCount = occurences.Count;
             var phraseLength = replacement.Length;
+            // TODO parallelize
             for (var i = 0; i < occurenceCount; i++)
             {
                 for (var j = i + 1; j < occurenceCount; j++)
                 {
+                    // TODO move to getOccurences and add sentenceEndCheck
                     if (occurences[i] - 1 >= 0 && !wordIndexes[occurences[i] - 1].IsNormalWordOrEndOfAcronym) { return false; }
                     if (occurences[j] - 1 >= 0 && !wordIndexes[occurences[j] - 1].IsNormalWordOrEndOfAcronym) { return false; }
                     if (!wordIndexes[occurences[i] + phraseLength - 1].IsNormalWordOrEndOfAcronym) { return false; }
@@ -192,6 +191,7 @@ namespace MySubmission
             var occurences = new List<int>();
             if (searchAtPositions == null)
             {
+                // TODO parallelize
                 var partLength = part.Length;
                 for (int pos = searchFrom; pos < text.Length - partLength; pos++)
                 {
@@ -200,6 +200,7 @@ namespace MySubmission
             }
             else
             {
+                // TODO parallelize
                 for (int i = 0; i < searchAtPositions.Count; i++)
                 {
                     var pos = searchAtPositions[i];
