@@ -1,9 +1,12 @@
 ﻿using evocontest.Common;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MySubmission
 {
@@ -43,6 +46,7 @@ namespace MySubmission
         {
             if (string.IsNullOrEmpty(input)) { return input; }
 
+            ThreadPool.SetMaxThreads(4, 4);
             var processedInput = GetSentences(input);
             var replacements = GetReplacements(input, processedInput);
             var result = ReplaceAcronyms(input, processedInput, replacements);
@@ -110,7 +114,8 @@ namespace MySubmission
                     if (!wordIndexes[i + aLength - 1].IsNormalWordOrEndOfAcronym) { continue; } // Do not end mid acronym
                     if (upperText[i + aLength - 1] == '.') { break; } // Do not go through a sentence
 
-                    var part = upperText.AsSpan()[i..(i + aLength)];
+                    //var part = upperText.AsSpan()[i..(i + aLength)];
+                    var part = new string(upperText.AsSpan()[i..(i + aLength)]);
                     occurences = GetOccurences(upperText, part, 0, occurences);
                     if (occurences.Count > 1)
                     {
@@ -155,7 +160,8 @@ namespace MySubmission
             var occurences = replacement.Occurences;
             var occurenceCount = occurences.Count;
             var phraseLength = replacement.Length;
-            // TODO parallelize
+
+            // TODO parallelize?
             for (var i = 0; i < occurenceCount; i++)
             {
                 for (var j = i + 1; j < occurenceCount; j++)
@@ -175,7 +181,6 @@ namespace MySubmission
                     }
                 }
             }
-
             return true;
         }
 
@@ -186,21 +191,29 @@ namespace MySubmission
             return text[w1Range];
         }
 
-        private List<int> GetOccurences(ReadOnlySpan<char> text, ReadOnlySpan<char> part, int searchFrom, List<int> searchAtPositions)
+        private List<int> GetOccurences(string text, string part, int searchFrom, List<int> searchAtPositions)
         {
             var occurences = new List<int>();
             if (searchAtPositions == null)
             {
-                // TODO parallelize
                 var partLength = part.Length;
-                for (int pos = searchFrom; pos < text.Length - partLength; pos++)
-                {
-                    if (IsMatch(text, part, pos)) { occurences.Add(pos); }
-                }
+                var bag = new ConcurrentBag<List<int>>();
+                var rangePartitioner = Partitioner.Create(searchFrom, text.Length - partLength, text.Length / 4);
+                var parallelResult = Parallel.ForEach(rangePartitioner, new ParallelOptions { MaxDegreeOfParallelism = 4 }, (range, loopState) =>
+                 {
+                     var (from, to) = range;
+                     var smallOccurenceParts = new List<int>();
+                     for (int pos = from; pos < to; pos++)
+                     {
+                         if (IsMatch(text, part, pos)) { smallOccurenceParts.Add(pos); }
+                     }
+                     bag.Add(smallOccurenceParts);
+                 });
+                occurences = bag.SelectMany(x => x).ToList();
             }
             else
             {
-                // TODO parallelize
+                // TODO parallelize?
                 for (int i = 0; i < searchAtPositions.Count; i++)
                 {
                     var pos = searchAtPositions[i];
