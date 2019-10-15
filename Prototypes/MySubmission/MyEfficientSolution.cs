@@ -92,12 +92,13 @@ namespace MySubmission
             var upperText = processedInput.Acronym;
 
             var replacements = new List<Replacement>();
-            var allOccurences = new Dictionary<int, int>();
+            var allOccurrences = new int[upperText.Length];
             for (int i = 0; i < upperText.Length; i++)
             {
                 //TODO more efficient
                 // Step over found occurrences
-                if (allOccurences.TryGetValue(i, out var stepSize))
+                var stepSize = allOccurrences[i];
+                if (stepSize != 0)
                 {
                     i += stepSize - 1;
                     continue;
@@ -109,7 +110,7 @@ namespace MySubmission
                 // Do not start on period
                 if (wordIndexes[i].Length == -1) { continue; }
 
-                List<int> occurences = null;
+                List<int> currentOccurrences = null;
                 var possibleReplacements = new List<Replacement>();
                 for (var aLength = minLength; aLength <= maxLength && aLength <= upperText.Length - i; aLength++)
                 {
@@ -118,10 +119,10 @@ namespace MySubmission
 
                     //var part = upperText.AsSpan()[i..(i + aLength)];
                     var part = new string(upperText.AsSpan()[i..(i + aLength)]);
-                    occurences = GetOccurences(upperText, part, 0, occurences);
-                    if (occurences.Count > 1)
+                    currentOccurrences = GetOccurences(upperText, part, 0, currentOccurrences);
+                    if (currentOccurrences.Count > 1)
                     {
-                        possibleReplacements.Add(new Replacement { Index = i, Length = aLength, Occurences = occurences });
+                        possibleReplacements.Add(new Replacement { Index = i, Length = aLength, Occurences = currentOccurrences });
                     }
                     else
                     {
@@ -143,7 +144,13 @@ namespace MySubmission
                     if (possibleReplacement != null)
                     {
                         replacements.Add(possibleReplacement);
-                        possibleReplacement.Occurences.ForEach(x => allOccurences.Add(x, possibleReplacement.Length));
+                        var replacementLength = possibleReplacement.Length;
+                        var possibleOccurrences = possibleReplacement.Occurences;
+                        var possibleOccurrenceLength = possibleOccurrences.Count;
+                        for (var oIndex = 0; oIndex < possibleOccurrenceLength; oIndex++)
+                        {
+                            allOccurrences[possibleOccurrences[oIndex]] = replacementLength;
+                        }
                         i += possibleReplacement.Length - 1;
                     }
                 }
@@ -199,7 +206,7 @@ namespace MySubmission
             if (searchAtPositions == null)
             {
                 var partLength = part.Length;
-                var bag = new ConcurrentBag<List<int>>();
+                var bag = new List<int>[4];
                 var rangePartitioner = Partitioner.Create(searchFrom, text.Length - partLength, (int)Math.Ceiling(text.Length / 4.0));
                 var parallelResult = Parallel.ForEach(rangePartitioner, new ParallelOptions { MaxDegreeOfParallelism = 4 }, (range, loopState, loopIndex) =>
                  {
@@ -210,9 +217,9 @@ namespace MySubmission
                      {
                          if (IsMatch(text, part, pos)) { smallOccurenceParts.Add(pos); }
                      }
-                     bag.Add(smallOccurenceParts);
+                     bag[loopIndex] = smallOccurenceParts;
                  });
-                occurences = bag.SelectMany(x => x).ToList();
+                occurences = bag.Where(x => x != null).SelectMany(x => x).ToList();
             }
             else
             {
