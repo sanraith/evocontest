@@ -12,17 +12,30 @@ namespace PerformanceTest
     internal sealed class PerformanceTestProgram
     {
         private const int Max = 500000000;
-        private const int Max2 = 100000000;
+        private const int Max2 = 20000000;
 
         static void Main(string[] args)
         {
-            Stopwatch sw;
-            var str = new string('a', Max2);
-            var strs = Enumerable.Range(0, 4).Select(_ => new string(str)).ToArray();
+            Stopwatch sw = new Stopwatch();
+            var str = new string('a', Max2).ToArray();
+            var strs = Enumerable.Range(0, 8).Select(_ => new string(str).ToArray()).ToArray();
             var repeatCount = 50;
 
+            sw.Restart();
+            Console.WriteLine("single");
+            var (from, to) = (0, Max2);
+            for (int j = 1; j < repeatCount; j++)
+            {
+                var sum = 0;
+                for (var i = from; i < to; i++)
+                {
+                    sum += str[i] == 'a' ? 1 : 0;
+                }
+            }
+            Console.WriteLine($"Done in {sw.ElapsedMilliseconds}");
+
             Console.WriteLine("copy");
-            sw = Stopwatch.StartNew();
+            sw.Restart();
             for (int i = 1; i < repeatCount; i++)
             {
                 CopyOrNot(str, strs, true);
@@ -30,7 +43,7 @@ namespace PerformanceTest
             Console.WriteLine($"Done in {sw.ElapsedMilliseconds}");
 
             Console.WriteLine("no copy");
-            sw = Stopwatch.StartNew();
+            sw.Restart();
             for (int i = 1; i < repeatCount; i++)
             {
                 CopyOrNot(str, strs, false);
@@ -85,22 +98,22 @@ namespace PerformanceTest
             //Console.WriteLine(result);
         }
 
-        private static void CopyOrNot(string origStr, string[] strs, bool isCopy)
+        private static void CopyOrNot(char[] origStr, char[][] strs, bool isCopy)
         {
             var chunks = 4;
             var ranges = Partitioner.Create(0, Max2, (int)Math.Ceiling(Max2 / (double)chunks));
-            var bag = new ConcurrentBag<int>();
+            //var bag = new ConcurrentBag<int>();
 
             Parallel.ForEach(ranges, (range, loopState, loopIndex) =>
             {
-                var str = isCopy ? strs[loopIndex] : origStr;
+                var str = isCopy ? strs[loopIndex * 2] : origStr;
                 var (from, to) = range;
                 var sum = 0;
                 for (var i = from; i < to; i++)
                 {
                     sum += str[i] == 'a' ? 1 : 0;
                 }
-                bag.Add(sum);
+                //bag.Add(sum);
             });
         }
 

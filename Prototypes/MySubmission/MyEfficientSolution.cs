@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -42,8 +43,6 @@ namespace MySubmission
 
     public sealed class MyEfficientSolution : ISolution
     {
-        private string[] myUpperTexts;
-
         public string Solve(string input)
         {
             if (string.IsNullOrEmpty(input)) { return input; }
@@ -91,7 +90,6 @@ namespace MySubmission
             var inputSpan = input.AsSpan();
             var wordIndexes = processedInput.WordIndexes;
             var upperText = processedInput.Acronym;
-            myUpperTexts = Enumerable.Range(0, 4).Select(_ => new string(upperText)).ToArray();
 
             var replacements = new List<Replacement>();
             var allOccurences = new Dictionary<int, int>();
@@ -206,15 +204,11 @@ namespace MySubmission
                 var parallelResult = Parallel.ForEach(rangePartitioner, new ParallelOptions { MaxDegreeOfParallelism = 4 }, (range, loopState, loopIndex) =>
                  {
                      var (from, to) = range;
-                     
-                     // This maybe solves some memory hit issues?
-                     var myText = myUpperTexts[loopIndex];
-                     var myPart = new string(part);
 
                      var smallOccurenceParts = new List<int>();
                      for (int pos = from; pos < to; pos++)
                      {
-                         if (IsMatch(myText, myPart, pos)) { smallOccurenceParts.Add(pos); }
+                         if (IsMatch(text, part, pos)) { smallOccurenceParts.Add(pos); }
                      }
                      bag.Add(smallOccurenceParts);
                  });
@@ -234,7 +228,8 @@ namespace MySubmission
             return occurences;
         }
 
-        private bool IsMatch(ReadOnlySpan<char> text, ReadOnlySpan<char> part, int pos, bool onlyCheckLastCharacter = false)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool IsMatch(ReadOnlySpan<char> text, ReadOnlySpan<char> part, int pos, bool onlyCheckLastCharacter = false)
         {
             var partLength = part.Length;
             var startIndex = onlyCheckLastCharacter ? partLength - 1 : 0;
