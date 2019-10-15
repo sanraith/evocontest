@@ -42,6 +42,8 @@ namespace MySubmission
 
     public sealed class MyEfficientSolution : ISolution
     {
+        private string[] myUpperTexts;
+
         public string Solve(string input)
         {
             if (string.IsNullOrEmpty(input)) { return input; }
@@ -89,6 +91,8 @@ namespace MySubmission
             var inputSpan = input.AsSpan();
             var wordIndexes = processedInput.WordIndexes;
             var upperText = processedInput.Acronym;
+            myUpperTexts = Enumerable.Range(0, 4).Select(_ => new string(upperText)).ToArray();
+
             var replacements = new List<Replacement>();
             var allOccurences = new Dictionary<int, int>();
             for (int i = 0; i < upperText.Length; i++)
@@ -198,14 +202,19 @@ namespace MySubmission
             {
                 var partLength = part.Length;
                 var bag = new ConcurrentBag<List<int>>();
-                var rangePartitioner = Partitioner.Create(searchFrom, text.Length - partLength, text.Length / 4);
-                var parallelResult = Parallel.ForEach(rangePartitioner, new ParallelOptions { MaxDegreeOfParallelism = 4 }, (range, loopState) =>
+                var rangePartitioner = Partitioner.Create(searchFrom, text.Length - partLength, (int)Math.Ceiling(text.Length / 4.0));
+                var parallelResult = Parallel.ForEach(rangePartitioner, new ParallelOptions { MaxDegreeOfParallelism = 4 }, (range, loopState, loopIndex) =>
                  {
                      var (from, to) = range;
+                     
+                     // This maybe solves some memory hit issues?
+                     var myText = myUpperTexts[loopIndex];
+                     var myPart = new string(part);
+
                      var smallOccurenceParts = new List<int>();
                      for (int pos = from; pos < to; pos++)
                      {
-                         if (IsMatch(text, part, pos)) { smallOccurenceParts.Add(pos); }
+                         if (IsMatch(myText, myPart, pos)) { smallOccurenceParts.Add(pos); }
                      }
                      bag.Add(smallOccurenceParts);
                  });

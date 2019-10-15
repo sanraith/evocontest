@@ -12,40 +12,65 @@ namespace PerformanceTest
     internal sealed class PerformanceTestProgram
     {
         private const int Max = 500000000;
+        private const int Max2 = 100000000;
 
         static void Main(string[] args)
         {
-            Console.WriteLine("Single core...");
-            var sw = Stopwatch.StartNew();
-            SingleCore();
-            sw.Stop();
+            Stopwatch sw;
+            var str = new string('a', Max2);
+            var strs = Enumerable.Range(0, 4).Select(_ => new string(str)).ToArray();
+            var repeatCount = 50;
+
+            Console.WriteLine("copy");
+            sw = Stopwatch.StartNew();
+            for (int i = 1; i < repeatCount; i++)
+            {
+                CopyOrNot(str, strs, true);
+            }
             Console.WriteLine($"Done in {sw.ElapsedMilliseconds}");
 
-
-            Console.WriteLine("Multi core 2...");
-            sw.Restart();
-            MultiThreaded(2);
-            sw.Stop();
+            Console.WriteLine("no copy");
+            sw = Stopwatch.StartNew();
+            for (int i = 1; i < repeatCount; i++)
+            {
+                CopyOrNot(str, strs, false);
+            }
             Console.WriteLine($"Done in {sw.ElapsedMilliseconds}");
 
-            Console.WriteLine("Multi core 4...");
-            sw.Restart();
-            MultiThreaded(4);
-            sw.Stop();
-            Console.WriteLine($"Done in {sw.ElapsedMilliseconds}");
-
-            Console.WriteLine("Multi core 8...");
-            sw.Restart();
-            MultiThreaded(8);
-            sw.Stop();
-            Console.WriteLine($"Done in {sw.ElapsedMilliseconds}");
+            //Console.WriteLine("Single core...");
+            //var sw = Stopwatch.StartNew();
+            //SingleCore();
+            //sw.Stop();
+            //Console.WriteLine($"Done in {sw.ElapsedMilliseconds}");
 
 
-            Console.WriteLine("Multi core 16...");
-            sw.Restart();
-            MultiThreaded(16);
-            sw.Stop();
-            Console.WriteLine($"Done in {sw.ElapsedMilliseconds}");
+            //Console.WriteLine("Multi core 2...");
+            //sw.Restart();
+            //MultiThreaded(2);
+            //sw.Stop();
+            //Console.WriteLine($"Done in {sw.ElapsedMilliseconds}");
+
+            //Console.WriteLine("Multi core 4...");
+            //sw.Restart();
+            //MultiThreaded(4);
+            //sw.Stop();
+            //Console.WriteLine($"Done in {sw.ElapsedMilliseconds}");
+
+            //Console.WriteLine("Multi core 8...");
+            //sw.Restart();
+            //MultiThreaded(8);
+            //sw.Stop();
+            //Console.WriteLine($"Done in {sw.ElapsedMilliseconds}");
+
+
+            //Console.WriteLine("Multi core 16...");
+            //sw.Restart();
+            //MultiThreaded(16);
+            //sw.Stop();
+            //Console.WriteLine($"Done in {sw.ElapsedMilliseconds}");
+
+
+
             //var input = "Alma Aroma Bor Bagatell. Alma Aroma Apple. AA Bor.";
             //Console.WriteLine(input);
             //var solved = new MyNewSolution().Solve(input);
@@ -58,6 +83,25 @@ namespace PerformanceTest
             //var benchmark = new Benchmark.Core.Benchmark(Spin);
             //var result = benchmark.Run();
             //Console.WriteLine(result);
+        }
+
+        private static void CopyOrNot(string origStr, string[] strs, bool isCopy)
+        {
+            var chunks = 4;
+            var ranges = Partitioner.Create(0, Max2, (int)Math.Ceiling(Max2 / (double)chunks));
+            var bag = new ConcurrentBag<int>();
+
+            Parallel.ForEach(ranges, (range, loopState, loopIndex) =>
+            {
+                var str = isCopy ? strs[loopIndex] : origStr;
+                var (from, to) = range;
+                var sum = 0;
+                for (var i = from; i < to; i++)
+                {
+                    sum += str[i] == 'a' ? 1 : 0;
+                }
+                bag.Add(sum);
+            });
         }
 
         private static void MultiThreaded(int chunks)
