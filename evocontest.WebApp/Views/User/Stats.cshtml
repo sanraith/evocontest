@@ -53,6 +53,14 @@
                         data: scores,
                         borderWidth: 1,
                         backgroundColor: chartColors
+                    }, {
+                        label: '',
+                        type: 'line',
+                        pointHoverRadius: 0,
+                        pointRadius: 0,
+                        borderColor: "#000000",
+                        fill: null,
+                        data: [5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000]
                     }]
                 },
                 options: {
@@ -99,7 +107,23 @@ else
                         <th style="text-align: center;">#</th>
                         @foreach (var round in rounds)
                         {
-                            var timeString = round.Error == null ? $"{round.TotalMilliseconds.ToString("0")} ms" : "hibás eredmény";
+                            string timeString;
+                            if (round.Error == null)
+                            {
+                                if (round.SplitMilliseconds.Length < 20)
+                                {
+                                    round.TotalMilliseconds = (20.0 / round.SplitMilliseconds.Length) * round.TotalMilliseconds;
+                                    timeString = $"~{(round.TotalMilliseconds / 1000.0).ToString("0.00")} s";
+                                }
+                                else
+                                {
+                                    timeString = $"{round.TotalMilliseconds.ToString("0")} ms";
+                                }
+                            }
+                            else
+                            {
+                                timeString = "hibás eredmény";
+                            }
                             <th style="text-align: center">
                                 lvl @round.DifficultyLevel<br />(@timeString)
                                 <div style="display: none">
