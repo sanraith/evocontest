@@ -189,7 +189,7 @@ namespace MySubmission
                         var w1 = GetWord(text, processedInput, occurences, i, p);
                         var w2 = GetWord(text, processedInput, occurences, j, p);
                         if (IsUpper(w1[0]) || IsUpper(w2[0])) { continue; }
-                        if (!MemoryExtensions.Equals(w1, w2, StringComparison.Ordinal)) { return false; }
+                        if (!w1.Equals(w2, StringComparison.Ordinal)) { return false; }
                     }
                 }
             }
@@ -213,10 +213,18 @@ namespace MySubmission
                 var parallelResult = Parallel.ForEach(rangePartitioner, new ParallelOptions { MaxDegreeOfParallelism = 4 }, (range, loopState, loopIndex) =>
                 {
                     var (from, to) = range;
+                    to = Math.Min(text.Length, to + part.Length - 1);
                     var smallOccurenceParts = new List<int>();
-                    for (int pos = from; pos < to; pos++)
+                    var textSpan = text.AsSpan();
+
+                    var pos = -1;
+                    var currentSpan = textSpan[from..to];
+                    while ((pos = currentSpan.IndexOf(part, StringComparison.Ordinal)) != -1)
                     {
-                        if (IsMatch(text, part, pos)) { smallOccurenceParts.Add(pos); }
+                        from += pos;
+                        smallOccurenceParts.Add(from);
+                        from += part.Length;
+                        currentSpan = textSpan[from..to];
                     }
                     bags[loopIndex] = smallOccurenceParts;
                 });
@@ -242,14 +250,14 @@ namespace MySubmission
         {
             var partLength = part.Length;
             var startIndex = onlyCheckLastCharacter ? partLength - 1 : 0;
-            for (int i = startIndex; i < partLength; i++)
+            if (onlyCheckLastCharacter)
             {
-                if (text[pos + i] != part[i])
-                {
-                    return false;
-                }
+                return text[pos + startIndex] == part[startIndex];
             }
-            return true;
+            else
+            {
+                return text[(pos + startIndex)..(pos + partLength)].Equals(part[startIndex..partLength], StringComparison.Ordinal);
+            }
         }
 
         private ProcessedInput GetSentences(string input)
