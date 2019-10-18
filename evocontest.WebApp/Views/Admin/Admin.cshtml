@@ -57,6 +57,9 @@
         <input type="submit" value="Run match" onclick="return confirm('Biztos?')" />
     }
 </div>
+<div style="margin-top:2em">
+    @Html.ActionLink("Download match zip", nameof(AdminController.DownloadMatchPackage), "Admin", new { })
+</div>
 
 <div style="margin-top:3em">
     <h5>Impersonate</h5>
@@ -75,10 +78,10 @@
     <ul>
         @foreach (var submission in (IEnumerable<Submission>)ViewBag.Submissions)
         {
-        <li>
-            @Html.ActionLink("[download]", nameof(AdminController.DownloadSubmission), "Admin", new { submissionId = submission.Id })
-            @submission.UploadDate.ToString("yyy.MM.dd. HH:mm:ss") - @submission.User.FullName (@submission.User.Email)
-        </li>
+            <li>
+                @Html.ActionLink("[download]", nameof(AdminController.DownloadSubmission), "Admin", new { submissionId = submission.Id })
+                @submission.UploadDate.ToString("yyy.MM.dd. HH:mm:ss") - @submission.User.FullName (@submission.User.Email)
+            </li>
         }
     </ul>
 </div>

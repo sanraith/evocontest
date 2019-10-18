@@ -3,6 +3,7 @@ Properties/PublishProfiles/
 
 # User submitted assemblies
 _Store/**/*.dll
+_Store/**/*.zip
 
 # npm packages
 node_modules/

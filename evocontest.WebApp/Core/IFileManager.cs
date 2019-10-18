@@ -14,6 +14,8 @@ namespace evocontest.WebApp.Core
 
         Task<FileInfo> SaveUserSubmissionAsync(ApplicationUser user, IFormFile file, DateTime timeStamp);
 
+        Task<IFileInfo> SaveFileAsync(ApplicationUser user, string fileName, Stream stream);
+
         void DeleteUserSubmission(ApplicationUser user, string fileName);
 
         IFileInfo GetFileInfo(ApplicationUser user, string fileName);

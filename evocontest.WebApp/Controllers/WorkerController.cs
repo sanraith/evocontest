@@ -18,52 +18,27 @@ namespace evocontest.WebApp.Controllers
     [Authorize(Roles = Roles.Worker)]
     public class WorkerController : Controller
     {
-        public WorkerController(ContestDb contestDb, IFileManager fileManager, UserManager<ApplicationUser> userManager)
+        public WorkerController(ContestDb contestDb, ISubmissionManager submissionManager)
         {
             myDb = contestDb;
-            myFileManager = fileManager;
-            myUserManager = userManager;
+            mySubmissionManager = submissionManager;
         }
 
         public async Task<IActionResult> DownloadSubmission(string submissionId)
         {
-            var submission = await myDb.Submissions.Where(x => x.Id == submissionId).Include(x => x.User).FirstOrDefaultAsync();
-            if (submission == null) { return NotFound(); }
-
-            var fileInfo = myFileManager.GetFileInfo(submission.User, submission.StoredFileName);
-            if (!fileInfo.Exists) { return NotFound(); }
-
-            var fileStream = fileInfo.CreateReadStream();
-            return File(fileStream, "application/x-msdownload", submission.OriginalFileName);
+            var (fileStream, originalFileName) = await mySubmissionManager.DownloadSubmission(submissionId);
+            if (fileStream == null)
+            {
+                return NotFound();
+            }
+            return File(fileStream, "application/x-msdownload", originalFileName);
         }
 
         public async Task<JsonResult> GetValidSubmissions()
         {
-            IEnumerable<Submission> activeSubmissions = await myDb.Submissions
-                .Where(x => !x.IsDeleted && (x.IsValid ?? false))
-                .Include(x => x.User)
-                .ToListAsync();
-
-            // Be safe, but there should be only one active submission per user.
-            activeSubmissions = activeSubmissions
-                .GroupBy(x => x.User)
-                .Select(x => x.OrderBy(x => x.UploadDate).Last());
-
-            var adminUsers = await myUserManager.GetUsersInRoleAsync(Roles.Admin);
-
-            return new JsonResult(new GetValidSubmissionsResult
-            {
-                Submissions = activeSubmissions.Select(x => new GetValidSubmissionsResult.Submission
-                {
-                    Id = x.Id,
-                    FullName = x.User.FullName,
-                    IsAdmin = adminUsers.Contains(x.User),
-                    IsValid = x.IsValid,
-                    UploadDate = x.UploadDate
-                }).ToList()
-            });
+            var getValidSubmissionResult = await mySubmissionManager.GetValidSubmissions();
+            return new JsonResult(getValidSubmissionResult);
         }
-
 
         [HttpPost]
         public async Task<IActionResult> UploadMatchResults([FromBody] MatchContainer matchResults)
@@ -96,7 +71,6 @@ namespace evocontest.WebApp.Controllers
         }
 
         private readonly ContestDb myDb;
-        private readonly IFileManager myFileManager;
-        private readonly UserManager<ApplicationUser> myUserManager;
+        private readonly ISubmissionManager mySubmissionManager;
     }
 }

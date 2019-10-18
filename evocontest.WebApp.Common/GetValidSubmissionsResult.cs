@@ -14,14 +14,17 @@ namespace evocontest.WebApp.Common
             [JsonPropertyName(nameof(Id))]
             public string Id { get; set; } = string.Empty;
 
-            [JsonPropertyName(nameof(FullName))]
-            public string FullName { get; set; } = string.Empty;
+            [JsonPropertyName(nameof(UserName))]
+            public string UserName { get; set; } = string.Empty;
+
+            [JsonPropertyName(nameof(FileName))]
+            public string FileName { get; set; } = string.Empty;
+
+            [JsonPropertyName(nameof(OriginalFileName))]
+            public string OriginalFileName { get; set; } = string.Empty;
 
             [JsonPropertyName(nameof(IsAdmin))]
             public bool IsAdmin { get; set; }
-
-            [JsonPropertyName(nameof(IsValid))]
-            public bool? IsValid { get; set; }
 
             [JsonPropertyName(nameof(UploadDate))]
             public DateTime UploadDate { get; set; }

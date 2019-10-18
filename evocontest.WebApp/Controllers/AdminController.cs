@@ -1,7 +1,11 @@
 ﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using evocontest.WebApp.Common.Hub;
 using evocontest.WebApp.Core;
@@ -15,6 +19,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 
 namespace evocontest.WebApp.Controllers
 {
@@ -22,13 +27,15 @@ namespace evocontest.WebApp.Controllers
     public class AdminController : Controller
     {
         public AdminController(ContestDb db, IFileManager fileManager, UserManager<ApplicationUser> userManager,
-            IHubContext<WorkerHub, IWorkerHubClient> workerHub, SignInManager<ApplicationUser> signInManager)
+            IHubContext<WorkerHub, IWorkerHubClient> workerHub, SignInManager<ApplicationUser> signInManager,
+            ISubmissionManager submissionManager)
         {
             myDb = db;
             myFileManager = fileManager;
             myUserManager = userManager;
             myWorkerHub = workerHub;
             mySignInManager = signInManager;
+            mySubmissionManager = submissionManager;
         }
 
         public IActionResult Index() => RedirectToAction(nameof(Admin));
@@ -106,14 +113,60 @@ namespace evocontest.WebApp.Controllers
 
         public async Task<IActionResult> DownloadSubmission(string submissionId)
         {
-            var submission = await myDb.Submissions.Where(x => x.Id == submissionId).Include(x => x.User).FirstOrDefaultAsync();
-            if (submission == null) { return NotFound(); }
+            var (fileStream, originalFileName) = await mySubmissionManager.DownloadSubmission(submissionId);
+            if (fileStream == null)
+            {
+                return NotFound();
+            }
+            return File(fileStream, "application/x-msdownload", originalFileName);
+        }
 
-            var fileInfo = myFileManager.GetFileInfo(submission.User, submission.StoredFileName);
-            if (!fileInfo.Exists) { return NotFound(); }
+        public async Task<IActionResult> DownloadMatchPackage()
+        {
+            var user = await myUserManager.GetUserAsync(User);
+            var getValidSubmissionsResult = await mySubmissionManager.GetValidSubmissions();
 
-            var fileStream = fileInfo.CreateReadStream();
-            return File(fileStream, "application/x-msdownload", submission.OriginalFileName);
+            IFileInfo createdFile = await CreateMatchArchive(user, getValidSubmissionsResult);
+
+            return File(createdFile.CreateReadStream(), "application/zip", MatchPackageFileName);
+        }
+
+        private async Task<IFileInfo> CreateMatchArchive(ApplicationUser user, Common.GetValidSubmissionsResult getValidSubmissionsResult)
+        {
+            IFileInfo createdFile;
+            using (var archiveStream = new MemoryStream())
+            {
+                var files = new List<(IFileInfo, string)>();
+                foreach (var s in getValidSubmissionsResult.Submissions)
+                {
+                    var submission = await myDb.Submissions.FindAsync(s.Id);
+                    var fileInfo = myFileManager.GetFileInfo(submission.User, submission.StoredFileName);
+                    files.Add((fileInfo, s.FileName));
+                }
+
+                await FillZipArchive(archiveStream, JsonSerializer.Serialize(getValidSubmissionsResult), files);
+                archiveStream.Seek(0, SeekOrigin.Begin);
+
+                createdFile = await myFileManager.SaveFileAsync(user, "match.zip", archiveStream);
+            }
+
+            return createdFile;
+        }
+
+        public async Task FillZipArchive(MemoryStream memoryStream, string jsonFileContent, IEnumerable<(IFileInfo StoredFile, string NewFileName)> files)
+        {
+            using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+            {
+                var jsonZipArchiveEntry = archive.CreateEntry("match.json", CompressionLevel.Fastest);
+                using (var zipStream = jsonZipArchiveEntry.Open())
+                {
+                    await zipStream.WriteAsync(Encoding.UTF8.GetBytes(jsonFileContent), 0, jsonFileContent.Length);
+                }
+                foreach (var file in files)
+                {
+                    var zipArchiveEntry = archive.CreateEntryFromFile(file.StoredFile.PhysicalPath, file.NewFileName, CompressionLevel.Fastest);
+                }
+            }
         }
 
         private readonly ContestDb myDb;
@@ -121,5 +174,8 @@ namespace evocontest.WebApp.Controllers
         private readonly UserManager<ApplicationUser> myUserManager;
         private readonly IHubContext<WorkerHub, IWorkerHubClient> myWorkerHub;
         private readonly SignInManager<ApplicationUser> mySignInManager;
+        private readonly ISubmissionManager mySubmissionManager;
+
+        private const string MatchPackageFileName = "match.zip";
     }
 }

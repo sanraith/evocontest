@@ -73,6 +73,27 @@ namespace evocontest.WebApp.Core
             return fileInfo;
         }
 
+        public async Task<IFileInfo> SaveFileAsync(ApplicationUser user, string fileName, Stream stream)
+        {
+            var userDir = GetUserDir(user);
+            if (!userDir.Exists)
+            {
+                userDir.Create();
+            }
+
+            var fileInfo = new FileInfo(Path.Combine(userDir.FullName, fileName));
+            if (fileInfo.Exists)
+            {
+                fileInfo.Delete();
+            }
+
+            using (var writeStream = File.Create(fileInfo.FullName))
+            {
+                await stream.CopyToAsync(writeStream);
+            }
+            return GetFileInfo(user, fileName);
+        }
+
         public void DeleteUserSubmission(ApplicationUser user, string fileName)
         {
             var userDir = GetUserDir(user);

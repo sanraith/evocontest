@@ -103,9 +103,10 @@ namespace evocontest.WebApp
 
         private void AddDependencies(IServiceCollection services)
         {
-            services.AddTransient(typeof(IFileManager), typeof(FileManager));
             services.AddSingleton(typeof(IConfigurationValidator), typeof(ConfigurationValidator));
             services.AddTransient(typeof(IEmailSender), typeof(EmailSender));
+            services.AddTransient(typeof(IFileManager), typeof(FileManager));
+            services.AddTransient(typeof(ISubmissionManager), typeof(SubmissionManager));
         }
     }
 }

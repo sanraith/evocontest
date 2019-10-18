@@ -208,7 +208,7 @@ namespace MySubmission
             return text.Slice(w1Pointer.Index, w1Pointer.Length);
         }
 
-        private List<int> GetOccurences(string text, ReadOnlyMemory<char> part, int searchFrom, List<int> searchAtPositions)
+        private List<int> GetOccurences(string text, ReadOnlyMemory<char> part, int searchFrom /* TODO remove parameter and checks */, List<int> searchAtPositions)
         {
             List<int> occurences;
             if (searchAtPositions == null)
