@@ -63,11 +63,11 @@ namespace evocontest.WebApp.Controllers
             var orderedMatches = matches;
             var lastMatch = orderedMatches.LastOrDefault();
 
-            var adminUser = (await myUserManager.GetUsersInRoleAsync(Roles.Admin)).FirstOrDefault();
+            var adminUsers = await myUserManager.GetUsersInRoleAsync(Roles.Admin);
 
             var lastMatchOrderedMeasurements = lastMatch?.Measurements
                 .Where(x => x.MeasurementResult.Result != null)
-                .OrderByDescending(x => x.Submission.User == adminUser ? -1 : x.MeasurementResult.Result.DifficultyLevel)
+                .OrderByDescending(x => adminUsers.Contains(x.Submission.User) ? -1 : x.MeasurementResult.Result.DifficultyLevel)
                 .ThenBy(x => x.MeasurementResult.Result.TotalMilliseconds)
                 .ToList();
             var lastMatchInvalidMeasurements = lastMatch?.Measurements
@@ -75,7 +75,7 @@ namespace evocontest.WebApp.Controllers
 
             return View(new RankingsViewModel
             {
-                AdminUser = adminUser,
+                AdminUsers = adminUsers,
                 OrderedMatches = orderedMatches,
                 LastMatch = lastMatch,
                 LastMatchOrderedMeasurements = lastMatchOrderedMeasurements,

@@ -70,7 +70,7 @@
                         var result = measurement.MeasurementResult.Result;
                         var adjustedDifficultyString = GetAdjustedDifficultyString(result.DifficultyLevel, result.TotalMilliseconds);
                         var exponentSolvedPerSecString = GetSolvedPerSecString(result.DifficultyLevel, result.TotalMilliseconds);
-                        var isAdminUser = measurement.Submission.User == Model.AdminUser;
+                        var isAdminUser = Model.AdminUsers.Contains(measurement.Submission.User);
                         <tr>
                             <td style="font-weight: bold; font-size: 20px; vertical-align: middle; text-align: center">
                                 @if (isAdminUser)

@@ -9,6 +9,7 @@ using evocontest.WebApp.Core;
 using evocontest.WebApp.Data;
 using evocontest.WebApp.Data.Helper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,10 +18,11 @@ namespace evocontest.WebApp.Controllers
     [Authorize(Roles = Roles.Worker)]
     public class WorkerController : Controller
     {
-        public WorkerController(ContestDb contestDb, IFileManager fileManager)
+        public WorkerController(ContestDb contestDb, IFileManager fileManager, UserManager<ApplicationUser> userManager)
         {
             myDb = contestDb;
             myFileManager = fileManager;
+            myUserManager = userManager;
         }
 
         public async Task<IActionResult> DownloadSubmission(string submissionId)
@@ -47,11 +49,15 @@ namespace evocontest.WebApp.Controllers
                 .GroupBy(x => x.User)
                 .Select(x => x.OrderBy(x => x.UploadDate).Last());
 
+            var adminUsers = await myUserManager.GetUsersInRoleAsync(Roles.Admin);
+
             return new JsonResult(new GetValidSubmissionsResult
             {
                 Submissions = activeSubmissions.Select(x => new GetValidSubmissionsResult.Submission
                 {
                     Id = x.Id,
+                    FullName = x.User.FullName,
+                    IsAdmin = adminUsers.Contains(x.User),
                     IsValid = x.IsValid,
                     UploadDate = x.UploadDate
                 }).ToList()
@@ -91,5 +97,6 @@ namespace evocontest.WebApp.Controllers
 
         private readonly ContestDb myDb;
         private readonly IFileManager myFileManager;
+        private readonly UserManager<ApplicationUser> myUserManager;
     }
 }

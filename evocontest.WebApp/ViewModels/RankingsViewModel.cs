@@ -5,7 +5,7 @@ namespace evocontest.WebApp.ViewModels
 {
     public class RankingsViewModel
     {
-        public ApplicationUser? AdminUser { get; set;}
+        public IList<ApplicationUser> AdminUsers { get; set;}
 
         public List<Match> OrderedMatches { get; set; }
 
