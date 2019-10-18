@@ -26,7 +26,7 @@ namespace evocontest.Submission.Runner.Core
         {
             const int roundLength = 20;
             const int difficultyCount = 16;
-            const int maxRuntimeMillis = 1000;
+            const int maxRuntimeMillis = 5000;
 
             var manager = new TestDataManager(Seed, new InputGeneratorManager(Seed));
 

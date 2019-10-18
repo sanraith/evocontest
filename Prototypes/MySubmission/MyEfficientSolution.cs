@@ -223,7 +223,7 @@ namespace MySubmission
                     {
                         from += pos;
                         smallOccurenceParts.Add(from);
-                        from += part.Length;
+                        from += 1;
                         currentSpan = textSpan[from..to];
                     }
                     bags[loopIndex] = smallOccurenceParts;

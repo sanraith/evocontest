@@ -1,5 +1,6 @@
 ﻿using evocontest.Submission.Runner.Core;
 using evocontest.Submission.Sample;
+using MySubmission;
 using System;
 
 namespace evocontest.Submission.Runner
@@ -9,7 +10,7 @@ namespace evocontest.Submission.Runner
         /// <summary>
         /// Change this if you want to test a different implementation.
         /// </summary>
-        public static Type SubmissionType { get; } = typeof(MySubmission);
+        public static Type SubmissionType { get; } = typeof(MyEfficientSolution);
 
         /// <summary>
         /// Change this if you want to use a different set of random test data.
