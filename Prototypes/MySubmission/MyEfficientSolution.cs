@@ -48,7 +48,7 @@ namespace MySubmission
             if (string.IsNullOrEmpty(input)) { return input; }
 
             ThreadPool.SetMaxThreads(4, 4);
-            var processedInput = GetSentences(input);
+            var processedInput = GetProcessedInput(input);
             var replacements = GetReplacements(input, processedInput);
             var result = ReplaceAcronyms(input, processedInput, replacements);
 
@@ -95,7 +95,6 @@ namespace MySubmission
             var allOccurrences = new int[upperText.Length];
             for (int i = 0; i < upperText.Length; i++)
             {
-                //TODO more efficient
                 // Step over found occurrences
                 var stepSize = allOccurrences[i];
                 if (stepSize != 0)
@@ -110,26 +109,30 @@ namespace MySubmission
                 // Do not start on period
                 if (wordIndexes[i].Length == -1) { continue; }
 
-                // TODO period not filtered!!!
                 List<int> currentOccurrences = null;
                 var possibleReplacements = new List<Replacement>();
-                for (var aLength = minLength; aLength <= maxLength && aLength <= upperText.Length - i; aLength++)
+                if (!upperText[i..Math.Min(upperText.Length, i + minLength)].Contains('.'))
                 {
-                    if (upperText[i + aLength - 1] == '.') { break; } // Do not go through a sentence
-                    if (!wordIndexes[i + aLength - 1].IsNormalWordOrEndOfAcronym) { continue; } // Do not end mid acronym
+                    var currentMaxLength = Math.Min(maxLength, upperText.Length - i);
+                    for (var aLength = minLength; aLength <= currentMaxLength; aLength++)
+                    {
+                        if (upperText[i + aLength - 1] == '.') { break; } // Do not go through a sentence
+                        if (!wordIndexes[i + aLength - 1].IsNormalWordOrEndOfAcronym) { continue; } // Do not end mid acronym
 
-                    //var part = upperText.AsSpan()[i..(i + aLength)];
-                    var part = new string(upperText.AsSpan()[i..(i + aLength)]);
-                    currentOccurrences = GetOccurences(upperText, part, 0, currentOccurrences);
-                    if (currentOccurrences.Count > 1)
-                    {
-                        possibleReplacements.Add(new Replacement { Index = i, Length = aLength, Occurrences = currentOccurrences });
-                    }
-                    else
-                    {
-                        break;
+                        //var part = upperText.AsSpan()[i..(i + aLength)];
+                        var part = new string(upperText.AsSpan()[i..(i + aLength)]);
+                        currentOccurrences = GetOccurences(upperText, part, 0, currentOccurrences);
+                        if (currentOccurrences.Count > 1)
+                        {
+                            possibleReplacements.Add(new Replacement { Index = i, Length = aLength, Occurrences = currentOccurrences });
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
                 }
+
                 if (possibleReplacements.Count > 0)
                 {
                     var possibleReplacement = (Replacement)null;
@@ -260,13 +263,13 @@ namespace MySubmission
             }
         }
 
-        private ProcessedInput GetSentences(string input)
+        private ProcessedInput GetProcessedInput(string input)
         {
             var inputLength = input.Length;
             var isInWord = false;
             var isInAcronym = false;
             var noIndex = (-1, -1, true);
-            var sentenceBuilder = new StringBuilder();
+            var upperBuilder = new StringBuilder();
             var wordIndexes = new List<(int Start, int Length, bool IsBorder)>();
             var wordStart = -1;
 
@@ -275,12 +278,12 @@ namespace MySubmission
                 var wordLength = wordEnd - wordStart + 1;
                 if (isInWord)
                 {
-                    sentenceBuilder.Append(char.ToUpper(input[wordStart]));
+                    upperBuilder.Append(char.ToUpper(input[wordStart]));
                     wordIndexes.Add((wordStart, wordLength, true));
                 }
                 else
                 {
-                    sentenceBuilder.Append(input[wordStart..(wordEnd + 1)]);
+                    upperBuilder.Append(input[wordStart..(wordEnd + 1)]);
                     wordIndexes.AddRange(Enumerable.Range(wordStart, wordLength).Select(x => (x, 1, x == wordEnd)));
                 }
                 isInWord = false;
@@ -294,7 +297,7 @@ namespace MySubmission
                 {
                     case '.':
                         HandleWordEnd(index - 1);
-                        sentenceBuilder.Append(".");
+                        upperBuilder.Append(".");
                         wordIndexes.Add(noIndex);
                         break;
 
@@ -317,7 +320,7 @@ namespace MySubmission
                 }
             }
 
-            return new ProcessedInput { Acronym = sentenceBuilder.ToString(), WordIndexes = wordIndexes.ToArray() };
+            return new ProcessedInput { Acronym = upperBuilder.ToString(), WordIndexes = wordIndexes.ToArray() };
         }
 
         private static bool IsUpper(char c)

@@ -15,7 +15,7 @@ namespace evocontest.Submission.Runner
         /// <summary>
         /// Change this if you want to use a different set of random test data.
         /// </summary>
-        public static int Seed { get; } = 42;
+        public static int Seed { get; } = 42; //new Random().Next();
 
         static void Main(string[] args)
         {
