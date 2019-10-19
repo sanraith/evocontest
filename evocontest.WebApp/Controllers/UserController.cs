@@ -81,6 +81,15 @@ namespace evocontest.WebApp.Controllers
         [RequestSizeLimit(FileManager.MaxSubmittedFileSize + 4096)]
         public async Task<IActionResult> DoUpload()
         {
+            if (DateTime.Now > Constants.LastSubmissionDate)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    error = "A nevezés lezárult."
+                });
+            }
+
             var user = await myUserManager.GetUserAsync(HttpContext.User);
             var hasActiveSubmission = myDb.Query(user, u => u.Submissions).Any(x => !x.IsDeleted);
             if (hasActiveSubmission)
@@ -133,14 +142,17 @@ namespace evocontest.WebApp.Controllers
         [HttpPost]
         public async Task<ActionResult> DoDelete(string submissionId)
         {
-            var user = await myUserManager.GetUserAsync(HttpContext.User);
-            var submissionForDelete = myDb.Query(user, u => u.Submissions).OrderBy(x => x.UploadDate).LastOrDefault(x => x.Id == submissionId);
-
-            if (submissionForDelete != null)
+            if (DateTime.Now <= Constants.LastSubmissionDate)
             {
-                submissionForDelete.IsDeleted = true;
-                submissionForDelete.DeletionDate = DateTime.Now;
-                await myDb.SaveChangesAsync();
+                var user = await myUserManager.GetUserAsync(HttpContext.User);
+                var submissionForDelete = myDb.Query(user, u => u.Submissions).OrderBy(x => x.UploadDate).LastOrDefault(x => x.Id == submissionId);
+
+                if (submissionForDelete != null)
+                {
+                    submissionForDelete.IsDeleted = true;
+                    submissionForDelete.DeletionDate = DateTime.Now;
+                    await myDb.SaveChangesAsync();
+                }
             }
 
             return RedirectToAction(nameof(Submit));

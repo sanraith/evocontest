@@ -35,6 +35,7 @@ namespace evocontest.Runner.Host.Core
         {
             const int roundLength = 20;
             const int difficultyCount = 16;
+            var currentTime = DateTime.Now;
             var random = new Random();
             var difficulty = -1;
             var activeSubmissions = downloadedSubmissions.ToList();
@@ -67,7 +68,7 @@ namespace evocontest.Runner.Host.Core
                     OnSubmissionEnd?.Invoke(this, (submission, round));
                 }
 
-                yield return new MatchContainer { Measurements = measurements };
+                yield return new MatchContainer { MatchDate = currentTime, Measurements = measurements };
             }
 
             testDataManager.Clean();

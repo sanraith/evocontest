@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -8,6 +9,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using evocontest.WebApp.Common;
+using evocontest.WebApp.Common.Data;
 using evocontest.WebApp.Common.Hub;
 using evocontest.WebApp.Core;
 using evocontest.WebApp.Data;
@@ -130,6 +132,43 @@ namespace evocontest.WebApp.Controllers
             IFileInfo createdFile = await CreateMatchArchive(user, getValidSubmissionsResult);
 
             return File(createdFile.CreateReadStream(), "application/zip", MatchPackageFileName);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DoUploadMatchResults()
+        {
+            var file = Request.Form.Files.SingleOrDefault();
+            MatchContainer matchResults;
+            using (var fileStream = file.OpenReadStream())
+            {
+                matchResults = await JsonSerializer.DeserializeAsync<MatchContainer>(fileStream);
+            }
+
+            var requiredSubmissionIds = matchResults.Measurements.Select(x => x.SubmissionId).ToList();
+            var submissions = await myDb.Submissions
+                .Where(x => requiredSubmissionIds.Contains(x.Id))
+                .ToDictionaryAsync(x => x.Id, x => x);
+
+            var match = new Match
+            {
+                MatchDate = matchResults.MatchDate.HasValue ? matchResults.MatchDate.Value : DateTime.Now,
+                JsonResult = JsonSerializer.Serialize(matchResults)
+            };
+            await myDb.Matches.AddAsync(match);
+
+            foreach (var mContainer in matchResults.Measurements)
+            {
+                var measurement = new Measurement
+                {
+                    Match = match,
+                    Submission = submissions[mContainer.SubmissionId],
+                    JsonResult = JsonSerializer.Serialize(mContainer)
+                };
+                await myDb.Measurements.AddAsync(measurement);
+            }
+
+            await myDb.SaveChangesAsync();
+            return Ok();
         }
 
         private async Task<IFileInfo> CreateMatchArchive(ApplicationUser user, Common.GetValidSubmissionsResult getValidSubmissionsResult)

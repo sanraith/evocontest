@@ -86,5 +86,16 @@
     </ul>
 </div>
 
+<div class="card-header">
+    <h3>Eredmények feltöltése</h3>
+    @using (Html.BeginForm(nameof(AdminController.DoUploadMatchResults), "Admin", FormMethod.Post, new { id = "upload_form", @class = "upload_form", enctype = "multipart/form-data" }))
+    {@:
+        <h5>Válaszd ki a feltöltendő .json fájlt!</h5>
+        <input type="file" name="file1" style="width: 40em"><br />
+        <input type="submit" class="btn btn-primary" value="Feltöltés" /><br />
+        <progress value="0" max="100" style="width:300px; display:none;"></progress>
+    }
+</div>
+
 <h5 style="margin-top:3em">SignalR messages</h5>
 <ul id="messagesList" style="font-size: x-small"></ul>

@@ -1,8 +1,7 @@
 {
   "profiles": {
     "evocontest.Runner.Host": {
-      "commandName": "Project",
-      "commandLineArgs": "--match"
+      "commandName": "Project"
     }
   }
 }
