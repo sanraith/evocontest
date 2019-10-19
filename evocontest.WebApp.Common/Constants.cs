@@ -8,5 +8,6 @@
         public static readonly string DownloadSubmissionRoute = "/Worker/DownloadSubmission";
         public static readonly string GetValidSubmissionsRoute = "/Worker/GetValidSubmissions";
         public static readonly string UploadMatchResultsRoute = "/Worker/UploadMatchResults";
+        public static readonly string MatchMetadataFileName = "match.json";
     }
 }

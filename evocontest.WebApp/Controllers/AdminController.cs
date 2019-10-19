@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using evocontest.WebApp.Common;
 using evocontest.WebApp.Common.Hub;
 using evocontest.WebApp.Core;
 using evocontest.WebApp.Data;
@@ -157,7 +158,7 @@ namespace evocontest.WebApp.Controllers
         {
             using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
             {
-                var jsonZipArchiveEntry = archive.CreateEntry("match.json", CompressionLevel.Fastest);
+                var jsonZipArchiveEntry = archive.CreateEntry(Constants.MatchMetadataFileName, CompressionLevel.Fastest);
                 using (var zipStream = jsonZipArchiveEntry.Open())
                 {
                     await zipStream.WriteAsync(Encoding.UTF8.GetBytes(jsonFileContent), 0, jsonFileContent.Length);

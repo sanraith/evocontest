@@ -10,6 +10,19 @@ namespace evocontest.Runner.Host.Core
         public FileManager(HostConfiguration config)
         {
             myTempDirectory = new DirectoryInfo(config.Directories.Temp);
+            if (!myTempDirectory.Exists)
+            {
+                myTempDirectory.Create();
+            }
+        }
+
+        public DirectoryInfo CreateNewWorkingDirectory()
+        {
+            var name = Guid.NewGuid().ToString();
+            var targetDirectory = new DirectoryInfo(Path.Combine(myTempDirectory.FullName, name));
+            targetDirectory.Create();
+
+            return targetDirectory;
         }
 
         public async Task<FileInfo> SaveSubmissionAsync(string submissionId, Stream downloadStream, string fileName)

@@ -21,12 +21,14 @@ namespace evocontest.Runner.Host
     {
         static async Task Main(string[] args)
         {
-            var isDebug = args.FirstOrDefault() == "--debug";
+            var isDebug = string.Equals(args.FirstOrDefault(), "--debug", StringComparison.OrdinalIgnoreCase);
             if (isDebug)
             {
                 Console.WriteLine("Waiting for debugger. Press enter when ready...");
                 Console.ReadLine();
+                args = args[1..];
             }
+            var isMatch = string.Equals(args.FirstOrDefault(), "--match", StringComparison.OrdinalIgnoreCase);
 
             using var container = LoggerExtensions.ProgressLog("Initializing", CreateContainer);
             using (var scope = container.BeginLifetimeScope())
@@ -46,9 +48,28 @@ namespace evocontest.Runner.Host
                     await screen.SleepAsync();
                 }
 
-                var workflow = scope.Resolve<MainWorkflow>();
-                await workflow.ExecuteAsync();
+                if (isMatch)
+                {
+                    var matchFilePath = args.Length > 1 ? args[1] : "match.zip";
+                    await LiveMatchWorkflow(matchFilePath, scope);
+                }
+                else
+                {
+                    await MainWorkflow(scope);
+                }
             }
+        }
+
+        private static async Task LiveMatchWorkflow(string matchFilePath, ILifetimeScope scope)
+        {
+            var workflow = scope.Resolve<LiveMatchWorkflow>();
+            await workflow.RunAsync(matchFilePath);
+        }
+
+        private static async Task MainWorkflow(ILifetimeScope scope)
+        {
+            var workflow = scope.Resolve<MainWorkflow>();
+            await workflow.ExecuteAsync();
         }
 
         private static IContainer CreateContainer()
