@@ -64,6 +64,7 @@ namespace evocontest.Runner.Host.Workflow
                     .Select(x => ("   " + submissionsById[x.SubmissionId].UserName, x.Rounds.Last().TotalMilliseconds))
                     .OrderBy(x => x.Item1).ToList();
 
+                Console.Clear();
                 Console.WriteLine();
                 Console.WriteLine();
                 DrawTimeDiagram(currentResult.Measurements.Max(x => x.Rounds.Count) - 1, 25, items);
@@ -149,7 +150,8 @@ namespace evocontest.Runner.Host.Workflow
             Console.WriteLine();
             foreach (var (label, value) in items)
             {
-                Action action = () => Console.WriteLine($"{label.PadRight(maxLabelWidth)}  [{new string('#', (int)(Math.Min(value, max) / max * Width)).PadRight(Width)}]  {value.ToString("0.00").PadLeft(7)} ms");
+                var valueString = value > 100000 ? "hibás eredmény".PadLeft(10) : value.ToString("0.00").PadLeft(7) + " ms";
+                Action action = () => Console.WriteLine($"{label.PadRight(maxLabelWidth)}  [{new string('#', (int)(Math.Min(value, max) / max * Width)).PadRight(Width)}]  {valueString}");
                 if (value > max)
                 {
                     TypeInColor(ConsoleColor.DarkGray, action);
