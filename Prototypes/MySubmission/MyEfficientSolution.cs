@@ -115,16 +115,16 @@ namespace MySubmission
                 var possibleReplacements = new List<Replacement>();
                 if (!upperTextSpan[i..Math.Min(upperTextSpan.Length, i + minLength)].Contains('.'))
                 {
+                    int skippedCharCount = 0;
                     var currentMaxLength = Math.Min(maxLength, upperTextSpan.Length - i);
                     for (var aLength = minLength; aLength <= currentMaxLength; aLength++)
                     {
                         if (upperTextSpan[i + aLength - 1] == '.') { break; } // Do not go through a sentence
-                        if (!wordIndexes[i + aLength - 1].IsNormalWordOrEndOfAcronym) { continue; } // Do not end mid acronym
+                        if (!wordIndexes[i + aLength - 1].IsNormalWordOrEndOfAcronym) { skippedCharCount++; continue; } // Do not end mid acronym
 
-                        //var part = upperText.AsSpan()[i..(i + aLength)];
-                        //var part = new string(upperTextSpan[i..(i + aLength)]);
                         var part = upperTextMemory[i..(i + aLength)];
-                        currentOccurrences = GetOccurences(upperText, part, 0, currentOccurrences);
+                        currentOccurrences = GetOccurences(upperText, part, skippedCharCount, currentOccurrences);
+                        skippedCharCount = 0;
                         if (currentOccurrences.Count > 1)
                         {
                             possibleReplacements.Add(new Replacement { Index = i, Length = aLength, Occurrences = currentOccurrences });
@@ -168,7 +168,7 @@ namespace MySubmission
             return replacements
                 .SelectMany(x => x.Occurrences
                     .Select(o => (Occurence: processedInput.WordIndexes[o].Index, Replacement: new Replacement { Index = o, Length = x.Length })))
-                .DistinctBy(x => x.Occurence) // TODO more efficient
+                .DistinctBy(x => x.Occurence)
                 .ToDictionary(x => x.Occurence, kvp => kvp.Replacement);
         }
 
@@ -179,14 +179,12 @@ namespace MySubmission
             var occurenceCount = occurences.Count;
             var phraseLength = replacement.Length;
 
-            // TODO parallelize?
             for (var i = 0; i < occurenceCount; i++)
             {
                 if (occurences[i] - 1 >= 0 && !wordIndexes[occurences[i] - 1].IsNormalWordOrEndOfAcronym) { return false; }
                 if (!wordIndexes[occurences[i] + phraseLength - 1].IsNormalWordOrEndOfAcronym) { return false; }
                 for (var j = i + 1; j < occurenceCount; j++)
                 {
-                    // TODO move to getOccurences and add sentenceEndCheck
                     if (occurences[j] - 1 >= 0 && !wordIndexes[occurences[j] - 1].IsNormalWordOrEndOfAcronym) { return false; }
                     if (!wordIndexes[occurences[j] + phraseLength - 1].IsNormalWordOrEndOfAcronym) { return false; }
 
@@ -208,14 +206,14 @@ namespace MySubmission
             return text.Slice(w1Pointer.Index, w1Pointer.Length);
         }
 
-        private List<int> GetOccurences(string text, ReadOnlyMemory<char> part, int searchFrom /* TODO remove parameter and checks */, List<int> searchAtPositions)
+        private List<int> GetOccurences(string text, ReadOnlyMemory<char> part, int skippedCharCount, List<int> searchAtPositions)
         {
             List<int> occurences;
             if (searchAtPositions == null)
             {
                 var partLength = part.Length;
                 var bags = new List<int>[4];
-                var rangePartitioner = Partitioner.Create(searchFrom, text.Length - partLength, (int)Math.Ceiling(text.Length / 4.0));
+                var rangePartitioner = Partitioner.Create(0, text.Length - partLength, (int)Math.Ceiling(text.Length / 4.0));
                 var parallelResult = Parallel.ForEach(rangePartitioner, new ParallelOptions { MaxDegreeOfParallelism = 4 }, (range, loopState, loopIndex) =>
                 {
                     var partSpan = part.Span;
@@ -241,12 +239,11 @@ namespace MySubmission
             {
                 var partSpan = part.Span;
                 occurences = new List<int>();
-                // TODO parallelize?
                 for (int i = 0; i < searchAtPositions.Count; i++)
                 {
                     var pos = searchAtPositions[i];
-                    if (pos < searchFrom || pos + part.Length > text.Length) { continue; }
-                    if (IsMatch(text, partSpan, pos, onlyCheckLastCharacter: true)) { occurences.Add(pos); }
+                    if (pos + part.Length > text.Length) { continue; }
+                    if (IsMatch(text, partSpan, pos, skippedCharCount)) { occurences.Add(pos); }
                 }
             }
 
@@ -254,11 +251,11 @@ namespace MySubmission
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool IsMatch(ReadOnlySpan<char> text, ReadOnlySpan<char> part, int pos, bool onlyCheckLastCharacter = false)
+        private static bool IsMatch(ReadOnlySpan<char> text, ReadOnlySpan<char> part, int pos, int skippedCharCount)
         {
             var partLength = part.Length;
-            var startIndex = onlyCheckLastCharacter ? partLength - 1 : 0;
-            if (onlyCheckLastCharacter)
+            var startIndex = partLength - 1 - skippedCharCount;
+            if (skippedCharCount == 0)
             {
                 return text[pos + startIndex] == part[startIndex];
             }
