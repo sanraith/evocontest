@@ -11,6 +11,8 @@ namespace evocontest.Runner.Host.Configuration
 
         public bool UseFanControl { get; set; } = false;
 
+        public bool UseConsoleColors { get; set; } = false;
+
         public bool IsDebug { get; set; } = false;
         
         public int FanGpio { get; set; } = 26;

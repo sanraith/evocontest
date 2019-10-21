@@ -30,21 +30,36 @@ namespace evocontest.Runner.Host.Workflow
 
         public async Task RunAsync(string matchFilePath)
         {
+            myFanControl.FanPower(true);
+            //await ConsoleUtilities.CountDown(myConfig.CoolDownSeconds, i => $"Processzor lehűtése... {i}", "Processzor lehűtve.");
             Console.Clear();
-            using (myFanControl.TurnOnTemporarily())
+
+            myFileManager.CleanTempDirectory();
+            if (!TryGetFileInfo(matchFilePath, out var matchZipFile)) { return; }
+
+            var workingDirectory = ExtractZipContents(matchZipFile);
+            var matchMetadata = await GetMatchMetadata(workingDirectory);
+
+            Console.WriteLine("Résztvevők: ");
+            Console.WriteLine();
+            foreach (var submission in matchMetadata.Submissions.OrderBy(x => x.UserName))
             {
-                await ConsoleUtilities.CountDown(myConfig.CoolDownSeconds, i => $"Processzor lehűtése... {i}", "Processzor lehűtve.");
-
-                myFileManager.CleanTempDirectory();
-                if (!TryGetFileInfo(matchFilePath, out var matchZipFile)) { return; }
-
-                var workingDirectory = ExtractZipContents(matchZipFile);
-                var matchMetadata = await GetMatchMetadata(workingDirectory);
-                var downloadedSubmissions = await SortSubmissionAssemblies(matchMetadata, workingDirectory);
-
-                var result = await RunMatch(downloadedSubmissions);
-                SaveMatchResult(result);
+                Console.WriteLine($"  {submission.UserName.PadRight(matchMetadata.Submissions.Max(x => x.UserName.Length))} - {submission.UploadDate.ToString("yyyy. MM. dd. HH:mm:ss")}");
             }
+            Console.WriteLine();
+            Console.Write("Mehet? (y | N) ");
+            var confirm = Console.ReadLine();
+            Console.WriteLine();
+            if (!confirm.StartsWith("y", StringComparison.OrdinalIgnoreCase))
+            {
+                Console.WriteLine("Megszakítva.");
+                return;
+            }
+
+            var downloadedSubmissions = await SortSubmissionAssemblies(matchMetadata, workingDirectory);
+
+            var result = await RunMatch(downloadedSubmissions);
+            SaveMatchResult(result);
         }
 
         private async Task<MatchContainer> RunMatch(List<DownloadedSubmission> downloadedSubmissions)
@@ -62,15 +77,14 @@ namespace evocontest.Runner.Host.Workflow
                 var items = currentResult.Measurements
                     .Where(x => !myCompletedSubmissions.Contains(submissionsById[x.SubmissionId]) || x.Rounds.Count == currentResult.Measurements.Max(x => x.Rounds.Count))
                     .Select(x => ("   " + submissionsById[x.SubmissionId].UserName, x.Rounds.Last().TotalMilliseconds))
-                    .OrderBy(x => x.Item1).ToList();
+                    .OrderBy(x => x.Item2).ToList();
 
                 Console.Clear();
                 Console.WriteLine();
-                Console.WriteLine();
+                //Console.WriteLine();
                 DrawTimeDiagram(currentResult.Measurements.Max(x => x.Rounds.Count) - 1, 25, items);
                 Console.WriteLine();
                 DrawResultsTable(currentResult, downloadedSubmissions.Count - downloadedSubmissions.Count(x => x.Data.IsAdmin));
-                Console.WriteLine();
                 Console.ReadLine();
 
                 SaveMatchResult(currentResult);
@@ -105,7 +119,6 @@ namespace evocontest.Runner.Host.Workflow
                     Console.WriteLine(" --- Részeredmények ---");
                 }
             });
-            Console.WriteLine();
             var currentPlace = totalPlaceCount - myCompletedSubmissions.Count(x => !x.IsAdmin) + 1;
             var maxNameLength = myCompletedSubmissions.Max(x => x.UserName.Length);
 
@@ -126,6 +139,7 @@ namespace evocontest.Runner.Host.Workflow
                     resultString = "DNF";
                 }
                 var color = submission.IsAdmin ? ConsoleColor.DarkGray : ConsoleColor.White;
+                Console.WriteLine();
                 TypeInColor(color, () =>
                     Console.WriteLine($" {(submission.IsAdmin ? "  " : $"{currentPlace++}.")} {submission.UserName.PadRight(maxNameLength)} - {resultString}")
                 );
@@ -151,7 +165,7 @@ namespace evocontest.Runner.Host.Workflow
             foreach (var (label, value) in items)
             {
                 var valueString = value > 100000 ? "hibás eredmény".PadLeft(10) : value.ToString("0.00").PadLeft(7) + " ms";
-                Action action = () => Console.WriteLine($"{label.PadRight(maxLabelWidth)}  [{new string('#', (int)(Math.Min(value, max) / max * Width)).PadRight(Width)}]  {valueString}");
+                Action action = () => Console.WriteLine($"{label.PadRight(maxLabelWidth)}  [{new string('#', (int)(Math.Min(value, max) / max * Width)).PadRight(Width)}]{(value > max ? '*' : ' ')}  {valueString}");
                 if (value > max)
                 {
                     TypeInColor(ConsoleColor.DarkGray, action);
@@ -163,12 +177,19 @@ namespace evocontest.Runner.Host.Workflow
             }
         }
 
-        private static void TypeInColor(ConsoleColor color, Action action)
+        private void TypeInColor(ConsoleColor color, Action action)
         {
-            var prevColor = Console.ForegroundColor;
-            Console.ForegroundColor = color;
-            action();
-            Console.ForegroundColor = prevColor;
+            if (myConfig.UseConsoleColors)
+            {
+                var prevColor = Console.ForegroundColor;
+                Console.ForegroundColor = color;
+                action();
+                Console.ForegroundColor = prevColor;
+            }
+            else
+            {
+                action();
+            }
         }
 
         private static void SaveMatchResult(MatchContainer matchResult)

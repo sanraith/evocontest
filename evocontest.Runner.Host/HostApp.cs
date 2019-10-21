@@ -97,7 +97,11 @@ namespace evocontest.Runner.Host
             if (config.UseEpaperDisplay)
             {
                 builder.RegisterType<Waveshare213EpaperDisplay>().As<IEpaperDisplay>().SingleInstance()
-                    .OnRelease(x => x.DisposeAsync().GetAwaiter().GetResult());
+                    .OnRelease(x =>
+                    {
+                        x.ClearAsync().GetAwaiter().GetResult();
+                        x.DisposeAsync().GetAwaiter().GetResult();
+                    });
             }
             else
             {
