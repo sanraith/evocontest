@@ -40,7 +40,7 @@ namespace evocontest.Runner.Host
                 using (var image = new Image<Rgba32>(ImageSharpConfig.Default, screen.Width, screen.Height, Rgba32.White))
                 {
                     image.Mutate(x => x.DrawText(new TextGraphicsOptions { Antialias = false },
-                        "evocontest Runner",
+                        config.EpaperText,
                         RpiFonts.Roboto.CreateFont(24), Rgba32.Black, new PointF(10, 10)));
 
                     await screen.InitializeAsync(RefreshMode.Full);

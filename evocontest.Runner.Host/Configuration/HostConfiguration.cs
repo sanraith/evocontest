@@ -9,6 +9,8 @@ namespace evocontest.Runner.Host.Configuration
 
         public bool UseEpaperDisplay { get; set; } = false;
 
+        public string EpaperText { get; set; } = string.Empty;
+
         public bool UseFanControl { get; set; } = false;
 
         public bool UseConsoleColors { get; set; } = false;
