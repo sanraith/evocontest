@@ -31,7 +31,7 @@ RPI --> BE
 
 ## Submitting a solution
 
-After submitting a solution, a static analysis is performed on the server, and tests are run on the reference system. 
+After submitting a solution, simple static analysis is performed on the server, then static analysis and tests are run on the reference system. 
 
 ```mermaid
 sequenceDiagram
@@ -103,12 +103,13 @@ loop for each Submission
 	activate sub
 	slave -->> sub: Static analysis
 	slave -->> host: Static analysis results
+	host --x cloud: Upload static results
 	slave ->> sub: Unit tests
 	deactivate sub
 	slave -->> host: Test results
 	deactivate slave
+	host --x cloud: Upload test results
 end
-host ->> cloud: Upload results
 ```
 
 ## Run performance measurements
@@ -172,8 +173,8 @@ loop while avg runtime &lt; 100ms
 		deactivate sub
 		slave ->> slave: Validate results
 		slave -->> host: Partial results
-		host ->> slave: Destroy
 		deactivate slave
 	end
+	host ->> slave: Destroy
 end
 ```
