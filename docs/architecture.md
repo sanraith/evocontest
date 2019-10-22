@@ -171,8 +171,8 @@ loop while avg runtime &lt; 100ms
 		slave ->> sub: Measure
 		Note right of sub: hard input
 		deactivate sub
-		slave ->> slave: Validate results
 		slave -->> host: Partial results
+		host ->> host: Validate results
 		deactivate slave
 	end
 	host ->> slave: Destroy
