@@ -10,15 +10,17 @@ using Microsoft.EntityFrameworkCore;
 using evocontest.WebApp.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using evocontest.WebApp.Data.Helper;
+using evocontest.WebApp.Core;
 
 namespace evocontest.WebApp.Controllers
 {
     public class HomeController : Controller
     {
-        public HomeController(ContestDb database, UserManager<ApplicationUser> userManager)
+        public HomeController(ContestDb database, UserManager<ApplicationUser> userManager, ISubmissionManager submissionManager)
         {
             myDb = database;
             myUserManager = userManager;
+            mySubmissionManager = submissionManager;
         }
 
         public IActionResult Index()
@@ -83,6 +85,16 @@ namespace evocontest.WebApp.Controllers
             });
         }
 
+        public async Task<IActionResult> DownloadSubmission(string submissionId)
+        {
+            var (fileStream, originalFileName) = await mySubmissionManager.DownloadSubmission(submissionId);
+            if (fileStream == null)
+            {
+                return NotFound();
+            }
+            return File(fileStream, "application/x-msdownload", originalFileName);
+        }
+
         public IActionResult Privacy()
         {
             return View();
@@ -96,5 +108,6 @@ namespace evocontest.WebApp.Controllers
 
         private readonly ContestDb myDb;
         private readonly UserManager<ApplicationUser> myUserManager;
+        private readonly ISubmissionManager mySubmissionManager;
     }
 }

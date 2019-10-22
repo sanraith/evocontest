@@ -3,6 +3,7 @@
 @using evocontest.WebApp.Data;
 @using evocontest.WebApp.ViewModels;
 @using evocontest.WebApp.Common.Data;
+@using evocontest.WebApp.Controllers;
 @model RankingsViewModel
 
 @{
@@ -97,10 +98,13 @@
                                         <span class="font-italic small">(Versenyen kívül)</span><br />
                                         @measurement.Submission.User.FullName
                                     </div>
+                                    @Html.ActionLink("[dll letöltés]", nameof(HomeController.DownloadSubmission), "Home", new { submissionId = measurement.Submission.Id })
                                 }
                                 else
                                 {
                                     @measurement.Submission.User.FullName
+                                    <br />
+                                    @Html.ActionLink("[dll letöltés]", nameof(HomeController.DownloadSubmission), "Home", new { submissionId = measurement.Submission.Id })
                                 }
                             </td>
                             <td style="vertical-align:middle">
